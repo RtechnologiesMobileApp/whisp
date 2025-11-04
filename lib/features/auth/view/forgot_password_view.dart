@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
-import 'package:whisp/features/auth/widgets/custom_text_field.dart';
-import 'package:whisp/features/auth/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_text_field.dart';
+import 'package:whisp/core/widgets/custom_button.dart';
  
 
 class ForgetPasswordView extends GetView<ForgetPasswordController> {

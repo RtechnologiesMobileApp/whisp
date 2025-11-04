@@ -3,12 +3,14 @@ import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
-import 'package:whisp/features/auth/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_button.dart';
+import 'package:whisp/features/auth/controllers/login_controller.dart';
 import '../controllers/signup_controller.dart';
-import '../widgets/custom_text_field.dart';
+import '../../../core/widgets/custom_text_field.dart';
 
 class SignupView extends GetView<SignupController> {
   SignupView({super.key});
+    final LoginController loginController = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -77,37 +79,7 @@ class SignupView extends GetView<SignupController> {
     }),
   ),
 
-              // GestureDetector(
-              //   onTap: controller.pickImage, // 👈 open image picker
-              //   child: Obx(() {
-              //     return Stack(
-              //       alignment: Alignment.bottomRight,
-              //       children: [
-              //         CircleAvatar(
-              //           radius: 45,
-              //           backgroundImage: controller.selectedImage.value != null
-              //               ? FileImage(controller.selectedImage.value!)
-              //               : const AssetImage(AppImages.placeholderpic)
-              //                     as ImageProvider,
-              //           backgroundColor: Colors.grey[200],
-              //         ),
-              //         Container(
-              //           padding: const EdgeInsets.all(6),
-              //           decoration: const BoxDecoration(
-              //             color: AppColors.secondary,
-              //             shape: BoxShape.circle,
-              //           ),
-              //           child: const Icon(
-              //             Icons.edit,
-              //             size: 18,
-              //             color: Colors.white,
-              //           ),
-              //         ),
-              //       ],
-              //     );
-              //   }),
-              // ),
-       
+           
        
               const SizedBox(height: 6),
               const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
@@ -211,15 +183,18 @@ class SignupView extends GetView<SignupController> {
               const Text('or Signup with'),
 
               const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                height: 50,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Image.asset(AppImages.googleLogo, height: 24),
+              InkWell(
+                onTap: loginController.googleSignIn,
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Image.asset(AppImages.googleLogo, height: 24),
+                  ),
                 ),
               ),
 

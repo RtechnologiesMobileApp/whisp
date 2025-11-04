@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/features/auth/repo/auth_repo.dart';
 
 class SignupController extends GetxController {
   final nameController = TextEditingController();
@@ -13,7 +14,8 @@ class SignupController extends GetxController {
   final dobController = TextEditingController();
   final Rx<File?> selectedImage = Rx<File?>(null);
   final acceptTerms = false.obs;
-
+  final isLoading = false.obs;
+ final AuthRepository _authRepo = Get.find<AuthRepository>();
   void toggleTerms(bool? value) {
     acceptTerms.value = value ?? false;
   }
@@ -43,16 +45,40 @@ class SignupController extends GetxController {
       dobController.text = DateFormat('dd MMM yyyy').format(pickedDate);
     }
   }
-  void createAccount() {
+  Future<void> createAccount() async {
     if (!acceptTerms.value) {
-  
-    Get.snackbar('Terms Required', 'Please accept terms and conditions.');
+      Get.snackbar('Terms Required', 'Please accept terms and conditions.');
       return;
     }
-    print("Navigating to gender screen...");
-print(AppPages.routes.map((r) => r.name).toList());
-   //   Get.offNamed(Routes.genderview);
-   Get.toNamed(Routes.genderview);
 
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        dobController.text.isEmpty) {
+      Get.snackbar('Error', 'Please fill all fields');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final response = await _authRepo.signup(
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+        dob: dobController.text.trim(),
+      );
+
+      Get.snackbar("Success", "Account created successfully");
+      print("Signup Response: $response");
+
+      Get.toNamed(Routes.login);
+    } catch (e) {
+      Get.snackbar("Signup Failed", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
   }
+    
+
+
 }

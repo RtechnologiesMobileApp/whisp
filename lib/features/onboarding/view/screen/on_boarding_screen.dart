@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/features/onboarding/controller/onboarding_controller.dart';
 import 'package:whisp/utils/colors.dart';
 
@@ -31,9 +32,17 @@ class OnboardingScreen extends StatelessWidget {
                 child: PageView.builder(
                   controller: pageController,
                   itemCount: controller.onBoardingData.length,
-                  onPageChanged: (index) {
-                    controller.currentPage.value = index;
-                  },
+                 onPageChanged: (index) {
+  controller.currentPage.value = index;
+
+  // 👇 If last page reached, wait a moment then navigate
+  if (index == controller.onBoardingData.length - 1) {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Get.offAllNamed(Routes.signup); // or Get.offAll(() => SignupScreen());
+    });
+  }
+},
+
                   itemBuilder: (context, index) {
                     final item = controller.onBoardingData[index];
                     return Column(

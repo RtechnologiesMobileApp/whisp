@@ -1,10 +1,15 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/features/auth/models/user_model.dart';
+import 'package:whisp/features/auth/repo/auth_repo.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+    final AuthRepository _authRepository = Get.find<AuthRepository>();
+   var isLoading = false.obs;
+  UserModel? currentUser;
 
   void login() {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
@@ -21,8 +26,26 @@ class LoginController extends GetxController {
  
   }
 
-  void googleSignIn() {
-    Get.snackbar("Google", "Google sign-in coming soon!");
+  Future<void> googleSignIn() async {
+    try {
+      isLoading.value = true;
+
+      final result = await _authRepository.signInWithGoogle();
+      isLoading.value = false;
+
+      if (result["success"]) {
+        currentUser = result["user"];
+        Get.snackbar("Success", "Welcome ${currentUser?.name ?? ''}!");
+
+       
+        Get.offAllNamed(Routes.genderview);  
+      } else {
+        Get.snackbar("Error", result["message"] ?? "Something went wrong");
+      }
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar("Error", e.toString());
+    }
   }
 
   void goToSignup() {

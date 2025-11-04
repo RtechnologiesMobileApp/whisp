@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 import '../controllers/gender_controller.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/widgets/custom_button.dart';
 
 class GenderView extends GetView<GenderController> {
   const GenderView({super.key});
@@ -18,7 +19,7 @@ class GenderView extends GetView<GenderController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.toNamed( Routes.signup),
         ),
        
         centerTitle: false,

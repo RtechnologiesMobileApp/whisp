@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whisp/features/auth/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_button.dart';
 
 class EnterOtpView extends StatefulWidget {
   const EnterOtpView({super.key});

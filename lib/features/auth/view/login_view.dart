@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/auth/controllers/login_controller.dart';
-import 'package:whisp/features/auth/widgets/custom_text_field.dart';
+import 'package:whisp/core/widgets/custom_text_field.dart';
 
-import 'package:whisp/features/auth/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_button.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});

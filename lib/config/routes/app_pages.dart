@@ -8,6 +8,7 @@ import 'package:whisp/features/auth/view/forgot_password_view.dart';
 import 'package:whisp/features/auth/view/gender_view.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
 import 'package:whisp/features/auth/view/signup_view.dart';
+import 'package:whisp/features/onboarding/view/screen/spalsh_screen.dart';
 
 part 'app_routes.dart';
 
@@ -37,6 +38,11 @@ GetPage(
   name: Routes.enterOtp,
   page: () => const EnterOtpView(),
 ),
+GetPage(
+  name: Routes.splash,
+  page: () => const SplashScreen(),
+),
+
 
 
 

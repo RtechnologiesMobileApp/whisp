@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1036495319175",
+    "project_id": "wisp-f8adf",
+    "storage_bucket": "wisp-f8adf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036495319175:android:8e1b640e0ae764cc504822",
+        "android_client_info": {
+          "package_name": "com.example.whisp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1036495319175-7gjsc4qgh45fr3qc7o3gckmedp9s42ib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whisp",
+            "certificate_hash": "4d6d51fca5786b06ff2f6405d23b25e4d750cf41"
+          }
+        },
+        {
+          "client_id": "1036495319175-ri7l0crshtrvek24eqsenn6f763dr2k1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1MOLq70zfgtzKiC6I7USX886_NB46fJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1036495319175-ri7l0crshtrvek24eqsenn6f763dr2k1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1036495319175-bj235udmr5c01nh9cp5aq6mqp6tmoqgq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.whisp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
