@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whisp/routes/app_pages.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 
 void main() {
   runApp(const MyApp());

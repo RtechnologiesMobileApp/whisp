@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/auth/widgets/custom_button.dart';
 import '../controllers/signup_controller.dart';
 import '../widgets/custom_text_field.dart';
 
 class SignupView extends GetView<SignupController> {
    SignupView({super.key});
-   @override
-     final controller = Get.put(SignupController());
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class SignupView extends GetView<SignupController> {
 
               // Whisp Logo
               const SizedBox(height: 6),
-              Image.asset('assets/images/logo.png', height: 60),
+              Image.asset(AppImages.logo, height: 60),
 
               const SizedBox(height: 20),
 
@@ -41,7 +41,7 @@ class SignupView extends GetView<SignupController> {
                 children: [
                   CircleAvatar(
                     radius: 45,
-                    backgroundImage: const AssetImage('assets/images/avatar.png'),
+                    backgroundImage: const AssetImage('assets/images/logo.png'),
                     backgroundColor: Colors.grey[200],
                   ),
                   Container(
