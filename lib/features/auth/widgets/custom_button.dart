@@ -1,5 +1,6 @@
  
 import 'package:flutter/material.dart';
+import 'package:whisp/config/constants/colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -15,8 +16,8 @@ class CustomButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.color = const Color(0xFFD32FE8),
-    this.textColor = Colors.white,
+    this.color = AppColors.primary,
+    this.textColor = AppColors.white,
     this.height = 52,
     this.borderRadius = 12,
     this.isLoading = false,

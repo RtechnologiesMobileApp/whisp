@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/features/auth/widgets/custom_button.dart';
@@ -24,61 +25,94 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 20),
 
               // Welcome Text
-                     Column(
-  children: [
-    const Text(
-      "Welcome To",
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-    ),
-    Transform.translate(
-      offset: const Offset(0, -10), // 👈 slightly moves logo upward
-      child: Image.asset(
-        AppImages.logo,
-        height: 115,
-      ),
-    ),
-  ],
-),
-         
+              Column(
+                children: [
+                  const Text(
+                    "Welcome To",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Transform.translate(
+                    offset: const Offset(
+                      0,
+                      -20,
+                    ), // 👈 slightly moves logo upward
+                    child: Image.asset(AppImages.logo, height: 120),
+                  ),
+                ],
+              ),
 
-              
               // Avatar Section
               GestureDetector(
-                onTap: controller.pickImage, // 👈 open image picker
-                child: Obx(() {
-                  return Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundImage: controller.selectedImage.value != null
-                            ? FileImage(controller.selectedImage.value!)
-                            : const AssetImage(AppImages.placeholderpic)
-                                  as ImageProvider,
-                        backgroundColor: Colors.grey[200],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFD90166),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.edit,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  );
-                }),
+    onTap: controller.pickImage,
+    child: Obx(() {
+      return Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topRight, // 👈 edit icon now top-right
+        children: [
+          CircleAvatar(
+            radius: 55, // 👈 slightly larger avatar
+            backgroundImage: controller.selectedImage.value != null
+                ? FileImage(controller.selectedImage.value!)
+                : const AssetImage(AppImages.placeholderpic) as ImageProvider,
+            backgroundColor: Colors.grey[200],
+          ),
+          Positioned(
+            top: -3, // slight adjustment to sit nicely
+            right: -3,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
               ),
+              child: const Icon(
+                Icons.edit,
+                size: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+    }),
+  ),
+
+              // GestureDetector(
+              //   onTap: controller.pickImage, // 👈 open image picker
+              //   child: Obx(() {
+              //     return Stack(
+              //       alignment: Alignment.bottomRight,
+              //       children: [
+              //         CircleAvatar(
+              //           radius: 45,
+              //           backgroundImage: controller.selectedImage.value != null
+              //               ? FileImage(controller.selectedImage.value!)
+              //               : const AssetImage(AppImages.placeholderpic)
+              //                     as ImageProvider,
+              //           backgroundColor: Colors.grey[200],
+              //         ),
+              //         Container(
+              //           padding: const EdgeInsets.all(6),
+              //           decoration: const BoxDecoration(
+              //             color: AppColors.secondary,
+              //             shape: BoxShape.circle,
+              //           ),
+              //           child: const Icon(
+              //             Icons.edit,
+              //             size: 18,
+              //             color: Colors.white,
+              //           ),
+              //         ),
+              //       ],
+              //     );
+              //   }),
+              // ),
+       
+       
               const SizedBox(height: 6),
               const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
 
- 
               const SizedBox(height: 6),
-             
 
               const SizedBox(height: 20),
 
@@ -125,10 +159,29 @@ class SignupView extends GetView<SignupController> {
                     Checkbox(
                       value: controller.acceptTerms.value,
                       onChanged: controller.toggleTerms,
-                      activeColor: Colors.purple,
+                      activeColor:
+                          AppColors.primary, // ✅ check fill color when checked
+                      checkColor:
+                          Colors.white, // ✅ color of the checkmark inside
+                      side: const BorderSide(
+                        // ✅ border color when unchecked
+                        color: AppColors.secondary,
+                        width: 2,
+                      ),
+                      fillColor: MaterialStateProperty.resolveWith<Color>((
+                        Set<MaterialState> states,
+                      ) {
+                        if (states.contains(MaterialState.selected)) {
+                          return AppColors.primary; // when checked
+                        }
+                        return Colors.transparent; // when unchecked
+                      }),
                     ),
-                    const Text('Accept ',
-                    style: TextStyle(color: Color(0xFFD90166)),),
+
+                    const Text(
+                      'Accept ',
+                      style: TextStyle(color: AppColors.secondary),
+                    ),
                     GestureDetector(
                       onTap: () {},
                       child: const Text(
@@ -202,6 +255,8 @@ class SignupView extends GetView<SignupController> {
 
               SizedBox(height: size.height * 0.05),
             ],
+        
+        
           ),
         ),
       ),

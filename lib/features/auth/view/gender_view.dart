@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import '../controllers/gender_controller.dart';
 import '../widgets/custom_button.dart';
 
@@ -73,10 +74,10 @@ class GenderView extends GetView<GenderController> {
         width: double.infinity,
         height: 50,
         decoration: BoxDecoration(
-          color: isSelected ? Colors.purple : Colors.white,
+          color: isSelected ? AppColors.primary : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.purple : Colors.grey.shade300,
+            color: isSelected ? AppColors.primary : Colors.grey.shade300,
             width: 1.2,
           ),
         ),
