@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Whisp',
       debugShowCheckedModeBanner: false,
       initialRoute: Routes.signup, // 👈 starting route
-      getPages: AppPages.pages, // 👈 routes with bindings
+      getPages: AppPages.routes, // 👈 routes with bindings
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

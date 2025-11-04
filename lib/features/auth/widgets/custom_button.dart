@@ -1,3 +1,4 @@
+ 
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
@@ -8,16 +9,18 @@ class CustomButton extends StatelessWidget {
   final double height;
   final double borderRadius;
   final bool isLoading;
+  final String? iconPath; // 👈 new optional parameter for asset icon
 
   const CustomButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.color = Colors.purple,
+    this.color = const Color(0xFFD32FE8),
     this.textColor = Colors.white,
     this.height = 52,
     this.borderRadius = 12,
     this.isLoading = false,
+    this.iconPath,
   });
 
   @override
@@ -42,13 +45,27 @@ class CustomButton extends StatelessWidget {
                   strokeWidth: 2,
                 ),
               )
-            : Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (iconPath != null) ...[
+                    Image.asset(
+                      iconPath!,
+                      height: 22,
+                      width: 22,
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
       ),
     );
