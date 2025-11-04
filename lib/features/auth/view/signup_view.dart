@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/features/auth/widgets/custom_button.dart';
 import '../controllers/signup_controller.dart';
 import '../widgets/custom_text_field.dart';
 
 class SignupView extends GetView<SignupController> {
-   SignupView({super.key});
- 
+  SignupView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,39 +25,94 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 20),
 
               // Welcome Text
-              const Text(
-                'Welcome To',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-              ),
-
-              // Whisp Logo
-              const SizedBox(height: 6),
-              Image.asset(AppImages.logo, height: 60),
-
-              const SizedBox(height: 20),
-
-              // Avatar
-              Stack(
-                alignment: Alignment.bottomRight,
+              Column(
                 children: [
-                  CircleAvatar(
-                    radius: 45,
-                    backgroundImage: const AssetImage('assets/images/logo.png'),
-                    backgroundColor: Colors.grey[200],
+                  const Text(
+                    "Welcome To",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                  Transform.translate(
+                    offset: const Offset(
+                      0,
+                      -20,
+                    ), // 👈 slightly moves logo upward
+                    child: Image.asset(AppImages.logo, height: 120),
                   ),
                 ],
               ),
+
+              // Avatar Section
+              GestureDetector(
+    onTap: controller.pickImage,
+    child: Obx(() {
+      return Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topRight, // 👈 edit icon now top-right
+        children: [
+          CircleAvatar(
+            radius: 55, // 👈 slightly larger avatar
+            backgroundImage: controller.selectedImage.value != null
+                ? FileImage(controller.selectedImage.value!)
+                : const AssetImage(AppImages.placeholderpic) as ImageProvider,
+            backgroundColor: Colors.grey[200],
+          ),
+          Positioned(
+            top: -3, // slight adjustment to sit nicely
+            right: -3,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.edit,
+                size: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+    }),
+  ),
+
+              // GestureDetector(
+              //   onTap: controller.pickImage, // 👈 open image picker
+              //   child: Obx(() {
+              //     return Stack(
+              //       alignment: Alignment.bottomRight,
+              //       children: [
+              //         CircleAvatar(
+              //           radius: 45,
+              //           backgroundImage: controller.selectedImage.value != null
+              //               ? FileImage(controller.selectedImage.value!)
+              //               : const AssetImage(AppImages.placeholderpic)
+              //                     as ImageProvider,
+              //           backgroundColor: Colors.grey[200],
+              //         ),
+              //         Container(
+              //           padding: const EdgeInsets.all(6),
+              //           decoration: const BoxDecoration(
+              //             color: AppColors.secondary,
+              //             shape: BoxShape.circle,
+              //           ),
+              //           child: const Icon(
+              //             Icons.edit,
+              //             size: 18,
+              //             color: Colors.white,
+              //           ),
+              //         ),
+              //       ],
+              //     );
+              //   }),
+              // ),
+       
+       
               const SizedBox(height: 6),
-              const Text('Select Avatar',
-                  style: TextStyle(color: Colors.grey)),
+              const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
+
+              const SizedBox(height: 6),
 
               const SizedBox(height: 20),
 
@@ -81,57 +137,74 @@ class SignupView extends GetView<SignupController> {
                 isPassword: true,
               ),
               const SizedBox(height: 14),
-              CustomTextField(
-                controller: controller.dobController,
-                hint: 'Date of Birth',
-                icon: Icons.calendar_today,
+              GestureDetector(
+                onTap: () => controller.pickDate(context),
+                child: AbsorbPointer(
+                  // prevent keyboard from opening
+                  child: CustomTextField(
+                    controller: controller.dobController,
+                    hint: 'Date of Birth',
+                    icon: Icons.calendar_today,
+                    keyboardType: TextInputType.datetime,
+                  ),
+                ),
               ),
 
               const SizedBox(height: 12),
 
               // Terms Checkbox
-              Obx(() => Row(
-                    children: [
-                      Checkbox(
-                        value: controller.acceptTerms.value,
-                        onChanged: controller.toggleTerms,
-                        activeColor: Colors.purple,
+              Obx(
+                () => Row(
+                  children: [
+                    Checkbox(
+                      value: controller.acceptTerms.value,
+                      onChanged: controller.toggleTerms,
+                      activeColor:
+                          AppColors.primary, // ✅ check fill color when checked
+                      checkColor:
+                          Colors.white, // ✅ color of the checkmark inside
+                      side: const BorderSide(
+                        // ✅ border color when unchecked
+                        color: AppColors.secondary,
+                        width: 2,
                       ),
-                      const Text('Accept '),
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Text(
-                          'Terms and Conditions',
-                          style: TextStyle(
-                              color: Colors.red,
-                              decoration: TextDecoration.underline),
+                      fillColor: MaterialStateProperty.resolveWith<Color>((
+                        Set<MaterialState> states,
+                      ) {
+                        if (states.contains(MaterialState.selected)) {
+                          return AppColors.primary; // when checked
+                        }
+                        return Colors.transparent; // when unchecked
+                      }),
+                    ),
+
+                    const Text(
+                      'Accept ',
+                      style: TextStyle(color: AppColors.secondary),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Text(
+                        'Terms and Conditions',
+                        style: TextStyle(
+                          color: Colors.black,
+                          decoration: TextDecoration.underline,
                         ),
-                      )
-                    ],
-                  )),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 12),
 
               // Create Account Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                 child: CustomButton(
-  text: 'Create Account',
-  onPressed: controller.createAccount,
-),
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.purple,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(12),
-                //     ),
-                //   ),
-                //   onPressed: controller.createAccount,
-                //   child: const Text(
-                //     'Create Account',
-                //     style: TextStyle(fontSize: 16, color: Colors.white),
-                //   ),
-                // ),
+                child: CustomButton(
+                  text: 'Create Account',
+                  onPressed: controller.createAccount,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -146,25 +219,35 @@ class SignupView extends GetView<SignupController> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Image.asset('assets/images/google.png', height: 24),
+                  child: Image.asset(AppImages.googleLogo, height: 24),
                 ),
               ),
 
               const SizedBox(height: 20),
 
+              // Sign up link
+              // Sign up text link section
               GestureDetector(
-                onTap: () => Get.back(),
-                child: const Text.rich(
-                  TextSpan(
-                    text: 'Already have an account? ',
-                    style: TextStyle(color: Colors.grey),
+                onTap: () =>
+                    Get.toNamed(Routes.login), // ✅ navigate to login route
+                child: RichText(
+                  text: const TextSpan(
+                    text: "Don’t have an account? ",
+                    style: TextStyle(
+                      color: Color(0xFFD90166), // whole text in #D90166
+                      fontSize: 14,
+                    ),
                     children: [
                       TextSpan(
-                        text: 'Sign in',
+                        text: "Sign in",
                         style: TextStyle(
-                            color: Colors.purple,
-                            fontWeight: FontWeight.w600),
-                      )
+                          color: Color(0xFFD90166),
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration
+                              .underline, // underline only for “Sign up”
+                          decorationColor: Color(0xFFD90166),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -172,6 +255,8 @@ class SignupView extends GetView<SignupController> {
 
               SizedBox(height: size.height * 0.05),
             ],
+        
+        
           ),
         ),
       ),
