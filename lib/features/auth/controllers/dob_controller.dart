@@ -1,27 +1,65 @@
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:get/get.dart' hide FormData;
+import 'package:intl/intl.dart';
+import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
+import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
+import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/features/auth/models/user_model.dart';
 
 class DobController extends GetxController {
   var selectedDate = DateTime(2000, 1, 1).obs;
   var isLoading = false.obs;
 
+  final Dio dio = Dio();
+  final manager = SharedPreferencesManager.instance;
+  final constants = SharedPreferencesConstants.instance;
+
   Future<void> saveDateOfBirth() async {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    // TODO: Integrate API call or Firebase update later
-    await Future.delayed(const Duration(seconds: 1));
+      final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+      final token = await manager.getString(key: constants.userTokenConstant);
 
-    // Example: Navigate to next screen
-    Get.snackbar(
-      'Success',
-      'Date of Birth saved: ${selectedDate.value.toLocal().toString().split(' ')[0]}',
-      backgroundColor: Colors.greenAccent,
-      colorText: Colors.white,
-    );
+      // ✅ Correct FormData creation
+      final formData = FormData.fromMap({
+        "dateOfBirth": formattedDate,
+      });
 
-    // Navigate to next screen (replace with your route)
-    // Get.to(() => const NextScreen());
+      final response = await dio.put(
+        ApiEndpoints.updateProfile,
+        data: formData,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "multipart/form-data",
+          },
+        ),
+      );
 
-    isLoading.value = false;
+      print("✅ DOB updated: ${response.data}");
+      Get.snackbar("Success", "Date of Birth updated successfully");
+
+print('Navigating to: ${Routes.country}');
+ 
+      // Save updated user locally
+      final Map<String, dynamic>? userJson =
+          (response.data is Map) ? response.data['user'] as Map<String, dynamic>? : null;
+      if (userJson != null) {
+        await manager.saveUser(UserModel.fromJson(userJson));
+      }
+
+      Get.toNamed(Routes.country);
+    } on DioException catch (e) {
+      print("❌ Dio error: ${e.response?.data ?? e.message}");
+      Get.snackbar("Error", "Server error: ${e.response?.statusCode ?? e.message}");
+    } catch (e) {
+      print("❌ Unexpected error: $e");
+      Get.snackbar("Error", "Failed to update Date of Birth");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

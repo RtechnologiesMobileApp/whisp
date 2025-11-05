@@ -107,18 +107,18 @@ class SignupView extends GetView<SignupController> {
                 isPassword: true,
               ),
               const SizedBox(height: 14),
-              GestureDetector(
-                onTap: () => controller.pickDate(context),
-                child: AbsorbPointer(
-                  // prevent keyboard from opening
-                  child: CustomTextField(
-                    controller: controller.dobController,
-                    hint: 'Date of Birth',
-                    icon: Icons.calendar_today,
-                    keyboardType: TextInputType.datetime,
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () => controller.pickDate(context),
+              //   child: AbsorbPointer(
+              //     // prevent keyboard from opening
+              //     child: CustomTextField(
+              //       controller: controller.dobController,
+              //       hint: 'Date of Birth',
+              //       icon: Icons.calendar_today,
+              //       keyboardType: TextInputType.datetime,
+              //     ),
+              //   ),
+              // ),
 
               const SizedBox(height: 12),
 

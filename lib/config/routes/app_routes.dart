@@ -12,5 +12,9 @@ abstract class Routes {
  
   static const enterOtp = '/enter-otp';
   static const profile = '/profile';
+  static const country= '/country';
+  static const welcomehome = '/welcohome';
+  static const resetPassword = '/reset-password';
  
 }
+  

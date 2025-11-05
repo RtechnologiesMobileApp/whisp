@@ -5,7 +5,7 @@ import 'package:whisp/features/Chats/view/chat_list_screen.dart';
 import 'package:whisp/features/friends/view/screen/friend_screen.dart';
 import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class MainHomeScreen extends StatelessWidget {
   final RxInt _selectedIndex = 0.obs;
 
   final List<Widget> _screens = [
@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
     PremiumScreen(),
   ];
 
-  HomeScreen({super.key});
+  MainHomeScreen({super.key});
 
   void _onItemTapped(int index) {
     _selectedIndex.value = index;
