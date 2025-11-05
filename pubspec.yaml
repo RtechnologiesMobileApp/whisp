@@ -48,6 +48,7 @@ dependencies:
   google_sign_in: ^6.2.1
   http: ^1.5.0
   flutter_cupertino_date_picker_fork: ^1.0.7
+  shared_preferences: ^2.5.3
  
 
 dev_dependencies:

@@ -8,13 +8,14 @@ import 'package:whisp/features/auth/view/enter_otp_view.dart';
 import 'package:whisp/features/auth/view/forgot_password_view.dart';
 import 'package:whisp/features/auth/view/gender_view.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
+import 'package:whisp/features/auth/view/profile_screen.dart';
 import 'package:whisp/features/auth/view/signup_view.dart';
 import 'package:whisp/features/onboarding/view/screen/spalsh_screen.dart';
 
 part 'app_routes.dart';
 
 class AppPages {
-  static final  routes= [
+  static final routes = [
     GetPage(
       name: Routes.signup,
       page: () => SignupView(),
@@ -22,10 +23,11 @@ class AppPages {
     ),
     GetPage(
       name: Routes.genderview,
-      page: () => GenderView(), 
-      binding: GenderBinding(),  
+      page: () => GenderView(),
+      binding: GenderBinding(),
     ),
     GetPage(
+ 
   name: Routes.login,
   page: () => const LoginView(),
   binding: LoginBinding(),
@@ -49,7 +51,7 @@ GetPage(
 ),
 
 
-
-
+ 
+  
   ];
 }
