@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import 'api_exception.dart';
@@ -19,6 +21,22 @@ class ApiClient {
     } catch (e) {
       throw ApiException.handleError(e);
     }
+  }
+    Future<dynamic> postMultipart(
+    String endpoint, {
+    required Map<String, dynamic> data,
+    required File? file,
+    required String fileField,
+  }) async {
+    final formData = FormData.fromMap({
+      ...data,
+      if (file != null)
+        fileField: await MultipartFile.fromFile(file.path,
+            filename: file.path.split("/").last),
+    });
+
+    final response = await _dio.post(endpoint, data: formData);
+    return response.data;
   }
 
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {

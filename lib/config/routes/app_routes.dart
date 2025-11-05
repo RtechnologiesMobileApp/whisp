@@ -6,6 +6,11 @@ abstract class Routes {
   static const genderview = '/genderview';
   static const login = '/login';
   static const forgetPassword = '/forget-password';
+ 
+ 
+  static const dob='/dob';
+ 
   static const enterOtp = '/enter-otp';
   static const profile = '/profile';
+ 
 }

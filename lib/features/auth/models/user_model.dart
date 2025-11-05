@@ -4,6 +4,7 @@ class UserModel {
   final String email;
   final String? profilePic;
   final String? dob;
+   final String? gender;
 
   UserModel({
     this.id,
@@ -11,6 +12,7 @@ class UserModel {
     required this.email,
     this.profilePic,
     this.dob,
+    this.gender = "Not Specified",
   });
 
   Map<String, dynamic> toJson() {
@@ -20,6 +22,7 @@ class UserModel {
       "email": email,
       "profilePic": profilePic ?? "",
       "dob": dob ?? "",
+      "gender": gender,
     };
   }
 
@@ -30,6 +33,22 @@ class UserModel {
       email: json["email"] ?? "",
       profilePic: json["profilePic"],
       dob: json["dob"],
+      gender: json["gender"] ?? "Not specified",
+    );
+  }
+    UserModel copyWith({
+    String? name,
+    String? email,
+    String? profilePic,
+    String? dob,
+    String? gender,
+  }) {
+    return UserModel(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      profilePic: profilePic ?? this.profilePic,
+      dob: dob ?? this.dob,
+      gender: gender ?? this.gender,
     );
   }
 }

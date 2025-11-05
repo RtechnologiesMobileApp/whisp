@@ -36,9 +36,13 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Whisp',
       debugShowCheckedModeBanner: false,
-      initialBinding: AppBindings(),
-      initialRoute: Routes.splash,
-      getPages: AppPages.routes,
+ 
+        initialBinding: AppBindings(), 
+      initialRoute: Routes.dob, 
+      getPages: AppPages.routes, 
+ 
+     
+ 
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

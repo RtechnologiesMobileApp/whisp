@@ -1,98 +1,4 @@
-// // import 'dart:io';
-
-// // import 'package:flutter/material.dart';
-// // import 'package:get/get.dart';
-// // import 'package:image_picker/image_picker.dart';
-// // import 'package:whisp/config/routes/app_pages.dart';
-// // import 'package:whisp/features/auth/services/profile_services.dart';
-
-// // class ProfileController extends GetxController {
-// //   final Rx<File?> selectedImage = Rx<File?>(null);
-// //   final RxString gender = "male".obs;
-// //   final RxString dob = "2000-01-01".obs;
-// //   final RxString country = "USA".obs;
-
-// //   final ProfileService _service = ProfileService();
-
-// //   Future<void> pickImage() async {
-// //     final picker = ImagePicker();
-// //     final picked = await picker.pickImage(source: ImageSource.gallery);
-// //     if (picked != null) {
-// //       selectedImage.value = File(picked.path);
-// //     }
-// //   }
-
-// //   Future<void> updateProfile() async {
-// //     try {
-// //       Get.dialog(
-// //         const Center(child: CircularProgressIndicator()),
-// //         barrierDismissible: false,
-// //       );
-
-// //       final result = await _service.updateProfile(
-// //         avatar: selectedImage.value,
-// //         gender: gender.value,
-// //         dateOfBirth: dob.value,
-// //         country: country.value,
-// //       );
-
-// //       Get.back(); // close loader
-// //       Get.snackbar("Success", "Profile updated successfully!");
-// //       print("✅ Response: $result");
-// //       Get.toNamed(Routes.genderview);
-// //     } catch (e) {
-// //       Get.back();
-// //       Get.snackbar("Error", e.toString());
-// //     }
-// //   }
-// // }
-
-// import 'dart:io';
-
-// import 'package:get/get.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:whisp/features/auth/services/profile_services.dart';
-
-// class ProfileController extends GetxController {
-//   final ProfileService _service = ProfileService();
-
-//   final Rx<File?> selectedImage = Rx<File?>(null);
-//   final RxString gender = ''.obs;
-//   final RxString dateOfBirth = ''.obs;
-//   final RxString country = ''.obs;
-//   final isLoading = false.obs;
-
-//   Future<void> pickImage() async {
-//     final picker = ImagePicker();
-//     final picked = await picker.pickImage(source: ImageSource.gallery);
-//     if (picked != null) {
-//       selectedImage.value = File(picked.path);
-//     }
-//   }
-
-//   Future<void> updateProfile() async {
-//     if (isLoading.value) return;
-
-//     try {
-//       isLoading.value = true;
-//       final response = await _service.updateProfile(
-//         avatar: selectedImage.value,
-//         gender: gender.value,
-//         dateOfBirth: dateOfBirth.value,
-//         country: country.value,
-//       );
-
-//       print("✅ Profile update response: $response");
-//       Get.snackbar("Success", "Profile updated successfully!");
-//     } catch (e) {
-//       print("❌ Update failed: $e");
-//       Get.snackbar("Error", e.toString());
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-// }
-
+ 
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -210,11 +116,22 @@ class ProfileController extends GetxController {
   Future<void> updateAvatar() async {
     if (selectedImage.value == null) {
       Get.snackbar("Error", "Please select an image first");
+ 
       return;
     }
 
     try {
       isLoading.value = true;
+ 
+      final updatedUser = await _authRepo.updateProfilePicture(
+        userId: userId,
+        imageFile: selectedImage.value!,
+      );
+
+      Get.snackbar("Success", "Profile updated successfully!");
+      print("Updated User: ${updatedUser.toJson()}");
+    } catch (e) {
+ 
 
       final token = await manager.getString(key: constants.userTokenConstant);
 
@@ -238,6 +155,7 @@ class ProfileController extends GetxController {
     } catch (e) {
       Get.snackbar("Error", "Failed to update avatar: $e");
       print("❌ Update avatar failed: $e");
+ 
     } finally {
       isLoading.value = false;
     }
