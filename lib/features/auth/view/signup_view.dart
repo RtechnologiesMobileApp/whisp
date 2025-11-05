@@ -5,12 +5,13 @@ import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/controllers/login_controller.dart';
-import '../controllers/signup_controller.dart';
+
 import '../../../core/widgets/custom_text_field.dart';
+import '../controllers/signup_controller.dart';
 
 class SignupView extends GetView<SignupController> {
   SignupView({super.key});
-    final LoginController loginController = Get.find<LoginController>();
+  final LoginController loginController = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,47 +44,44 @@ class SignupView extends GetView<SignupController> {
                 ],
               ),
 
-              // Avatar Section
-              GestureDetector(
-    onTap: controller.pickImage,
-    child: Obx(() {
-      return Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.topRight, // 👈 edit icon now top-right
-        children: [
-          CircleAvatar(
-            radius: 55, // 👈 slightly larger avatar
-            backgroundImage: controller.selectedImage.value != null
-                ? FileImage(controller.selectedImage.value!)
-                : const AssetImage(AppImages.placeholderpic) as ImageProvider,
-            backgroundColor: Colors.grey[200],
-          ),
-          Positioned(
-            top: -3, // slight adjustment to sit nicely
-            right: -3,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.edit,
-                size: 20,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      );
-    }),
-  ),
+              //             // Avatar Section
+              //             GestureDetector(
+              //   onTap: controller.pickImage,
+              //   child: Obx(() {
+              //     return Stack(
+              //       clipBehavior: Clip.none,
+              //       alignment: Alignment.topRight, // 👈 edit icon now top-right
+              //       children: [
+              //         CircleAvatar(
+              //           radius: 55, // 👈 slightly larger avatar
+              //           backgroundImage: controller.selectedImage.value != null
+              //               ? FileImage(controller.selectedImage.value!)
+              //               : const AssetImage(AppImages.placeholderpic) as ImageProvider,
+              //           backgroundColor: Colors.grey[200],
+              //         ),
+              //         Positioned(
+              //           top: -3, // slight adjustment to sit nicely
+              //           right: -3,
+              //           child: Container(
+              //             padding: const EdgeInsets.all(6),
+              //             decoration: const BoxDecoration(
+              //               color: AppColors.primary,
+              //               shape: BoxShape.circle,
+              //             ),
+              //             child: const Icon(
+              //               Icons.edit,
+              //               size: 20,
+              //               color: Colors.white,
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     );
+              //   }),
+              // ),
 
-           
-       
-              const SizedBox(height: 6),
-              const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
-
+              //             const SizedBox(height: 6),
+              //             const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 6),
 
               const SizedBox(height: 20),
@@ -230,8 +228,6 @@ class SignupView extends GetView<SignupController> {
 
               SizedBox(height: size.height * 0.05),
             ],
-        
-        
           ),
         ),
       ),
