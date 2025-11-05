@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/features/onboarding/controller/onboarding_controller.dart';
@@ -100,7 +101,7 @@ class OnboardingScreen extends StatelessWidget {
                       width: controller.currentPage.value == index ? 26 : 7,
                       decoration: BoxDecoration(
                         color: controller.currentPage.value == index
-                            ? AppColors.vividPurple
+                            ? AppColors.primary
                             : AppColors.deepblue,
                         borderRadius: BorderRadius.circular(12),
                       ),

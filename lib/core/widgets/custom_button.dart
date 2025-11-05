@@ -17,7 +17,7 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.color = AppColors.primary,
-    this.textColor = AppColors.white,
+    this.textColor = AppColors.whiteColor,
     this.height = 52,
     this.borderRadius = 12,
     this.isLoading = false,

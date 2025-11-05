@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/onboarding/view/screen/on_boarding_screen.dart';
 
