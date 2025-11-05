@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       title: 'Whisp',
       debugShowCheckedModeBanner: false,
         initialBinding: AppBindings(), 
-      initialRoute: Routes.splash, 
+      initialRoute: Routes.dob, 
       getPages: AppPages.routes, 
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

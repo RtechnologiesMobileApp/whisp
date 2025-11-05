@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:whisp/features/auth/controllers/dob_controller.dart';
 import 'package:whisp/features/auth/controllers/login_controller.dart';
 import 'package:whisp/features/auth/controllers/signup_controller.dart';
 import 'package:whisp/features/auth/repo/auth_repo.dart';
@@ -12,5 +13,6 @@ class AppBindings extends Bindings {
     // Controllers
     Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
     Get.lazyPut<SignupController>(() => SignupController(), fenix: true);
+    Get.lazyPut<DobController>(() => DobController(), fenix: true);
   }
 }

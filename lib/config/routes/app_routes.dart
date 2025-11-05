@@ -7,4 +7,5 @@ abstract class Routes {
   static const login = '/login';
   static const forgetPassword = '/forget-password';
   static const enterOtp='/enter-otp';
+  static const dob='/dob';
 }
