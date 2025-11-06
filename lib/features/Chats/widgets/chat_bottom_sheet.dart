@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
- 
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+ 
+import 'package:whisp/services/socket_service.dart';  
 
 void showChatBottomSheet(BuildContext context) {
+  final socketService = Get.find<SocketService>();  
+
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.white,
@@ -18,8 +20,19 @@ void showChatBottomSheet(BuildContext context) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _tile("Exit", Colors.black, onTap: _showExitDialog),
-            _tile("Next Chat", Colors.black, onTap: () => Get.offAllNamed(Routes.findMatch)),
+            _tile(
+              "Exit",
+              Colors.black,
+              onTap: () => _showExitDialog(socketService),
+            ),
+            _tile(
+              "Next Chat",
+              Colors.black,
+              onTap: () {
+                socketService.endSession(); // end current session
+                Get.offAllNamed(Routes.findMatch);
+              },
+            ),
             _tile("Report", Colors.red, onTap: () {}),
             _tile("Cancel", Colors.grey, onTap: () => Get.back()),
           ],
@@ -31,13 +44,19 @@ void showChatBottomSheet(BuildContext context) {
 
 Widget _tile(String title, Color color, {required VoidCallback onTap}) {
   return ListTile(
-    title: Center(child: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.w600))),
+    title: Center(
+      child: Text(
+        title,
+        style: TextStyle(color: color, fontWeight: FontWeight.w600),
+      ),
+    ),
     onTap: onTap,
   );
 }
 
-void _showExitDialog() {
-  Get.back(); // close bottom sheet
+void _showExitDialog(SocketService socketService) {
+  Get.back(); // close bottom sheet first
+
   showDialog(
     context: Get.context!,
     builder: (_) => AlertDialog(
@@ -60,7 +79,10 @@ void _showExitDialog() {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => Get.toNamed(Routes.welcomehome),
+            onPressed: () {
+              socketService.endSession(); // ✅ end session before leaving
+              Get.offAllNamed(Routes.welcomehome);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               minimumSize: const Size(double.infinity, 45),
