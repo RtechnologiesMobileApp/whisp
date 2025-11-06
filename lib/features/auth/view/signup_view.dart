@@ -4,9 +4,9 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_text_field.dart';
 import 'package:whisp/features/auth/controllers/login_controller.dart';
 
-import '../../../core/widgets/custom_text_field.dart';
 import '../controllers/signup_controller.dart';
 
 class SignupView extends GetView<SignupController> {
@@ -82,31 +82,31 @@ class SignupView extends GetView<SignupController> {
 
               //             const SizedBox(height: 6),
               //             const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 6),
-
               const SizedBox(height: 20),
 
               // Text Fields
               CustomTextField(
                 controller: controller.nameController,
                 hint: 'Name',
-                icon: Icons.person,
+                icon: Icons.person_2_outlined,
               ),
               const SizedBox(height: 14),
               CustomTextField(
                 controller: controller.emailController,
                 hint: 'Email',
-                icon: Icons.email,
+                icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 14),
               CustomTextField(
                 controller: controller.passwordController,
                 hint: 'Password',
-                icon: Icons.lock,
+                icon: Icons.lock_outline,
                 isPassword: true,
               ),
+
               const SizedBox(height: 14),
+
               // GestureDetector(
               //   onTap: () => controller.pickDate(context),
               //   child: AbsorbPointer(
@@ -119,7 +119,6 @@ class SignupView extends GetView<SignupController> {
               //     ),
               //   ),
               // ),
-
               const SizedBox(height: 12),
 
               // Terms Checkbox
@@ -150,15 +149,16 @@ class SignupView extends GetView<SignupController> {
 
                     const Text(
                       'Accept ',
-                      style: TextStyle(color: AppColors.secondary),
+                      style: TextStyle(color: Colors.black),
                     ),
                     GestureDetector(
                       onTap: () {},
                       child: const Text(
                         'Terms and Conditions',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.pinkColor,
                           decoration: TextDecoration.underline,
+                          decorationColor: AppColors.pinkColor,
                         ),
                       ),
                     ),
@@ -174,6 +174,7 @@ class SignupView extends GetView<SignupController> {
                 child: CustomButton(
                   text: 'Create Account',
                   onPressed: controller.createAccount,
+                  borderRadius: 24,
                 ),
               ),
 
@@ -187,8 +188,9 @@ class SignupView extends GetView<SignupController> {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xFFEFEFEF),
+                    //  border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                   child: Center(
                     child: Image.asset(AppImages.googleLogo, height: 24),
@@ -205,9 +207,9 @@ class SignupView extends GetView<SignupController> {
                     Get.toNamed(Routes.login), // ✅ navigate to login route
                 child: RichText(
                   text: const TextSpan(
-                    text: "Don’t have an account? ",
+                    text: "Already have an account?",
                     style: TextStyle(
-                      color: Color(0xFFD90166), // whole text in #D90166
+                      color: Colors.black, // whole text in #D90166
                       fontSize: 14,
                     ),
                     children: [

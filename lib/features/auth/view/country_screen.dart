@@ -1,6 +1,7 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:country_picker/country_picker.dart';
+
 import '../controllers/country_controller.dart'; // your controller file
 
 class CountryScreen extends StatelessWidget {
@@ -13,11 +14,10 @@ class CountryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
       ),
@@ -26,10 +26,13 @@ class CountryScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            const Text(
-              "Please enter your Country",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: const Text(
+                "Please enter your Country",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -44,7 +47,10 @@ class CountryScreen extends StatelessWidget {
                     borderRadius: BorderRadius.zero,
                     inputDecoration: InputDecoration(
                       labelText: 'Search Country',
-                      prefixIcon: const Icon(Icons.search, color: Colors.purple),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.purple,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -56,13 +62,16 @@ class CountryScreen extends StatelessWidget {
                   },
                 );
               },
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Obx(() => Row(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Obx(
+                    () => Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const SizedBox(width: 12),
@@ -80,31 +89,33 @@ class CountryScreen extends StatelessWidget {
                           ),
                         ),
                       ],
-                    )),
+                    ),
+                  ),
+                ),
               ),
             ),
 
             const Spacer(),
 
             // Continue button
-            Obx(() => ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.purpleAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+            Obx(
+              () => ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.purpleAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : () => controller.updateCountry(),
-                  child: Text(
-                    controller.isLoading.value
-                        ? "Saving..."
-                        : "Continue",
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                )),
+                ),
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () => controller.updateCountry(),
+                child: Text(
+                  controller.isLoading.value ? "Saving..." : "Continue",
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
         ),

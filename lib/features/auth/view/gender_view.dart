@@ -26,19 +26,22 @@ class GenderView extends GetView<GenderController> {
         centerTitle: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 30),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Please enter your Gender",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            //   const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Please enter your Gender",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
 
             // Gender Buttons
             Obx(
@@ -56,7 +59,11 @@ class GenderView extends GetView<GenderController> {
             const Spacer(),
 
             // Continue Button
-            CustomButton(text: "Continue", onPressed: controller.continueNext),
+            CustomButton(
+              text: "Continue",
+              onPressed: controller.continueNext,
+              borderRadius: 24,
+            ),
             SizedBox(height: size.height * 0.04),
           ],
         ),
@@ -72,12 +79,12 @@ class GenderView extends GetView<GenderController> {
         width: double.infinity,
         height: 50,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.grey.shade300,
-            width: 1.2,
-          ),
+          color: isSelected ? AppColors.primary : Color(0xFFF0F0F0),
+          borderRadius: BorderRadius.circular(24),
+          // border: Border.all(
+          //   color: isSelected ? AppColors.primary : Colors.grey.shade300,
+          //   width: 1.2,
+          // ),
         ),
         child: Center(
           child: Text(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/utils/manager/user_prefs.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,11 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    AppImages.logo,
-                    height: 70,
-                    fit: BoxFit.contain,
-                  ),
+                  Image.asset(AppImages.logo, height: 70, fit: BoxFit.contain),
                   GestureDetector(
                     onTap: () {
                       Get.toNamed(Routes.login);
@@ -59,9 +56,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: CircleAvatar(
                       radius: 12,
                       backgroundColor: Colors.grey.shade200,
-                      backgroundImage: (userImage != null && userImage!.isNotEmpty)
+                      backgroundImage:
+                          (userImage != null && userImage!.isNotEmpty)
                           ? NetworkImage(userImage!)
-                          : const AssetImage(AppImages.placeholderpic) as ImageProvider,
+                          : const AssetImage(AppImages.placeholderpic)
+                                as ImageProvider,
                     ),
                   ),
                 ],
@@ -88,7 +87,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 270.w, // optional: responsive max width
+                    maxHeight: 400.h, // optional: responsive max height
+                  ),
+                  child: Image.asset(
+                    AppImages.startChating,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
 
               const Spacer(),
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
-import 'package:whisp/features/auth/controllers/login_controller.dart';
-import 'package:whisp/core/widgets/custom_text_field.dart';
-
 import 'package:whisp/core/widgets/custom_button.dart';
+import 'package:whisp/core/widgets/custom_text_field.dart';
+import 'package:whisp/features/auth/controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
@@ -24,22 +24,21 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 20),
 
               // App Title
-            Column(
-  children: [
-    const Text(
-      "Welcome To",
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-    ),
-    Transform.translate(
-      offset: const Offset(0, -10), // 👈 slightly moves logo upward
-      child: Image.asset(
-        AppImages.logo,
-        height: 115,
-      ),
-    ),
-  ],
-),
-
+              Column(
+                children: [
+                  const Text(
+                    "Welcome To",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Transform.translate(
+                    offset: const Offset(
+                      0,
+                      -10,
+                    ), // 👈 slightly moves logo upward
+                    child: Image.asset(AppImages.logo, height: 115),
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 40),
 
@@ -69,7 +68,7 @@ class LoginView extends GetView<LoginController> {
                   onTap: controller.forgotPassword,
                   child: const Text(
                     "Forget Password?",
-                    style: TextStyle(color: Colors.pink, fontSize: 13),
+                    style: TextStyle(color: AppColors.pinkColor, fontSize: 13),
                   ),
                 ),
               ),
@@ -77,7 +76,11 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 30),
 
               // Sign in button
-              CustomButton(text: "Sign in", onPressed: controller.login),
+              CustomButton(
+                text: "Sign in",
+                onPressed: controller.login,
+                borderRadius: 24,
+              ),
 
               const SizedBox(height: 20),
 
@@ -86,8 +89,9 @@ class LoginView extends GetView<LoginController> {
                 text: "Continue with Google",
                 color: Colors.grey[200]!,
                 textColor: Colors.black,
-                 iconPath:  AppImages.googleLogo, 
+                iconPath: AppImages.googleLogo,
                 onPressed: controller.googleSignIn,
+                borderRadius: 24,
               ),
 
               const SizedBox(height: 30),
@@ -102,9 +106,10 @@ class LoginView extends GetView<LoginController> {
                     child: const Text(
                       "Sign up",
                       style: TextStyle(
-                        color: Colors.pink,
+                        color: AppColors.pinkColor,
                         fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.pinkColor,
                       ),
                     ),
                   ),

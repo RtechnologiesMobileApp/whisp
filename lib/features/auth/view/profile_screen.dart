@@ -1,68 +1,8 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:whisp/config/constants/images.dart';
-// import 'package:whisp/core/widgets/custom_button.dart';
-// import 'package:whisp/features/auth/controllers/profile_pic_controller.dart';
-
-// class ProfileView extends StatelessWidget {
-//   ProfileView({super.key});
-
-//   final ProfileController controller = Get.put(ProfileController()); // ✅ Register controller
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             const SizedBox(height: 50),
-
-//             // Avatar
-//             GestureDetector(
-//               onTap: controller.pickImage,
-//               child: Obx(() {
-//                 return CircleAvatar(
-//                   radius: 70,
-//                   backgroundImage: controller.selectedImage.value != null
-//                       ? FileImage(controller.selectedImage.value!)
-//                       : const AssetImage(AppImages.placeholderpic)
-//                           as ImageProvider,
-//                   backgroundColor: Colors.grey[200],
-//                 );
-//               }),
-//             ),
-//             const SizedBox(height: 16),
-//             const Text(
-//               "Tap to change avatar",
-//               style: TextStyle(color: Colors.grey),
-//             ),
-
-//             const Spacer(),
-
-//             // Update button
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
-//               child: SizedBox(
-//                 width: double.infinity,
-//                 height: 52,
-//                 child: CustomButton(
-//                   text: "Update Profile",
-//                   onPressed: controller.updateProfile,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 //import 'package:whisp/features/auth/controllers/profile_controller.dart';
 import 'package:whisp/features/auth/controllers/profile_pic_controller.dart';
@@ -76,10 +16,31 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          onPressed: () => Get.toNamed(Routes.signup),
+        ),
+
+        centerTitle: false,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 50),
+            //const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+              child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Please select your avatar",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
             // Avatar Section
             GestureDetector(
               onTap: controller.pickImage,
@@ -116,32 +77,9 @@ class ProfileView extends StatelessWidget {
                 );
               }),
             ),
+            const SizedBox(height: 6),
+            const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
 
-            //             const SizedBox(height: 6),
-            //             const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
-            // // Avatar
-            // GestureDetector(
-            //   onTap: controller.pickImage,
-            //   child: Obx(() {
-            //     return CircleAvatar(
-            //       radius: 70,
-            //       backgroundImage: controller.selectedImage.value != null
-            //           ? FileImage(controller.selectedImage.value!)
-            //           : const AssetImage(AppImages.placeholderpic)
-            //                 as ImageProvider,
-            //       backgroundColor: Colors.grey[200],
-            //     );
-            //   }),
-            // ),
-            // const SizedBox(height: 16),
-            // const Text(
-            //   "Tap to change avatar",
-            //   style: TextStyle(color: Colors.grey),
-            // ),
-
-            // Date of Birth input
-
-            // Country input
             const Spacer(),
 
             // Update button
@@ -154,8 +92,9 @@ class ProfileView extends StatelessWidget {
                   child: CustomButton(
                     text: controller.isLoading.value
                         ? "Updating..."
-                        : "Update Profile",
+                        : "Continue",
                     onPressed: controller.updateAvatar,
+                    borderRadius: 24,
                   ),
                 );
               }),
