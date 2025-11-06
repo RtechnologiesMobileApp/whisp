@@ -52,6 +52,12 @@ class FindingMatchController extends GetxController {
     });
 
     socketService.onPartnerLeft(() {
+      Get.back();  
+      Get.snackbar(
+        'Partner Disconnected',
+        'Your chat partner has left the chat.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       debugPrint('Partner left');
       // if you are on the chat screen you might show a dialog and go home
     });
