@@ -20,6 +20,26 @@ class DobController extends GetxController {
     try {
       isLoading.value = true;
 
+      // Check if user is at least 13 years old
+      final now = DateTime.now();
+      final age = now.year - selectedDate.value.year;
+      final monthDifference = now.month - selectedDate.value.month;
+      final dayDifference = now.day - selectedDate.value.day;
+      
+      final actualAge = (monthDifference < 0 || (monthDifference == 0 && dayDifference < 0))
+          ? age - 1
+          : age;
+
+      if (actualAge < 13) {
+        isLoading.value = false;
+        Get.snackbar(
+          "Age Requirement",
+          "You must be at least 13 years old to continue. Please select a different date.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
       final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.value);
       final token = await manager.getString(key: constants.userTokenConstant);
 

@@ -49,6 +49,14 @@ class DobScreen extends StatelessWidget {
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(height: 4),
+            const Text(
+              "You must be 13 years old to continue",
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
 
             const SizedBox(height: 20),
 
