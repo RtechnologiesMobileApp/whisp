@@ -26,4 +26,5 @@ class AppImages {
 
   static const String daim = 'assets/images/daim.png';
   static const String startChating = 'assets/images/Startgif.gif';
+  static const String findingMatch = 'assets/images/findingmatch.json';
 }

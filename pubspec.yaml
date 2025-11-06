@@ -50,6 +50,8 @@ dependencies:
   flutter_cupertino_date_picker_fork: ^1.0.7
   shared_preferences: ^2.5.3
   country_picker: ^2.0.27
+  lottie: ^3.3.2
+  socket_io_client: ^3.1.2
  
 
 dev_dependencies:

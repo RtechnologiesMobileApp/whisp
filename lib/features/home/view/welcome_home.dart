@@ -87,18 +87,26 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 20),
-              Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 270.w, // optional: responsive max width
-                    maxHeight: 400.h, // optional: responsive max height
-                  ),
-                  child: Image.asset(
-                    AppImages.startChating,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
+          Center(
+  child: GestureDetector(
+       behavior: HitTestBehavior.translucent,
+
+    onTap: () {
+       debugPrint("Start Chat Image tapped ✅"); 
+      Get.toNamed(Routes.findMatch); // 👈 your Find Match route
+    },
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: 270.w,
+        maxHeight: 400.h,
+      ),
+      child: Image.asset(
+        AppImages.startChating,
+        fit: BoxFit.contain,
+      ),
+    ),
+  ),
+),
 
               const Spacer(),
 
