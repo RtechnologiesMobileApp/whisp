@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
+import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:whisp/features/auth/bindings/country_bindings.dart';
 import 'package:whisp/features/auth/bindings/forgot_password_binding.dart';
 import 'package:whisp/features/auth/bindings/gender_binding.dart';
@@ -73,6 +74,18 @@ GetPage(
   page: () => const FindingMatchScreen(),
  
 ),
+   GetPage(
+      name: Routes.chatscreen,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>;
+        return ChatScreen(
+          partnerId: args['partnerId'],
+          partnerName: args['partnerName'],
+          partnerAvatar: args['partnerAvatar'],
+        );
+      },
+      binding: AppBindings(),
+    ),
   ];
 }
 

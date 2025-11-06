@@ -16,6 +16,7 @@ abstract class Routes {
   static const welcomehome = '/welcohome';
   static const resetPassword = '/reset-password';
   static const findMatch='/find-match';
+  static const chatscreen='/chatscreen';
  
 }
   
