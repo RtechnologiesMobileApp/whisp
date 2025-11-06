@@ -25,4 +25,5 @@ class AppImages {
   static const String profile_unselected = 'assets/icons/user_unselected.png';
 
   static const String daim = 'assets/images/daim.png';
+  static const String startChating = 'assets/images/Startgif.gif';
 }

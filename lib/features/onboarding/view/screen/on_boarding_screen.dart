@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whisp/config/constants/colors.dart';
@@ -24,7 +25,7 @@ class OnboardingScreen extends StatelessWidget {
               // App Logo
               Image.asset(AppImages.logo, height: 142, width: 142),
 
-              SizedBox(height: 30),
+              // SizedBox(height: 10),
 
               // PageView for onboarding items
               Expanded(
@@ -53,12 +54,12 @@ class OnboardingScreen extends StatelessWidget {
                           item['title'] ?? '',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            fontSize: 24,
+                            fontSize: 24.sp,
                             fontWeight: FontWeight.w700,
                             color: AppColors.darkgrey,
                           ),
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 40),
 
                         // Image/Illustration
                         Image.asset(
@@ -67,15 +68,15 @@ class OnboardingScreen extends StatelessWidget {
                           width: 250,
                           fit: BoxFit.contain,
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 20),
 
                         // Subtitle
                         Text(
                           item['subtitle'] ?? '',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w400,
                             color: AppColors.darkgrey,
                             height: 1.5,
                           ),

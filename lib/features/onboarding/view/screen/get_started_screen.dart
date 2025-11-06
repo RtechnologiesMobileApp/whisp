@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/onboarding/view/screen/on_boarding_screen.dart';
 
-import 'package:whisp/utils/colors.dart';
-
 import '../../../../core/widgets/custom_button.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 
 class GetStartedScreen extends StatefulWidget {
   const GetStartedScreen({super.key});
@@ -65,7 +62,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                         // background color
                         textColor: AppColors.whiteColor,
                         height: 48,
-                        borderRadius: 8,
+                        borderRadius: 24,
                       ),
                     ),
                   ],
