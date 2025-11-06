@@ -1,7 +1,7 @@
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:country_picker/country_picker.dart';
+import 'package:whisp/core/widgets/custom_back_button.dart';
 import '../controllers/country_controller.dart'; // your controller file
 
 class CountryScreen extends StatelessWidget {
@@ -12,27 +12,16 @@ class CountryScreen extends StatelessWidget {
     final controller = Get.find<CountryController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
-        ),
-      ),
+      appBar: AppBar(leading: CustomBackButton()),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: const Text(
-                "Please enter your Country",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 20),
+            const Text(
+              "Please enter your Country",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
@@ -62,34 +51,31 @@ class CountryScreen extends StatelessWidget {
                   },
                 );
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(width: 12),
-                        const Icon(Icons.search, color: Colors.purple),
-                        const SizedBox(width: 8),
-                        Text(
-                          controller.selectedCountry.value.isEmpty
-                              ? "Search Country"
-                              : controller.selectedCountry.value,
-                          style: TextStyle(
-                            color: controller.selectedCountry.value.isEmpty
-                                ? Colors.grey
-                                : Colors.black,
-                            fontSize: 16,
-                          ),
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 12),
+                      const Icon(Icons.search, color: Colors.purple),
+                      const SizedBox(width: 8),
+                      Text(
+                        controller.selectedCountry.value.isEmpty
+                            ? "Search Country"
+                            : controller.selectedCountry.value,
+                        style: TextStyle(
+                          color: controller.selectedCountry.value.isEmpty
+                              ? Colors.grey
+                              : Colors.black,
+                          fontSize: 16,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

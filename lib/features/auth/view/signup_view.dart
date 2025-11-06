@@ -18,7 +18,6 @@ class SignupView extends GetView<SignupController> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -137,10 +136,10 @@ class SignupView extends GetView<SignupController> {
                         color: AppColors.secondary,
                         width: 2,
                       ),
-                      fillColor: MaterialStateProperty.resolveWith<Color>((
-                        Set<MaterialState> states,
+                      fillColor: WidgetStateProperty.resolveWith<Color>((
+                        Set<WidgetState> states,
                       ) {
-                        if (states.contains(MaterialState.selected)) {
+                        if (states.contains(WidgetState.selected)) {
                           return AppColors.primary; // when checked
                         }
                         return Colors.transparent; // when unchecked

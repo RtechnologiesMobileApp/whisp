@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
-import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/core/widgets/custom_back_button.dart';
 
 import '../../../core/widgets/custom_button.dart';
 import '../controllers/gender_controller.dart';
@@ -14,17 +14,7 @@ class GenderView extends GetView<GenderController> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.toNamed(Routes.signup),
-        ),
-
-        centerTitle: false,
-      ),
+      appBar: AppBar(leading: CustomBackButton()),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
