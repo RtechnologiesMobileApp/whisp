@@ -5,7 +5,7 @@ import 'package:whisp/features/auth/models/user_model.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 class AuthRepository {
-  final ApiClient _apiClient = Get.find<ApiClient>();
+  final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   Future<dynamic> login(String email, String password) async {
