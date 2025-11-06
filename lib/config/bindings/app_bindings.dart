@@ -11,7 +11,7 @@ import 'package:whisp/features/auth/controllers/reset_password_controller.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/home/controllers/finding_match_controller.dart';
 import 'package:whisp/services/socket_service.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class AppBindings extends Bindings {
   @override
@@ -31,19 +31,28 @@ class AppBindings extends Bindings {
     Get.lazyPut<ChatController>(() => ChatController(), fenix: true);
 
       // 🧩 Socket Service (global singleton)
-    Get.putAsync<SocketService>(() async {
-      final prefs = SharedPreferencesManager.instance;
+    // Only initialize if not already initialized
+    if (!Get.isRegistered<SocketService>()) {
+      Get.putAsync<SocketService>(() async {
+        final token = SessionController().user?.token;
 
-      // token stored in SharedPreferences
-      final token = await prefs.getString(key: 'token');
+        // token stored in SharedPreferences with key "userToken"
 
-      final service = SocketService();
-      await service.init(
-        baseUrl: ApiEndpoints.baseUrl,  
-        token: token,
-      );
+        if (token?.isEmpty ?? true) {
+          print('[socket] Warning: No token found in Session. Socket will connect after login.');
+        }
 
-      return service;
-    });
+        final service = SocketService();
+        // Only initialize socket if token exists
+        if (token?.isNotEmpty ?? false) {
+          await service.init(
+            baseUrl: ApiEndpoints.baseUrl,  
+            token: token ?? '',
+          );
+        }
+
+        return service;
+      });
+    }
   }
 }

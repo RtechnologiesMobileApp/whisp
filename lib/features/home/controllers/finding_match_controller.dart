@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../../../../services/socket_service.dart';
@@ -16,16 +18,17 @@ class FindingMatchController extends GetxController {
 
     // Listen server events:
     socketService.onAuthOk((data) {
-      print('AUTH_OK: $data');
+      debugPrint('AUTH_OK: $data');
     });
 
   socketService.onMatchFound((data) {
   // server sends { partnerId, partnerName, partnerAvatar }
-  final id = data['partnerId'] as String?;
-  final name = data['partnerName'] as String?;
-  final avatar = data['partnerAvatar'] as String?;
+  log("this is on match found data: ${data.toString()}");
+  final id = data['partner']['id'] as String?;
+  final name = data['partner']['fullName'] as String?;
+  final avatar = data['partner']['avatar'] as String?;
 
-  print('MATCH_FOUND with $id, name: $name, avatar: $avatar');
+  debugPrint('MATCH_FOUND with $id, name: $name, avatar: $avatar');
 
   if (id != null) {
     partnerId.value = id;
@@ -44,12 +47,18 @@ class FindingMatchController extends GetxController {
 
 
     socketService.onError((data) {
-      print('Socket error: $data');
+      debugPrint('Socket error: $data');
       // optionally show toast
     });
 
     socketService.onPartnerLeft(() {
-      print('Partner left');
+      Get.back();  
+      Get.snackbar(
+        'Partner Disconnected',
+        'Your chat partner has left the chat.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      debugPrint('Partner left');
       // if you are on the chat screen you might show a dialog and go home
     });
   }
@@ -58,7 +67,7 @@ class FindingMatchController extends GetxController {
   void startSearch() {
     if (!socketService.connected) {
       // optionally connect again or show error
-      print('Socket not connected');
+      debugPrint('Socket not connected');
       // you could attempt to re-init socket here
       return;
     }

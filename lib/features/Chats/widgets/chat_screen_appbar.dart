@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/services/socket_service.dart';
 import 'chat_bottom_sheet.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,6 +15,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+     final socketService = Get.find<SocketService>(); 
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -21,7 +23,10 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-              onPressed: () => Get.back(),
+              onPressed: () {
+                socketService.endSession();
+                Get.back();
+              },
             ),
             CircleAvatar(
               radius: 20,

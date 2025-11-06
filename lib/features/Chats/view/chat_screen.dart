@@ -28,7 +28,9 @@ class ChatScreen extends StatelessWidget {
                 itemCount: controller.messages.length,
                 itemBuilder: (context, index) {
                   final msg = controller.messages[index];
-                  return ChatBubble(fromMe: msg['fromMe'], message: msg['message']);
+                  final bool isFromMe = msg['fromMe'] ?? false;
+                  final String message = msg['body'] ?? msg['message'] ?? '';
+                  return ChatBubble(fromMe: isFromMe, message: message);
                 },
               ),
             ),

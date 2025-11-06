@@ -1,15 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class GenderController extends GetxController {
   var selectedGender = (-1).obs;
   final Dio dio = Dio();
-  final manager = SharedPreferencesManager.instance;
-  final constants = SharedPreferencesConstants.instance;
   final isLoading = false.obs;
 
   void selectGender(int index) {
@@ -37,7 +34,7 @@ class GenderController extends GetxController {
 
     try {
       isLoading.value = true;
-      final token = await manager.getString(key: constants.userTokenConstant);
+      final token = SessionController().user?.token;
 
       final response = await dio.put(
         ApiEndpoints.updateProfile,

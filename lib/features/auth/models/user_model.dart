@@ -5,6 +5,7 @@ class UserModel {
   final String? profilePic;
   final String? dob;
    final String? gender;
+   final String? token;
 
   UserModel({
     this.id,
@@ -13,6 +14,7 @@ class UserModel {
     this.profilePic,
     this.dob,
     this.gender = "Not Specified",
+    this.token,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class UserModel {
       "profilePic": profilePic ?? "",
       "dob": dob ?? "",
       "gender": gender,
+      "token": token,
     };
   }
 
@@ -42,6 +45,7 @@ class UserModel {
     String? profilePic,
     String? dob,
     String? gender,
+    String? token,
   }) {
     return UserModel(
       name: name ?? this.name,
@@ -49,6 +53,7 @@ class UserModel {
       profilePic: profilePic ?? this.profilePic,
       dob: dob ?? this.dob,
       gender: gender ?? this.gender,
+      token: token ?? this.token,
     );
   }
 }
