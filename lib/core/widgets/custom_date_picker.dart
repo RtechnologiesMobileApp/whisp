@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:whisp/config/constants/colors.dart';
 
 class CustomCupertinoDatePicker extends StatelessWidget {
   final DateTime initialDateTime;

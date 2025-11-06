@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/config/theme/theme.dart';
 import 'package:whisp/features/onboarding/view/screen/spalsh_screen.dart';
-import 'package:whisp/features/auth/view/reset_password_screen.dart';
 import 'package:whisp/firebase_options.dart';
 
 void main() async {
@@ -37,16 +37,10 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Whisp',
       debugShowCheckedModeBanner: false,
- 
-        initialBinding: AppBindings(), 
-      initialRoute: Routes.splash, 
-      getPages: AppPages.routes, 
- 
-     
- 
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: AppTheme.lightTheme,
+      initialBinding: AppBindings(),
+      initialRoute: Routes.splash,
+      getPages: AppPages.routes,
       home: SplashScreen(),
     );
   }

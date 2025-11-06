@@ -14,7 +14,6 @@ class LoginView extends GetView<LoginController> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
@@ -24,22 +23,21 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 20),
 
               // App Title
-            Column(
-  children: [
-    const Text(
-      "Welcome To",
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-    ),
-    Transform.translate(
-      offset: const Offset(0, -10), // 👈 slightly moves logo upward
-      child: Image.asset(
-        AppImages.logo,
-        height: 115,
-      ),
-    ),
-  ],
-),
-
+              Column(
+                children: [
+                  const Text(
+                    "Welcome To",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Transform.translate(
+                    offset: const Offset(
+                      0,
+                      -10,
+                    ), // 👈 slightly moves logo upward
+                    child: Image.asset(AppImages.logo, height: 115),
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 40),
 
@@ -86,7 +84,7 @@ class LoginView extends GetView<LoginController> {
                 text: "Continue with Google",
                 color: Colors.grey[200]!,
                 textColor: Colors.black,
-                 iconPath:  AppImages.googleLogo, 
+                iconPath: AppImages.googleLogo,
                 onPressed: controller.googleSignIn,
               ),
 
@@ -104,7 +102,7 @@ class LoginView extends GetView<LoginController> {
                       style: TextStyle(
                         color: Colors.pink,
                         fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ),
