@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
-import 'package:whisp/features/onboarding/view/screen/get_started_screen.dart';
+import 'package:whisp/core/services/splash_services.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,10 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 5), () {
-      Get.offAll(() => GetStartedScreen());
-      //Get.offAll(() => HomeScreen());
-    });
+    SplashServices.navigateToLogin();
   }
 
   @override

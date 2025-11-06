@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisp/features/home/widgets/home_header.dart';
 import 'package:whisp/features/home/widgets/start_button.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final manager = SharedPreferencesManager.instance;
   String userName = "";
   String? userImage;
   @override
@@ -21,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadUser() async {
-    final user = await manager.getUser();
+    final user = SessionController().user;
     setState(() {
       userName = user?.name ?? "User";
       userImage = user?.profilePic;

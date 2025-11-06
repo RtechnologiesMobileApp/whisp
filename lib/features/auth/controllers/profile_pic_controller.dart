@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
+import 'package:whisp/core/services/session_manager.dart';
 class ProfileController extends GetxController {
   final isLoading = false.obs;
   final selectedGender = ''.obs;
   final selectedImage = Rx<File?>(null);
   final dobController = TextEditingController();
-  final manager = SharedPreferencesManager.instance;
-  final constants = SharedPreferencesConstants.instance;
   final Dio dio = Dio();
   // :jigsaw: Pick gender from dropdown or selection
   void selectGender(String gender) {
@@ -56,7 +53,7 @@ class ProfileController extends GetxController {
     }
     try {
       isLoading.value = true;
-      final token = await manager.getString(key: constants.userTokenConstant);
+      final token = SessionController().user?.token;
       final response = await dio.put(
         ApiEndpoints.updateProfile,
         data: {"dateOfBirth": dobController.text},
@@ -80,7 +77,7 @@ class ProfileController extends GetxController {
     }
     try {
       isLoading.value = true;
-      final token = await manager.getString(key: constants.userTokenConstant);
+      final token = SessionController().user?.token;
       final formData = FormData.fromMap({
         "avatar": await MultipartFile.fromFile(selectedImage.value!.path),
       });

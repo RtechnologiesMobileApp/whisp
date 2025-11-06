@@ -11,8 +11,7 @@ import 'package:whisp/features/auth/controllers/reset_password_controller.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/home/controllers/finding_match_controller.dart';
 import 'package:whisp/services/socket_service.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class AppBindings extends Bindings {
   @override
@@ -35,22 +34,20 @@ class AppBindings extends Bindings {
     // Only initialize if not already initialized
     if (!Get.isRegistered<SocketService>()) {
       Get.putAsync<SocketService>(() async {
-        final prefs = SharedPreferencesManager.instance;
-        final constants = SharedPreferencesConstants.instance;
+        final token = SessionController().user?.token;
 
         // token stored in SharedPreferences with key "userToken"
-        final token = await prefs.getString(key: constants.userTokenConstant);
 
-        if (token.isEmpty) {
-          print('[socket] Warning: No token found in SharedPreferences. Socket will connect after login.');
+        if (token?.isEmpty ?? true) {
+          print('[socket] Warning: No token found in Session. Socket will connect after login.');
         }
 
         final service = SocketService();
         // Only initialize socket if token exists
-        if (token.isNotEmpty) {
+        if (token?.isNotEmpty ?? false) {
           await service.init(
             baseUrl: ApiEndpoints.baseUrl,  
-            token: token,
+            token: token ?? '',
           );
         }
 

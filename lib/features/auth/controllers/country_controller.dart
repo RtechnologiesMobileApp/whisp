@@ -1,16 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 
 class CountryController extends GetxController {
   final Dio dio = Dio();
-  final manager = SharedPreferencesManager.instance;
-  final constants = SharedPreferencesConstants.instance;
 
   var selectedCountry = ''.obs;
   var isLoading = false.obs;
@@ -30,7 +26,7 @@ class CountryController extends GetxController {
     try {
       isLoading.value = true;
 
-      final token = await manager.getString(key: constants.userTokenConstant);
+      final token = SessionController().user?.token;
 
       final response = await dio.put(
         ApiEndpoints.updateProfile,
@@ -45,7 +41,8 @@ class CountryController extends GetxController {
       final Map<String, dynamic>? userJson =
           (response.data is Map) ? response.data['user'] as Map<String, dynamic>? : null;
       if (userJson != null) {
-        await manager.saveUser(UserModel.fromJson(userJson));
+        await SessionController().saveUserSession(UserModel.fromJson(userJson));
+        await SessionController().loadSession();
       }
 
       // ✅ Navigate to Welcome screen

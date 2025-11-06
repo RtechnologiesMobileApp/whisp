@@ -1,20 +1,15 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
-import 'package:whisp/features/auth/models/auth_response_model.dart';
 import 'package:whisp/features/auth/repo/auth_repo.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/utils/manager/user_prefs.dart';
 import 'package:whisp/services/socket_service.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final AuthRepository _authRepository = Get.find<AuthRepository>();
-  final SharedPreferencesManager _prefs = SharedPreferencesManager.instance;
-  final SharedPreferencesConstants _constants = SharedPreferencesConstants.instance;
   var isLoading = false.obs;
   UserModel? currentUser;
 
@@ -30,30 +25,24 @@ class LoginController extends GetxController {
         passwordController.text.trim(),
       );
       final data = res is Map ? res : res?.data;
-      final auth = AuthResponseModel.fromJson(data);
-      currentUser = auth.user;
+      final user = UserModel.fromJson(data['user']);
+      final token = data['token'];
+      final updatedUser = user.copyWith(token: token);
+      currentUser = updatedUser;
 
-      await _prefs.setString(
-        key: _constants.userTokenConstant,
-        value: auth.token,
-      );
-      await _prefs.setString(
-        key: _constants.userIdConstant,
-        value: auth.user.id ?? '',
-      );
-      await _prefs.saveUser(auth.user);
+      await SessionController().saveUserSession(updatedUser);
+      await SessionController().loadSession();
 
       // Reconnect socket with new token
       try {
         if (Get.isRegistered<SocketService>()) {
           final socketService = SocketService.to;
-          await socketService.reconnectWithToken(auth.token);
+          await socketService.reconnectWithToken(token);
         }
       } catch (e) {
         print('[socket] Error reconnecting after login: $e');
       }
 
-      Get.snackbar("Success", "Welcome ${auth.user.name}");
       Get.offAllNamed(Routes.welcomehome);
     } catch (e) {
       Get.snackbar("Login Failed", e.toString());

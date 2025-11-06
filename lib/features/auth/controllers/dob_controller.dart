@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide FormData;
 import 'package:intl/intl.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 
 class DobController extends GetxController {
@@ -13,8 +11,6 @@ class DobController extends GetxController {
   var isLoading = false.obs;
 
   final Dio dio = Dio();
-  final manager = SharedPreferencesManager.instance;
-  final constants = SharedPreferencesConstants.instance;
 
   Future<void> saveDateOfBirth() async {
     try {
@@ -41,7 +37,7 @@ class DobController extends GetxController {
       }
 
       final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.value);
-      final token = await manager.getString(key: constants.userTokenConstant);
+      final token = SessionController().user?.token;
 
       // ✅ Correct FormData creation
       final formData = FormData.fromMap({
@@ -68,7 +64,8 @@ print('Navigating to: ${Routes.country}');
       final Map<String, dynamic>? userJson =
           (response.data is Map) ? response.data['user'] as Map<String, dynamic>? : null;
       if (userJson != null) {
-        await manager.saveUser(UserModel.fromJson(userJson));
+        await SessionController().saveUserSession(UserModel.fromJson(userJson));
+        await SessionController().loadSession();
       }
 
       Get.toNamed(Routes.country);

@@ -15,7 +15,7 @@ import 'package:whisp/features/auth/view/login_view.dart';
 import 'package:whisp/features/auth/view/signup_view.dart';
 import 'package:whisp/features/home/view/finding_match_screen.dart';
 import 'package:whisp/features/home/view/welcome_home.dart';
-import 'package:whisp/features/onboarding/view/screen/spalsh_screen.dart';
+import 'package:whisp/features/onboarding/view/screen/splash_screen.dart';
 import 'package:whisp/features/auth/view/reset_password_screen.dart';
 part 'app_routes.dart';
 

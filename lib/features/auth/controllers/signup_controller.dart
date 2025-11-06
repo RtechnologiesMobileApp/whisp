@@ -3,20 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
-import 'package:whisp/features/auth/models/auth_response_model.dart';
+import 'package:whisp/core/services/session_manager.dart';
+import 'package:whisp/features/auth/models/user_model.dart';
 import 'package:whisp/features/auth/repo/auth_repo.dart';
 import 'package:whisp/features/auth/view/profile_screen.dart';
-import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
-import 'package:whisp/utils/manager/user_prefs.dart';
 import 'package:whisp/services/socket_service.dart';
+
 class SignupController extends GetxController {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final dobController = TextEditingController();
-  final manager = SharedPreferencesManager.instance;
-  final constants = SharedPreferencesConstants.instance;
   final Rx<File?> selectedImage = Rx<File?>(null);
   final acceptTerms = false.obs;
   final isLoading = false.obs;
@@ -69,20 +66,13 @@ class SignupController extends GetxController {
       );
       /// :small_blue_diamond: Handle Dio Response type (in case your repo returns Response)
       final data = apiResponse is Map ? apiResponse : apiResponse.data;
-      final signupResponse = AuthResponseModel.fromJson(data);
-      /// :small_blue_diamond: Save user data
-      await manager.setString(
-        key: constants.userIdConstant,
-        value: signupResponse.user.id.toString(),
-      );
-      final token = signupResponse.token ?? "";
-      await manager.setString(
-        key: constants.userTokenConstant,
-        value: token,
-      );
-      /// Optional: Save the full user model for later use
-      await manager.saveUser(signupResponse.user);
 
+      final user = UserModel.fromJson(data['user']);
+      final token = data['token'];
+
+      final updatedUser = user.copyWith(token: token);
+      await SessionController().saveUserSession(updatedUser);
+      await SessionController().loadSession();
       // Reconnect socket with new token
       if (token.isNotEmpty) {
         try {
