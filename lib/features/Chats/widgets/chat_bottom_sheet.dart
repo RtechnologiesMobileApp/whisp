@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+ 
+import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/config/routes/app_pages.dart';
+
+void showChatBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) {
+      return Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _tile("Exit", Colors.black, onTap: _showExitDialog),
+            _tile("Next Chat", Colors.black, onTap: () => Get.offAllNamed(Routes.findMatch)),
+            _tile("Report", Colors.red, onTap: () {}),
+            _tile("Cancel", Colors.grey, onTap: () => Get.back()),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _tile(String title, Color color, {required VoidCallback onTap}) {
+  return ListTile(
+    title: Center(child: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.w600))),
+    onTap: onTap,
+  );
+}
+
+void _showExitDialog() {
+  Get.back(); // close bottom sheet
+  showDialog(
+    context: Get.context!,
+    builder: (_) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      contentPadding: const EdgeInsets.all(20),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Align(
+            alignment: Alignment.topRight,
+            child: Icon(Icons.close, color: Colors.grey),
+          ),
+          const SizedBox(height: 10),
+          const Text("Exit Chat?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const SizedBox(height: 8),
+          const Text(
+            "You won't be able to undo this. Are you sure you want to continue?",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () => Get.toNamed(Routes.welcomehome),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              minimumSize: const Size(double.infinity, 45),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text("Yes, Exit", style: TextStyle(color: Colors.white)),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("No", style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    ),
+  );
+}
