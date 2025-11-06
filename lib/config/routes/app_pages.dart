@@ -32,49 +32,35 @@ class AppPages {
       binding: GenderBinding(),
     ),
     GetPage(
- 
-  name: Routes.login,
-  page: () => const LoginView(),
-  binding: LoginBinding(),
-),
-GetPage(
-  name: Routes.forgetPassword,
-  page: () => const ForgetPasswordView(),
-  binding: ForgetPasswordBinding(),
-),
-GetPage(
-  name: Routes.enterOtp,
-  page: () => const EnterOtpView(),
-  binding: AppBindings(),
-),
-GetPage(
-  name: Routes.splash,
-  page: () => const SplashScreen(),
-),
-GetPage(
-  name: Routes.dob,
-  page: () => const DobScreen(),
-),
-GetPage(
-  name: Routes.country,
-  page: () => const CountryScreen(),
-  binding: CountryBinding(),
-),
-GetPage(
-  name: Routes.welcomehome,
-  page: () =>  HomeScreen(),
-),
-GetPage(
-  name: Routes.resetPassword,
-  page: () => const ResetPasswordScreen(),
-  binding: AppBindings(),
-),
-GetPage(
-  name: Routes.findMatch,
-  page: () => const FindingMatchScreen(),
- 
-),
-   GetPage(
+      name: Routes.login,
+      page: () => const LoginView(),
+      binding: LoginBinding(),
+    ),
+    GetPage(
+      name: Routes.forgetPassword,
+      page: () => const ForgetPasswordView(),
+      binding: ForgetPasswordBinding(),
+    ),
+    GetPage(
+      name: Routes.enterOtp,
+      page: () => const EnterOtpView(),
+      binding: AppBindings(),
+    ),
+    GetPage(name: Routes.splash, page: () => const SplashScreen()),
+    GetPage(name: Routes.dob, page: () => const DobScreen()),
+    GetPage(
+      name: Routes.country,
+      page: () => const CountryScreen(),
+      binding: CountryBinding(),
+    ),
+    GetPage(name: Routes.welcomehome, page: () => HomeScreen()),
+    GetPage(
+      name: Routes.resetPassword,
+      page: () => const ResetPasswordScreen(),
+      binding: AppBindings(),
+    ),
+    GetPage(name: Routes.findMatch, page: () => const FindingMatchScreen()),
+    GetPage(
       name: Routes.chatscreen,
       page: () {
         final args = Get.arguments as Map<String, dynamic>;
@@ -88,5 +74,3 @@ GetPage(
     ),
   ];
 }
-
- 

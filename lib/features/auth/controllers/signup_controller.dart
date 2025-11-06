@@ -9,6 +9,7 @@ import 'package:whisp/features/auth/repo/auth_repo.dart';
 import 'package:whisp/features/auth/view/profile_screen.dart';
 import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
 import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/services/socket_service.dart';
 class SignupController extends GetxController {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -69,20 +70,31 @@ class SignupController extends GetxController {
       /// :small_blue_diamond: Handle Dio Response type (in case your repo returns Response)
       final data = apiResponse is Map ? apiResponse : apiResponse.data;
       final signupResponse = AuthResponseModel.fromJson(data);
-      if (signupResponse.user == null) {
-        throw Exception("Invalid response: user is null");
-      }
       /// :small_blue_diamond: Save user data
       await manager.setString(
         key: constants.userIdConstant,
-        value: signupResponse.user!.id.toString(),
+        value: signupResponse.user.id.toString(),
       );
+      final token = signupResponse.token ?? "";
       await manager.setString(
         key: constants.userTokenConstant,
-        value: signupResponse.token ?? "",
+        value: token,
       );
       /// Optional: Save the full user model for later use
-      await manager.saveUser(signupResponse.user!);
+      await manager.saveUser(signupResponse.user);
+
+      // Reconnect socket with new token
+      if (token.isNotEmpty) {
+        try {
+          if (Get.isRegistered<SocketService>()) {
+            final socketService = SocketService.to;
+            await socketService.reconnectWithToken(token);
+          }
+        } catch (e) {
+          print('[socket] Error reconnecting after signup: $e');
+        }
+      }
+
       /// :white_tick: Success
       Get.snackbar("Success", "Account created successfully");
       Get.offAll(() => ProfileView());

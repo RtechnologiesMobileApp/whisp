@@ -12,6 +12,7 @@ import 'package:whisp/features/auth/controllers/forgot_password_controller.dart'
 import 'package:whisp/features/home/controllers/finding_match_controller.dart';
 import 'package:whisp/services/socket_service.dart';
 import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
+import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 
 class AppBindings extends Bindings {
   @override
@@ -31,19 +32,30 @@ class AppBindings extends Bindings {
     Get.lazyPut<ChatController>(() => ChatController(), fenix: true);
 
       // 🧩 Socket Service (global singleton)
-    Get.putAsync<SocketService>(() async {
-      final prefs = SharedPreferencesManager.instance;
+    // Only initialize if not already initialized
+    if (!Get.isRegistered<SocketService>()) {
+      Get.putAsync<SocketService>(() async {
+        final prefs = SharedPreferencesManager.instance;
+        final constants = SharedPreferencesConstants.instance;
 
-      // token stored in SharedPreferences
-      final token = await prefs.getString(key: 'token');
+        // token stored in SharedPreferences with key "userToken"
+        final token = await prefs.getString(key: constants.userTokenConstant);
 
-      final service = SocketService();
-      await service.init(
-        baseUrl: ApiEndpoints.baseUrl,  
-        token: token,
-      );
+        if (token.isEmpty) {
+          print('[socket] Warning: No token found in SharedPreferences. Socket will connect after login.');
+        }
 
-      return service;
-    });
+        final service = SocketService();
+        // Only initialize socket if token exists
+        if (token.isNotEmpty) {
+          await service.init(
+            baseUrl: ApiEndpoints.baseUrl,  
+            token: token,
+          );
+        }
+
+        return service;
+      });
+    }
   }
 }

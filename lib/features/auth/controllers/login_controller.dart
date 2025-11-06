@@ -7,6 +7,7 @@ import 'package:whisp/features/auth/repo/auth_repo.dart';
 import 'package:whisp/config/constants/shared_preferences/shared_preferences_constants.dart';
 import 'package:whisp/utils/manager/shared_preferences/shared_preferences_manager.dart';
 import 'package:whisp/utils/manager/user_prefs.dart';
+import 'package:whisp/services/socket_service.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -41,6 +42,16 @@ class LoginController extends GetxController {
         value: auth.user.id ?? '',
       );
       await _prefs.saveUser(auth.user);
+
+      // Reconnect socket with new token
+      try {
+        if (Get.isRegistered<SocketService>()) {
+          final socketService = SocketService.to;
+          await socketService.reconnectWithToken(auth.token);
+        }
+      } catch (e) {
+        print('[socket] Error reconnecting after login: $e');
+      }
 
       Get.snackbar("Success", "Welcome ${auth.user.name}");
       Get.offAllNamed(Routes.welcomehome);

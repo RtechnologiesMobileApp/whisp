@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:whisp/core/network/api_endpoints.dart';
 
 class SocketService extends GetxService {
   static SocketService get to => Get.find();
@@ -13,6 +14,17 @@ class SocketService extends GetxService {
     required String baseUrl,
     required String token,
   }) async {
+    // Dispose existing socket if any
+    if (socket != null) {
+      print('[socket] Disposing existing socket before creating new one');
+      socket?.disconnect();
+      socket?.dispose();
+      socket = null;
+    }
+
+    print('[socket] Initializing socket connection to $baseUrl');
+    print('[socket] Token provided: ${token.isNotEmpty ? "Yes (${token.substring(0, token.length > 10 ? 10 : token.length)}...)" : "No"}');
+    
     // Connect with token as query param for auth
     socket = IO.io(
       baseUrl,
@@ -27,13 +39,19 @@ class SocketService extends GetxService {
       _connected.value = true;
     });
 
-    socket!.on('disconnect', (_) {
-      print('[socket] disconnected');
-      _connected.value = false;
-    });
 
     socket!.on('connect_error', (data) {
       print('[socket] connect_error $data');
+      _connected.value = false;
+    });
+
+    socket!.on('error', (data) {
+      print('[socket] error event: $data');
+    });
+
+    socket!.on('disconnect', (reason) {
+      print('[socket] disconnected. Reason: $reason');
+      _connected.value = false;
     });
 
     // Generic server -> client events, we'll forward them via functions below
@@ -90,6 +108,20 @@ class SocketService extends GetxService {
       socket?.on('SESSION_ENDED', (_) => cb());
   void onError(void Function(Map) cb) =>
       socket?.on('ERROR', (data) => cb(Map.from(data)));
+
+  // Reconnect with new token (useful after login)
+  Future<void> reconnectWithToken(String token) async {
+    if (token.isEmpty) {
+      print('[socket] Cannot reconnect: token is empty');
+      return;
+    }
+    
+    print('[socket] Reconnecting with new token');
+    await init(
+      baseUrl: ApiEndpoints.baseUrl,
+      token: token,
+    );
+  }
 
   // Disconnect
   void disposeSocket() {
