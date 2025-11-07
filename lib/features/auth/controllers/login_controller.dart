@@ -11,6 +11,8 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
   final AuthRepository _authRepository = Get.find<AuthRepository>();
   var isLoading = false.obs;
+  final isGoogleLoading = false.obs;
+
   UserModel? currentUser;
 
   Future<void> login({
@@ -34,6 +36,22 @@ class LoginController extends GetxController {
       );
       debugPrint("[login api] res: $res");
       final data = res is Map ? res : res?.data;
+
+        // 🛑 Handle API error before parsing user
+  if (data == null) {
+    throw Exception("No response from server");
+  }
+  if (data.containsKey('error')) {
+    final error = data['error'];
+    if (error == 'INCORRECT_PASSWORD') {
+      throw Exception("Incorrect password");
+    } else if (error == 'USER_NOT_FOUND') {
+      throw Exception("User not found");
+    } else {
+      throw Exception(error.toString());
+    }
+  }
+
       final user = UserModel.fromJson(data['user']);
       final token = data['token'];
       final updatedUser = user.copyWith(token: token);
@@ -67,14 +85,14 @@ class LoginController extends GetxController {
 
   Future<void> googleSignIn() async {
     try {
-      isLoading.value = true;
+      isGoogleLoading.value = true;
       final user = await _authRepository.signInWithGoogle();
 
       currentUser = user;
 
       await login(email: user.email, type: "google");
     } catch (e) {
-      isLoading.value = false;
+      isGoogleLoading.value = false;
       Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;

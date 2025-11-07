@@ -87,14 +87,17 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 20),
 
               // Google sign in button
-              CustomButton(
-                text: "Continue with Google",
-                color: Colors.grey[200]!,
-                textColor: Colors.black,
-                iconPath: AppImages.googleLogo,
-                onPressed: controller.googleSignIn,
-                borderRadius: 24,
-              ),
+            Obx(() => CustomButton(
+  isLoading: controller.isGoogleLoading.value,
+  text: "Continue with Google",
+  color: Colors.grey[200]!,
+  textColor: Colors.black,
+  iconPath: AppImages.googleLogo,
+  onPressed:  controller.googleSignIn, // ✅ Fixed
+  borderRadius: 24,
+)),
+
+
 
               const SizedBox(height: 30),
 

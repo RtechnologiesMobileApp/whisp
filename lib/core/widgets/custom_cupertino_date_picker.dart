@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
 
 class CustomColoredDatePicker extends StatefulWidget {
   const CustomColoredDatePicker({super.key});
@@ -35,6 +37,17 @@ class _CustomColoredDatePickerState extends State<CustomColoredDatePicker> {
   );
   final days = List.generate(31, (index) => index + 1);
 
+  void _updateSelectedDate() {
+  final controller = Get.find<SignupController>();
+  final selectedDate = DateTime(
+    years[selectedYear],
+    selectedMonth + 1,
+    days[selectedDay],
+  );
+  controller.selectedDate.value = selectedDate;
+}
+
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -68,9 +81,14 @@ class _CustomColoredDatePickerState extends State<CustomColoredDatePicker> {
                   ),
                 ),
               ),
-              onSelectedItemChanged: (index) {
-                setState(() => selectedMonth = index);
-              },
+             // Month picker
+onSelectedItemChanged: (index) {
+  setState(() {
+    selectedMonth = index;
+    _updateSelectedDate();
+  });
+},
+
               children: months
                   .map(
                     (month) => Center(
@@ -111,9 +129,14 @@ class _CustomColoredDatePickerState extends State<CustomColoredDatePicker> {
                   ),
                 ),
               ),
-              onSelectedItemChanged: (index) {
-                setState(() => selectedDay = index);
-              },
+             // Day picker
+onSelectedItemChanged: (index) {
+  setState(() {
+    selectedDay = index;
+    _updateSelectedDate();
+  });
+},
+
               children: days
                   .map(
                     (day) => Center(
@@ -157,9 +180,14 @@ class _CustomColoredDatePickerState extends State<CustomColoredDatePicker> {
                   ),
                 ),
               ),
-              onSelectedItemChanged: (index) {
-                setState(() => selectedYear = index);
-              },
+             // Year picker
+onSelectedItemChanged: (index) {
+  setState(() {
+    selectedYear = index;
+    _updateSelectedDate();
+  });
+},
+
               children: years
                   .map(
                     (year) => Center(

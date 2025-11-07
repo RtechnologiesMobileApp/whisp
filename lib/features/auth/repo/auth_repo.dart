@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,22 +8,71 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
+import '../../../core/network/api_exception.dart';
 
 class AuthRepository {
   final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<dynamic> login({required String email, String? password, required String type}) async {
+Future<dynamic> login({
+    required String email,
+    String? password,
+    required String type,
+  }) async {
     print("[login api] url: ${ApiEndpoints.login}");
-    final response = await _apiClient.post(ApiEndpoints.login, {
-      "email": email,
-      if (password != null) "password": password,
-      "type":type
-    });
-    print("[login api] response: $response");
-    return response;
+    try {
+      final response = await _apiClient.post(ApiEndpoints.login, {
+        "email": email,
+        if (password != null) "password": password,
+        "type": type,
+      });
+
+      print("[login api] success: ${response}");
+      return response;
+    } on DioException catch (e) {
+      print("[login api] DioException caught!");
+      print("[login api] status: ${e.response?.statusCode}");
+      print("[login api] data: ${e.response?.data}");
+
+      dynamic data = e.response?.data;
+      // Some APIs return a JSON string instead of a Map
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map && data.containsKey('error')) {
+        final error = data['error'];
+        print("[login api] parsed error: $error");
+        if (error == 'INCORRECT_PASSWORD') {
+          throw ApiException("Incorrect password");
+        } else if (error == 'USER_NOT_FOUND') {
+          throw ApiException("User not found");
+        } else {
+          throw ApiException(error.toString());
+        }
+      }
+
+      // if data is null or unexpected, use general handler
+      throw ApiException.handleError(e);
+    } catch (e, s) {
+      print("[login api] UNEXPECTED: $e");
+      print(s);
+      throw ApiException(e.toString());
+    }
   }
+  // Future<dynamic> login({required String email, String? password, required String type}) async {
+  //   print("[login api] url: ${ApiEndpoints.login}");
+  //   final response = await _apiClient.post(ApiEndpoints.login, {
+  //     "email": email,
+  //     if (password != null) "password": password,
+  //     "type":type
+  //   });
+  //   print("[login api] response: $response");
+  //   return response;
+  // }
 
   Future<void> logout() async {
     await _auth.signOut();

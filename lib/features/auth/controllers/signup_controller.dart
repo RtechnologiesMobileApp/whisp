@@ -72,20 +72,26 @@ class SignupController extends GetxController {
     }
   }
 
-  Future<void> pickDate(BuildContext context) async {
-    final now = DateTime.now();
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(now.year - 18),
-      firstDate: DateTime(1900),
-      lastDate: now,
-    );
-    if (pickedDate != null) {
-      dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-    }
+Future<void> pickDate(BuildContext context) async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: selectedDate.value,
+    firstDate: DateTime(1900),
+    lastDate: DateTime.now(),
+  );
+
+  if (picked != null && picked != selectedDate.value) {
+    selectedDate.value = picked; // 🔥 THIS is the key line
+    print("✅ New DOB selected: $picked");
   }
+}
+
 
   Future<void> googleSignIn() async {
+      if (!acceptTerms.value) {
+    Get.snackbar('Terms Required', 'Please accept terms and conditions before continuing.');
+    return;
+  }
     try {
       isLoading.value = true;
       isGoogle.value = true;
@@ -201,46 +207,49 @@ class SignupController extends GetxController {
     }
   }
 
-  Future<void> saveDateOfBirth() async {
-    try {
-      isLoading.value = true;
+Future<void> saveDateOfBirth() async {
+  try {
+    isLoading.value = true;
 
-      // Check if user is at least 13 years old
-      final now = DateTime.now();
-      final age = now.year - selectedDate.value.year;
-      final monthDifference = now.month - selectedDate.value.month;
-      final dayDifference = now.day - selectedDate.value.day;
+    final now = DateTime.now();
+    final birth = selectedDate.value;
 
-      final actualAge =
-          (monthDifference < 0 || (monthDifference == 0 && dayDifference < 0))
-          ? age - 1
-          : age;
+    // 🔥 Calculate exact age difference
+    int age = now.year - birth.year;
 
-      if (actualAge < 13) {
-        isLoading.value = false;
-        Get.snackbar(
-          "Age Requirement",
-          "You must be at least 13 years old to continue. Please select a different date.",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
-
-      dob.value = DateFormat('yyyy-MM-dd').format(selectedDate.value);
-
-      // Get.snackbar("Success", "Date of Birth updated successfully");
-
-      print('Navigating to: ${Routes.country}');
-
-      Get.toNamed(Routes.country);
-    } catch (e) {
-      print("❌ Unexpected error: $e");
-      // Get.snackbar("Error", "Failed to update Date of Birth");
-    } finally {
-      isLoading.value = false;
+    // Agar birth month/day abhi aane wale hain to ek saal kam kar do
+    if (now.month < birth.month ||
+        (now.month == birth.month && now.day < birth.day)) {
+      age--;
     }
-  }
 
+    print("🎂 User age: $age years");
+
+    // 🚫 Check if user is under 13
+    if (age < 13) {
+      isLoading.value = false;
+      Get.snackbar(
+        "Age Requirement",
+        "You must be at least 13 years old to continue.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // ✅ Save date if valid
+    dob.value = DateFormat('yyyy-MM-dd').format(birth);
+    print('Navigating to: ${Routes.country}');
+    Get.toNamed(Routes.country);
+
+  } catch (e) {
+    print("❌ Unexpected error: $e");
+    Get.snackbar("Error", "Failed to update Date of Birth");
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+  
   /// Method to set selected country
   void selectCountry(String countryName) {
     selectedCountry.value = countryName;

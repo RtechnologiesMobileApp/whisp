@@ -179,21 +179,35 @@ class SignupView extends GetView<SignupController> {
               const Text('or Signup with'),
 
               const SizedBox(height: 12),
-              InkWell(
-                onTap: controller.googleSignIn,
-                child: Container(
-                  width: double.infinity,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFEFEFEF),
-                    //  border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Center(
-                    child: Image.asset(AppImages.googleLogo, height: 24),
-                  ),
+              Obx(() {
+  return InkWell(
+    onTap: controller.isLoading.value
+        ? null // disable while loading
+        : controller.googleSignIn,
+    child: Container(
+      width: double.infinity,
+      height: 50,
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFEFEF),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Center(
+        child: controller.isLoading.value
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.black,
                 ),
-              ),
+              )
+            : Image.asset(AppImages.googleLogo, height: 24),
+      ),
+    ),
+  );
+}),
+
+         
 
               const SizedBox(height: 20),
 
