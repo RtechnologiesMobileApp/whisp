@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,25 +10,26 @@ class AuthRepository {
   final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  Future<dynamic> login(String email, String password) async {
+  Future<dynamic> login(String email, String password,String type) async {
     return await _apiClient.post(ApiEndpoints.login, {
       "email": email,
       "password": password,
+      "type":type
     });
   }
-  Future<dynamic> signup({
-    required String name,
-    required String email,
-    required String password,
+  // Future<dynamic> signup({
+  //   required String name,
+  //   required String email,
+  //   required String password,
     
-  }) async {
-    return await _apiClient.post(ApiEndpoints.signUp, {
-      "fullName": name,
-      "email": email,
-      "password": password,
+  // }) async {
+  //   return await _apiClient.post(ApiEndpoints.signUp, {
+  //     "fullName": name,
+  //     "email": email,
+  //     "password": password,
        
-    });
-  }
+  //   });
+  // }
   Future<dynamic> forgotPassword(String email) async {
     return await _apiClient.post(ApiEndpoints.forgotPassword, {"email": email});
   }
@@ -63,6 +66,59 @@ class AuthRepository {
       print(":x: Google Sign-In Error: $e");
       print(":page_facing_up: StackTrace:\n$stackTrace");
       return {"success": false, "message": e.toString()};
+    }
+  }
+  
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final res = await _apiClient.post(ApiEndpoints.checkEmailExists, {"email": email});
+      return res['exists'] ?? false; // backend should return { exists: true/false }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> registerUser({
+    required String name,
+    required String email,
+    required String password,
+    required String gender,
+    required String dob,
+    required String country,
+    required File? avatar,
+    String type = "email",
+  }) async {
+    try {
+      final data = {
+        "fullName": name,
+        "email": email,
+        "password": password,
+        "gender": gender,
+        "dateOfBirth": dob,
+        "country": country,
+        "type": type,
+      };
+
+      final response = await _apiClient.postMultipart(
+        ApiEndpoints.signUp,
+        data: data,
+        file: avatar,
+        fileField: "avatar",
+      );
+
+      return response;
+    } catch (e) {
+      throw Exception(_handleError(e));
+    }
+  }
+
+  String _handleError(dynamic e) {
+    if (e) {
+      final msg = e.response?.data?['message'] ?? e.message;
+      if (msg.toString().contains("email")) return "Email already exists.";
+      return msg ?? "Something went wrong, please try again.";
+    } else {
+      return "Unexpected error: $e";
     }
   }
 }

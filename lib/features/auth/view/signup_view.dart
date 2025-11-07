@@ -172,7 +172,7 @@ class SignupView extends GetView<SignupController> {
                 height: 52,
                 child: CustomButton(
                   text: 'Create Account',
-                  onPressed: controller.createAccount,
+                  onPressed: controller.checkEmailAndProceed,
                   borderRadius: 24,
                 ),
               ),

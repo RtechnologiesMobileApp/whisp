@@ -10,7 +10,7 @@ class ApiEndpoints {
  static const String updateProfile = "$baseUrl/api/auth/profile";
  
  static const String resetPassword = "$baseUrl/api/auth/reset-password";  
- static const String checkEmailExists = "$baseUrl/api/auth/check-email";
+ static const String checkEmailExists = "$baseUrl/api/auth/check-account";
  
 }
  

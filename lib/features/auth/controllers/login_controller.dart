@@ -23,6 +23,7 @@ class LoginController extends GetxController {
       final res = await _authRepository.login(
         emailController.text.trim(),
         passwordController.text.trim(),
+        "email"
       );
       final data = res is Map ? res : res?.data;
       final user = UserModel.fromJson(data['user']);
