@@ -33,6 +33,7 @@ class AuthRepository {
   }
   Future<UserModel> signInWithGoogle() async {
     try {
+      await _googleSignIn.signOut(); // Ensure any previous session is cleared
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         throw Exception("Sign-in cancelled");
