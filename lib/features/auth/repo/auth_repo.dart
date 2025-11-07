@@ -7,17 +7,21 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
+
 class AuthRepository {
   final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<dynamic> login(String email, String password,String type) async {
-    return await _apiClient.post(ApiEndpoints.login, {
+  Future<dynamic> login({required String email, String? password, required String type}) async {
+    print("[login api] url: ${ApiEndpoints.login}");
+    final response = await _apiClient.post(ApiEndpoints.login, {
       "email": email,
-      "password": password,
+      if (password != null) "password": password,
       "type":type
     });
+    print("[login api] response: $response");
+    return response;
   }
 
   Future<void> logout() async {
@@ -100,8 +104,11 @@ class AuthRepository {
         fileField: "avatar",
       );
 
+      print("[register user api] response: $response");
+
       return response;
     } catch (e) {
+      print("[register user api] error: $e");
       throw Exception(_handleError(e));
     }
   }

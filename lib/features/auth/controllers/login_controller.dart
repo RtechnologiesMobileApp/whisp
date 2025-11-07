@@ -24,11 +24,15 @@ class LoginController extends GetxController {
       Get.snackbar("Error", "Please fill all fields");
       return;
     }
-    print("email: $email, password: $password, type: $type");
+    debugPrint("[login api] email: $email, password: $password, type: $type");
     try {
       isLoading.value = true;
-      final res = await _authRepository.login(email, password, type);
-      print("res: $res");
+      final res = await _authRepository.login(
+        email: email,
+        password: password,
+        type: type,
+      );
+      debugPrint("[login api] res: $res");
       final data = res is Map ? res : res?.data;
       final user = UserModel.fromJson(data['user']);
       final token = data['token'];
@@ -50,6 +54,7 @@ class LoginController extends GetxController {
 
       Get.offAllNamed(Routes.welcomehome);
     } catch (e) {
+      debugPrint("[login api] error: $e");
       Get.snackbar("Login Failed", e.toString());
     } finally {
       isLoading.value = false;
@@ -63,9 +68,6 @@ class LoginController extends GetxController {
   Future<void> googleSignIn() async {
     try {
       isLoading.value = true;
-
-      // await _authRepository.logout();
-
       final user = await _authRepository.signInWithGoogle();
 
       currentUser = user;
@@ -74,7 +76,7 @@ class LoginController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       Get.snackbar("Error", e.toString());
-    }finally {
+    } finally {
       isLoading.value = false;
     }
   }

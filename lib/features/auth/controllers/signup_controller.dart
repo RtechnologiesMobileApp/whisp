@@ -18,8 +18,8 @@ class SignupController extends GetxController {
   final Rx<File?> avatarFile = Rx<File?>(null);
   final RxString gender = "".obs;
   final RxString dob = "".obs;
- 
-   var selectedCountry = ''.obs;
+
+  var selectedCountry = ''.obs;
   final Rx<File?> selectedImage = Rx<File?>(null);
   final acceptTerms = false.obs;
   final isLoading = false.obs;
@@ -29,8 +29,7 @@ class SignupController extends GetxController {
 
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
 
-
-   // Step 1: Check email existence
+  // Step 1: Check email existence
   Future<void> checkEmailAndProceed() async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
@@ -40,15 +39,18 @@ class SignupController extends GetxController {
 
     isLoading.value = true;
     try {
-      if(!acceptTerms.value){
+      if (!acceptTerms.value) {
         Get.snackbar('Terms Required', 'Please accept terms and conditions.');
         return;
       }
       final exists = await _authRepo.checkEmailExists(email);
       if (exists) {
-        Get.snackbar("Email Exists", "An account with this email already exists.");
+        Get.snackbar(
+          "Email Exists",
+          "An account with this email already exists.",
+        );
       } else {
-         Get.to(ProfileView());
+        Get.to(ProfileView());
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
@@ -69,6 +71,7 @@ class SignupController extends GetxController {
       Get.snackbar('No image selected', 'Please choose an avatar image.');
     }
   }
+
   Future<void> pickDate(BuildContext context) async {
     final now = DateTime.now();
     final pickedDate = await showDatePicker(
@@ -81,27 +84,50 @@ class SignupController extends GetxController {
       dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
     }
   }
-  Future<void> createAccount() async {
-    if (!acceptTerms.value) {
-      Get.snackbar('Terms Required', 'Please accept terms and conditions.');
-      return;
-    }
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty 
-         ) {
-      Get.snackbar('Error', 'Please fill all fields');
-      return;
-    }
+
+  Future<void> googleSignIn() async {
     try {
       isLoading.value = true;
+      final user = await _authRepo.signInWithGoogle();
+
+      nameController.text = user.name;
+      emailController.text = user.email;
+
+      Get.toNamed(Routes.genderview);
+
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> createAccount() async {
+    // if (!acceptTerms.value) {
+    //   Get.snackbar('Terms Required', 'Please accept terms and conditions.');
+    //   return;
+    // }
+    // if (nameController.text.isEmpty ||
+    //     emailController.text.isEmpty ||
+    //     passwordController.text.isEmpty) {
+    //   Get.snackbar('Error', 'Please fill all fields');
+    //   return;
+    // }
+    try {
+      isLoading.value = true;
+
       /// :small_blue_diamond: Call signup API
       final apiResponse = await _authRepo.registerUser(
         name: nameController.text.trim(),
         email: emailController.text.trim(),
-        password: passwordController.text.trim(), gender: gender.value, dob: dob.value, country: selectedCountry.value, avatar: selectedImage.value,
-        
+        password: passwordController.text.trim(),
+        gender: gender.value,
+        dob: dob.value,
+        country: selectedCountry.value,
+        avatar: selectedImage.value,
       );
+
       /// :small_blue_diamond: Handle Dio Response type (in case your repo returns Response)
       final data = apiResponse is Map ? apiResponse : apiResponse.data;
 
@@ -129,15 +155,16 @@ class SignupController extends GetxController {
     } catch (e) {
       Get.snackbar("Signup Failed", e.toString());
       debugPrint(":x: Signup Error: $e");
+      throw Exception(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
-  
+
   void selectGender(int index) {
     selectedGender.value = index;
   }
-  
+
   Future<void> genderContinue() async {
     if (selectedGender.value == -1) {
       Get.snackbar("Select Gender", "Please select your gender to continue");
@@ -145,7 +172,7 @@ class SignupController extends GetxController {
     }
 
     // 👇 Convert index to string value based on your backend
-   
+
     switch (selectedGender.value) {
       case 0:
         gender.value = "female";
@@ -154,14 +181,11 @@ class SignupController extends GetxController {
         gender.value = "male";
         break;
       default:
-        
         gender.value = "not_specified";
     }
 
     try {
       isLoading.value = true;
- 
-
 
       Get.snackbar("Success", "Gender updated successfully");
 
@@ -174,7 +198,8 @@ class SignupController extends GetxController {
       isLoading.value = false;
     }
   }
-Future<void> saveDateOfBirth() async {
+
+  Future<void> saveDateOfBirth() async {
     try {
       isLoading.value = true;
 
@@ -183,8 +208,9 @@ Future<void> saveDateOfBirth() async {
       final age = now.year - selectedDate.value.year;
       final monthDifference = now.month - selectedDate.value.month;
       final dayDifference = now.day - selectedDate.value.day;
-      
-      final actualAge = (monthDifference < 0 || (monthDifference == 0 && dayDifference < 0))
+
+      final actualAge =
+          (monthDifference < 0 || (monthDifference == 0 && dayDifference < 0))
           ? age - 1
           : age;
 
@@ -198,23 +224,22 @@ Future<void> saveDateOfBirth() async {
         return;
       }
 
-       dob.value = DateFormat('yyyy-MM-dd').format(selectedDate.value);
-     
+      dob.value = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+
       Get.snackbar("Success", "Date of Birth updated successfully");
 
-print('Navigating to: ${Routes.country}');
- 
-
+      print('Navigating to: ${Routes.country}');
 
       Get.toNamed(Routes.country);
-    }  catch (e) {
+    } catch (e) {
       print("❌ Unexpected error: $e");
       Get.snackbar("Error", "Failed to update Date of Birth");
     } finally {
       isLoading.value = false;
     }
   }
-   /// Method to set selected country
+
+  /// Method to set selected country
   void selectCountry(String countryName) {
     selectedCountry.value = countryName;
   }
@@ -229,7 +254,6 @@ print('Navigating to: ${Routes.country}');
     try {
       isLoading.value = true;
       await createAccount();
-    
 
       // ✅ Navigate to Welcome screen
       Get.offAllNamed(Routes.welcomehome);
