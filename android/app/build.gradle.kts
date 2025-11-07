@@ -1,45 +1,20 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-android {
-    namespace = "com.example.whisp"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.whisp"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
-
-  val keystoreProperties = java.util.Properties()
+ 
 val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = mutableMapOf<String, String>()
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+    keystorePropertiesFile.forEachLine { line ->
+        val parts = line.split("=")
+        if (parts.size == 2) {
+            keystoreProperties[parts[0].trim()] = parts[1].trim()
+        }
+    }
 }
 
 android {
@@ -66,18 +41,29 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
+            val storeFilePath = keystoreProperties["storeFile"]
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = keystoreProperties["storePassword"]
+                keyAlias = keystoreProperties["keyAlias"]
+                keyPassword = keystoreProperties["keyPassword"]
+            }
         }
     }
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
-        }
+  buildTypes {
+    getByName("release") {
+        // You can disable both shrinking and minification for now
+        isMinifyEnabled = false
+        isShrinkResources = false
+
+        signingConfig = signingConfigs.getByName("release")
+    }
+
+    getByName("debug") {
+        // Optional, make sure debug works fine
+        isMinifyEnabled = false
+        isShrinkResources = false
     }
 }
 
