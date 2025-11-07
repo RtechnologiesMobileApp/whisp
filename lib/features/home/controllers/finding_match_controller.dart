@@ -2,8 +2,11 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:whisp/services/ad_service.dart';
 import '../../../../../services/socket_service.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+
+
 
 class FindingMatchController extends GetxController {
   final SocketService socketService = SocketService.to;
@@ -21,7 +24,7 @@ class FindingMatchController extends GetxController {
       debugPrint('AUTH_OK: $data');
     });
 
-  socketService.onMatchFound((data) {
+  socketService.onMatchFound((data) async {
   // server sends { partnerId, partnerName, partnerAvatar }
   log("this is on match found data: ${data.toString()}");
   final id = data['partner']['id'] as String?;
@@ -32,6 +35,11 @@ class FindingMatchController extends GetxController {
 
   if (id != null) {
     partnerId.value = id;
+
+      AdService().showInterstitialAd();
+
+     
+    await Future.delayed(const Duration(seconds: 1));
 
     // navigate to chat screen with all details
     Get.offNamed(
@@ -71,6 +79,7 @@ class FindingMatchController extends GetxController {
       // you could attempt to re-init socket here
       return;
     }
+      AdService().loadInterstitialAd();
     isSearching.value = true;
     socketService.readyForRandom();
   }
