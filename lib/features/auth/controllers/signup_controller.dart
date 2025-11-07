@@ -18,7 +18,7 @@ class SignupController extends GetxController {
   final Rx<File?> avatarFile = Rx<File?>(null);
   final RxString gender = "".obs;
   final RxString dob = "".obs;
-
+  final RxBool isGoogle = false.obs;
   var selectedCountry = ''.obs;
   final Rx<File?> selectedImage = Rx<File?>(null);
   final acceptTerms = false.obs;
@@ -88,12 +88,13 @@ class SignupController extends GetxController {
   Future<void> googleSignIn() async {
     try {
       isLoading.value = true;
+      isGoogle.value = true;
       final user = await _authRepo.signInWithGoogle();
 
       nameController.text = user.name;
       emailController.text = user.email;
-
-      Get.toNamed(Routes.genderview);
+      checkEmailAndProceed();
+      // Get.toNamed(Routes.genderview);
 
     } catch (e) {
       isLoading.value = false;
@@ -126,6 +127,7 @@ class SignupController extends GetxController {
         dob: dob.value,
         country: selectedCountry.value,
         avatar: selectedImage.value,
+        type: isGoogle.value ? "google" : "email",
       );
 
       /// :small_blue_diamond: Handle Dio Response type (in case your repo returns Response)
@@ -167,7 +169,7 @@ class SignupController extends GetxController {
 
   Future<void> genderContinue() async {
     if (selectedGender.value == -1) {
-      Get.snackbar("Select Gender", "Please select your gender to continue");
+      // Get.snackbar("Select Gender", "Please select your gender to continue");
       return;
     }
 
@@ -187,13 +189,13 @@ class SignupController extends GetxController {
     try {
       isLoading.value = true;
 
-      Get.snackbar("Success", "Gender updated successfully");
+      // Get.snackbar("Success", "Gender updated successfully");
 
       // 👇 navigate to DOB screen next
       Get.toNamed(Routes.dob);
     } catch (e) {
       print(":x: Gender update failed: $e");
-      Get.snackbar("Error", "Failed to update gender: $e");
+      // Get.snackbar("Error", "Failed to update gender: $e");
     } finally {
       isLoading.value = false;
     }
@@ -226,14 +228,14 @@ class SignupController extends GetxController {
 
       dob.value = DateFormat('yyyy-MM-dd').format(selectedDate.value);
 
-      Get.snackbar("Success", "Date of Birth updated successfully");
+      // Get.snackbar("Success", "Date of Birth updated successfully");
 
       print('Navigating to: ${Routes.country}');
 
       Get.toNamed(Routes.country);
     } catch (e) {
       print("❌ Unexpected error: $e");
-      Get.snackbar("Error", "Failed to update Date of Birth");
+      // Get.snackbar("Error", "Failed to update Date of Birth");
     } finally {
       isLoading.value = false;
     }
@@ -247,7 +249,7 @@ class SignupController extends GetxController {
   /// API call to update country
   Future<void> updateCountry() async {
     if (selectedCountry.value.isEmpty) {
-      Get.snackbar("Select Country", "Please select your country to continue");
+      // Get.snackbar("Select Country", "Please select your country to continue");
       return;
     }
 
