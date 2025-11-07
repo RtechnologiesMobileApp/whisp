@@ -11,7 +11,7 @@ class SplashServices {
     await sC.loadSession();
 
     if (sC.user == null) {
-      Get.offAll(() => LoginView());
+       Get.offAll(() => GetStartedScreen());
       return;
     }
 
