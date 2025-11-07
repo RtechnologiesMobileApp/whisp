@@ -37,9 +37,11 @@ class UserModel {
       profilePic: json["profilePic"] ?? json["avatar"],
       dob: json["dob"] ?? json['dateOfBirth'],
       gender: json["gender"] ?? "Not specified",
+      token: json["token"] ?? "",
     );
   }
     UserModel copyWith({
+    String? id,
     String? name,
     String? email,
     String? profilePic,
@@ -48,6 +50,7 @@ class UserModel {
     String? token,
   }) {
     return UserModel(
+      id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       profilePic: profilePic ?? this.profilePic,

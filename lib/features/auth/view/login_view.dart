@@ -75,10 +75,13 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 30),
 
               // Sign in button
-              CustomButton(
-                text: "Sign in",
-                onPressed: controller.login,
-                borderRadius: 24,
+              Obx(()=>
+                CustomButton(
+                  isLoading: controller.isLoading.value,
+                  text: "Sign in",
+                  onPressed: controller.login,
+                  borderRadius: 24,
+                ),
               ),
 
               const SizedBox(height: 20),
