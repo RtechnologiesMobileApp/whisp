@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/routes/app_pages.dart';
  
-import 'package:whisp/services/socket_service.dart';  
+import 'package:whisp/core/services/socket_service.dart';  
 
 void showChatBottomSheet(BuildContext context) {
   final socketService = Get.find<SocketService>();  

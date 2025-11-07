@@ -9,7 +9,7 @@ import 'package:whisp/features/auth/controllers/otp_controller.dart';
 import 'package:whisp/features/auth/controllers/reset_password_controller.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/home/controllers/finding_match_controller.dart';
-import 'package:whisp/services/socket_service.dart';
+import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/core/services/session_manager.dart';
 
 class AppBindings extends Bindings {

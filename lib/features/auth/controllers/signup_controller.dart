@@ -7,9 +7,8 @@ import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import 'package:whisp/features/auth/repo/auth_repo.dart';
-import 'package:whisp/features/auth/view/dob_screen.dart';
 import 'package:whisp/features/auth/view/profile_screen.dart';
-import 'package:whisp/services/socket_service.dart';
+import 'package:whisp/core/services/socket_service.dart';
 
 class SignupController extends GetxController {
   final nameController = TextEditingController();
