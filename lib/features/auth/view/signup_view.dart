@@ -41,45 +41,7 @@ class SignupView extends GetView<SignupController> {
                 ],
               ),
 
-              //             // Avatar Section
-              //             GestureDetector(
-              //   onTap: controller.pickImage,
-              //   child: Obx(() {
-              //     return Stack(
-              //       clipBehavior: Clip.none,
-              //       alignment: Alignment.topRight, // 👈 edit icon now top-right
-              //       children: [
-              //         CircleAvatar(
-              //           radius: 55, // 👈 slightly larger avatar
-              //           backgroundImage: controller.selectedImage.value != null
-              //               ? FileImage(controller.selectedImage.value!)
-              //               : const AssetImage(AppImages.placeholderpic) as ImageProvider,
-              //           backgroundColor: Colors.grey[200],
-              //         ),
-              //         Positioned(
-              //           top: -3, // slight adjustment to sit nicely
-              //           right: -3,
-              //           child: Container(
-              //             padding: const EdgeInsets.all(6),
-              //             decoration: const BoxDecoration(
-              //               color: AppColors.primary,
-              //               shape: BoxShape.circle,
-              //             ),
-              //             child: const Icon(
-              //               Icons.edit,
-              //               size: 20,
-              //               color: Colors.white,
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     );
-              //   }),
-              // ),
-
-              //             const SizedBox(height: 6),
-              //             const Text('Select Avatar', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 20),
+               const SizedBox(height: 20),
 
               // Text Fields
               CustomTextField(
@@ -104,18 +66,7 @@ class SignupView extends GetView<SignupController> {
 
               const SizedBox(height: 14),
 
-              // GestureDetector(
-              //   onTap: () => controller.pickDate(context),
-              //   child: AbsorbPointer(
-              //     // prevent keyboard from opening
-              //     child: CustomTextField(
-              //       controller: controller.dobController,
-              //       hint: 'Date of Birth',
-              //       icon: Icons.calendar_today,
-              //       keyboardType: TextInputType.datetime,
-              //     ),
-              //   ),
-              // ),
+            
               const SizedBox(height: 12),
 
               // Terms Checkbox
