@@ -3,7 +3,7 @@ import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:whisp/features/auth/bindings/country_bindings.dart';
 import 'package:whisp/features/auth/bindings/forgot_password_binding.dart';
-import 'package:whisp/features/auth/bindings/gender_binding.dart';
+
 import 'package:whisp/features/auth/bindings/login_binding.dart';
 import 'package:whisp/features/auth/bindings/signup_binding.dart';
 import 'package:whisp/features/auth/view/country_screen.dart';
@@ -29,7 +29,7 @@ class AppPages {
     GetPage(
       name: Routes.genderview,
       page: () => GenderView(),
-      binding: GenderBinding(),
+   
     ),
     GetPage(
       name: Routes.login,
@@ -51,7 +51,7 @@ class AppPages {
     GetPage(
       name: Routes.country,
       page: () => const CountryScreen(),
-      binding: CountryBinding(),
+      // binding: CountryBinding(),
     ),
     GetPage(name: Routes.welcomehome, page: () => HomeScreen()),
     GetPage(

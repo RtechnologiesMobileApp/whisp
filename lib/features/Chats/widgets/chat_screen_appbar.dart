@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whisp/services/socket_service.dart';
+import 'package:whisp/core/services/socket_service.dart';
 import 'chat_bottom_sheet.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -8,10 +8,10 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String userAvatar;
 
   const ChatAppBar({
-    Key? key,
+    super.key,
     required this.userName,
     required this.userAvatar,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,40 +1,42 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
+
 class AuthRepository {
   final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  Future<dynamic> login(String email, String password) async {
-    return await _apiClient.post(ApiEndpoints.login, {
+
+  Future<dynamic> login({required String email, String? password, required String type}) async {
+    print("[login api] url: ${ApiEndpoints.login}");
+    final response = await _apiClient.post(ApiEndpoints.login, {
       "email": email,
-      "password": password,
+      if (password != null) "password": password,
+      "type":type
     });
+    print("[login api] response: $response");
+    return response;
   }
-  Future<dynamic> signup({
-    required String name,
-    required String email,
-    required String password,
-    
-  }) async {
-    return await _apiClient.post(ApiEndpoints.signUp, {
-      "fullName": name,
-      "email": email,
-      "password": password,
-       
-    });
+
+  Future<void> logout() async {
+    await _auth.signOut();
   }
+  
   Future<dynamic> forgotPassword(String email) async {
     return await _apiClient.post(ApiEndpoints.forgotPassword, {"email": email});
   }
-  Future<dynamic> signInWithGoogle() async {
+  Future<UserModel> signInWithGoogle() async {
     try {
+      await _googleSignIn.signOut(); // Ensure any previous session is cleared
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        return {"success": false, "message": "Sign-in cancelled"};
+        throw Exception("Sign-in cancelled");
       }
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -47,7 +49,7 @@ class AuthRepository {
       );
       final User? user = userCredential.user;
       if (user == null) {
-        return {"success": false, "message": "Failed to get user data"};
+        throw Exception("Failed to get user data");
       }
       final userData = UserModel(
         name: user.displayName ?? "",
@@ -57,12 +59,68 @@ class AuthRepository {
       );
       // temporarily skipping signup API call
       //final signupResponse =  await _apiClient.post(ApiEndpoints.signUp, userData.toJson());
-      return {"success": true, "user": userData};
+      return userData;
     } catch (e, stackTrace) {
       // :fire: Print the exact error in console
-      print(":x: Google Sign-In Error: $e");
-      print(":page_facing_up: StackTrace:\n$stackTrace");
-      return {"success": false, "message": e.toString()};
+      debugPrint(":x: Google Sign-In Error: $e");
+      debugPrint(":page_facing_up: StackTrace:\n$stackTrace");
+      throw Exception(e.toString());
+    }
+  }
+  
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final res = await _apiClient.post(ApiEndpoints.checkEmailExists, {"email": email});
+      return res['exists'] ?? false; // backend should return { exists: true/false }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> registerUser({
+    required String name,
+    required String email,
+    required String password,
+    required String gender,
+    required String dob,
+    required String country,
+    required File? avatar,
+    String type = "email",
+  }) async {
+    try {
+      final data = {
+        "fullName": name,
+        "email": email,
+        "password": password,
+        "gender": gender,
+        "dateOfBirth": dob,
+        "country": country,
+        "type": type,
+      };
+
+      final response = await _apiClient.postMultipart(
+        ApiEndpoints.signUp,
+        data: data,
+        file: avatar,
+        fileField: "avatar",
+      );
+
+      print("[register user api] response: $response");
+
+      return response;
+    } catch (e) {
+      print("[register user api] error: $e");
+      throw Exception(_handleError(e));
+    }
+  }
+
+  String _handleError(dynamic e) {
+    if (e) {
+      final msg = e.response?.data?['message'] ?? e.message;
+      if (msg.toString().contains("email")) return "Email already exists.";
+      return msg ?? "Something went wrong, please try again.";
+    } else {
+      return "Unexpected error: $e";
     }
   }
 }

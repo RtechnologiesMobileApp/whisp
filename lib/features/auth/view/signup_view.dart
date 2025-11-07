@@ -5,13 +5,11 @@ import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/core/widgets/custom_text_field.dart';
-import 'package:whisp/features/auth/controllers/login_controller.dart';
 
 import '../controllers/signup_controller.dart';
 
 class SignupView extends GetView<SignupController> {
-  SignupView({super.key});
-  final LoginController loginController = Get.find<LoginController>();
+  const SignupView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +170,7 @@ class SignupView extends GetView<SignupController> {
                 height: 52,
                 child: CustomButton(
                   text: 'Create Account',
-                  onPressed: controller.createAccount,
+                  onPressed: controller.checkEmailAndProceed,
                   borderRadius: 24,
                 ),
               ),
@@ -182,7 +180,7 @@ class SignupView extends GetView<SignupController> {
 
               const SizedBox(height: 12),
               InkWell(
-                onTap: loginController.googleSignIn,
+                onTap: controller.googleSignIn,
                 child: Container(
                   width: double.infinity,
                   height: 50,

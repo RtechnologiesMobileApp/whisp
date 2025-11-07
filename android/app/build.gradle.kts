@@ -1,11 +1,20 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+ 
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = mutableMapOf<String, String>()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.forEachLine { line ->
+        val parts = line.split("=")
+        if (parts.size == 2) {
+            keystoreProperties[parts[0].trim()] = parts[1].trim()
+        }
+    }
 }
 
 android {
@@ -23,23 +32,41 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.whisp"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        create("release") {
+            val storeFilePath = keystoreProperties["storeFile"]
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = keystoreProperties["storePassword"]
+                keyAlias = keystoreProperties["keyAlias"]
+                keyPassword = keystoreProperties["keyPassword"]
+            }
         }
     }
+
+  buildTypes {
+    getByName("release") {
+        // You can disable both shrinking and minification for now
+        isMinifyEnabled = false
+        isShrinkResources = false
+
+        signingConfig = signingConfigs.getByName("release")
+    }
+
+    getByName("debug") {
+        // Optional, make sure debug works fine
+        isMinifyEnabled = false
+        isShrinkResources = false
+    }
+}
+
 }
 
 flutter {

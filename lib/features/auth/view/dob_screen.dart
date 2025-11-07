@@ -3,14 +3,15 @@ import 'package:get/get.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/core/widgets/custom_cupertino_date_picker.dart';
 import 'package:whisp/core/widgets/custom_back_button.dart';
-import 'package:whisp/features/auth/controllers/dob_controller.dart';
+
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
 
 class DobScreen extends StatelessWidget {
   const DobScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DobController());
+    final controller = Get.find<SignupController>();
 
     return Scaffold(
       appBar: AppBar(leading: CustomBackButton()),

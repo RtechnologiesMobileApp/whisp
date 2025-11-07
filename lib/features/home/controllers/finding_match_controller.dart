@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:whisp/services/ad_service.dart';
-import '../../../../../services/socket_service.dart';
+import 'package:whisp/core/services/ad_service.dart';
+import '../../../core/services/socket_service.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 
 

@@ -4,13 +4,14 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
-//import 'package:whisp/features/auth/controllers/profile_controller.dart';
-import 'package:whisp/features/auth/controllers/profile_pic_controller.dart';
+
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
+import 'package:whisp/features/auth/view/gender_view.dart';
 
 class ProfileView extends StatelessWidget {
   ProfileView({super.key});
 
-  final controller = Get.put(ProfileController());
+  final controller = Get.put(SignupController());
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class ProfileView extends StatelessWidget {
                     text: controller.isLoading.value
                         ? "Updating..."
                         : "Continue",
-                    onPressed: controller.updateAvatar,
+                    onPressed:controller.selectedImage.value == null ? controller.pickImage:(){Get.to(GenderView());},
                     borderRadius: 24,
                   ),
                 );

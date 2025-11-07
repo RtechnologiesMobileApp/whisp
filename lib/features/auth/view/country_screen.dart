@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:whisp/core/widgets/custom_back_button.dart';
-import '../controllers/country_controller.dart'; // your controller file
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
+
 
 class CountryScreen extends StatelessWidget {
   const CountryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<CountryController>();
+    final controller = Get.find<SignupController>();
 
     return Scaffold(
       appBar: AppBar(leading: CustomBackButton()),

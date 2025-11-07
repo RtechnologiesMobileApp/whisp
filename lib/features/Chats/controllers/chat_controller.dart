@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whisp/services/socket_service.dart';
+import 'package:whisp/core/services/socket_service.dart';
 
 class ChatController extends GetxController {
   final SocketService socketService = Get.find<SocketService>();

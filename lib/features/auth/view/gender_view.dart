@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/core/widgets/custom_back_button.dart';
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
 
 import '../../../core/widgets/custom_button.dart';
-import '../controllers/gender_controller.dart';
 
-class GenderView extends GetView<GenderController> {
+
+class GenderView extends StatelessWidget {
   const GenderView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<SignupController>();
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -37,11 +39,11 @@ class GenderView extends GetView<GenderController> {
             Obx(
               () => Column(
                 children: [
-                  _genderOption("Female", 0),
+                  _genderOption("Female", 0,controller),
                   const SizedBox(height: 12),
-                  _genderOption("Male", 1),
+                  _genderOption("Male", 1,controller),
                   const SizedBox(height: 12),
-                  _genderOption("Not Specified", 2),
+                  _genderOption("Not Specified", 2,controller),
                 ],
               ),
             ),
@@ -51,7 +53,7 @@ class GenderView extends GetView<GenderController> {
             // Continue Button
             CustomButton(
               text: "Continue",
-              onPressed: controller.continueNext,
+              onPressed: controller.genderContinue,
               borderRadius: 24,
             ),
             SizedBox(height: size.height * 0.04),
@@ -61,7 +63,7 @@ class GenderView extends GetView<GenderController> {
     );
   }
 
-  Widget _genderOption(String label, int index) {
+  Widget _genderOption(String label, int index,SignupController controller) {
     final isSelected = controller.selectedGender.value == index;
     return GestureDetector(
       onTap: () => controller.selectGender(index),
