@@ -23,6 +23,7 @@ class SignupController extends GetxController {
   final Rx<File?> selectedImage = Rx<File?>(null);
   final acceptTerms = false.obs;
   final isLoading = false.obs;
+  final isGoogleLoading = false.obs;
   var selectedGender = (-1).obs;
   final AuthRepository _authRepo = Get.find<AuthRepository>();
   var selectedDate = DateTime(2000, 1, 1).obs;
@@ -93,7 +94,7 @@ Future<void> pickDate(BuildContext context) async {
     return;
   }
     try {
-      isLoading.value = true;
+     isGoogleLoading.value = true;
       isGoogle.value = true;
       final user = await _authRepo.signInWithGoogle();
 
@@ -103,10 +104,10 @@ Future<void> pickDate(BuildContext context) async {
       // Get.toNamed(Routes.genderview);
 
     } catch (e) {
-      isLoading.value = false;
+      isGoogleLoading.value = false;
       Get.snackbar("Error", e.toString());
     } finally {
-      isLoading.value = false;
+      isGoogleLoading.value = false;
     }
   }
 

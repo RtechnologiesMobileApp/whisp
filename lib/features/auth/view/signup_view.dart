@@ -165,15 +165,19 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 12),
 
               // Create Account Button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: CustomButton(
-                  text: 'Create Account',
-                  onPressed: controller.checkEmailAndProceed,
-                  borderRadius: 24,
-                ),
-              ),
+             SizedBox(
+  width: double.infinity,
+  height: 52,
+  child: Obx(() {
+    return CustomButton(
+      text: controller.isLoading.value ? 'Loading...' : 'Create Account',
+      onPressed: controller.checkEmailAndProceed,
+      borderRadius: 24,
+      isLoading: controller.isLoading.value, // agar CustomButton loader support karta hai
+    );
+  }),
+),
+
 
               const SizedBox(height: 16),
               const Text('or Signup with'),
@@ -181,7 +185,7 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 12),
               Obx(() {
   return InkWell(
-    onTap: controller.isLoading.value
+    onTap: controller.isGoogleLoading.value
         ? null // disable while loading
         : controller.googleSignIn,
     child: Container(
@@ -192,7 +196,7 @@ class SignupView extends GetView<SignupController> {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Center(
-        child: controller.isLoading.value
+        child: controller.isGoogleLoading.value
             ? const SizedBox(
                 height: 24,
                 width: 24,
