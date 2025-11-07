@@ -7,12 +7,15 @@ import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/config/theme/theme.dart';
 import 'package:whisp/features/onboarding/view/screen/splash_screen.dart';
 import 'package:whisp/firebase_options.dart';
+import 'package:whisp/services/ad_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase before runApp
+   await AdService().init();
+  await AdService().loadInterstitialAd();
 
+  // Initialize Firebase before runApp
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(

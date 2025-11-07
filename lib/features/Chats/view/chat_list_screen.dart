@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
-import 'package:whisp/utils/colors.dart';
  
 
 class ChatListScreen extends StatelessWidget {
