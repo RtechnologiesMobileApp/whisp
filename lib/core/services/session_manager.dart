@@ -57,7 +57,7 @@ class SessionController {
   Future<void> clearSession() async {
     try {
       await _localStorage.clearValue('user');
-      await _localStorage.clearValue('isFirstVisit');
+     
       _user = null;
       debugPrint('Session cleared');
     } catch (e) {

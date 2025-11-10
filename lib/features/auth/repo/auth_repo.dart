@@ -49,7 +49,7 @@ Future<dynamic> login({
         if (error == 'INCORRECT_PASSWORD') {
           throw ApiException("Incorrect password");
         } else if (error == 'USER_NOT_FOUND') {
-          throw ApiException("User not found");
+          throw ApiException("Email Does not exist");
         } else {
           throw ApiException(error.toString());
         }

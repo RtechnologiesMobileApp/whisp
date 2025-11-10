@@ -1,8 +1,12 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:country_picker/country_picker.dart';
+//import 'package:country_picker/country_picker.dart';
 import 'package:whisp/core/widgets/custom_back_button.dart';
 import 'package:whisp/features/auth/controllers/signup_controller.dart';
+ 
+ 
+
 
 
 class CountryScreen extends StatelessWidget {
@@ -29,6 +33,18 @@ class CountryScreen extends StatelessWidget {
             // Search bar
             GestureDetector(
               onTap: () {
+//                 showCountryPickerPlus(
+//   context: context,
+//   showPhoneCode: false,
+//   onSelect: (country) {
+//     controller.selectedCountry.value = "${country.flagEmoji} ${country.name}";
+//   },
+//   countryListTheme: CountryListThemeData(
+//     bottomSheetHeight: MediaQuery.of(context).size.height * 0.7,
+//     borderRadius: BorderRadius.zero,
+//   ),
+// );
+
                 showCountryPicker(
                   context: context,
                   showPhoneCode: false,
@@ -51,6 +67,7 @@ class CountryScreen extends StatelessWidget {
                         "${country.flagEmoji} ${country.name}";
                   },
                 );
+           
               },
               child: Container(
                 height: 50,

@@ -27,6 +27,8 @@ class SignupController extends GetxController {
   var selectedGender = (-1).obs;
   final AuthRepository _authRepo = Get.find<AuthRepository>();
   var selectedDate = DateTime(2000, 1, 1).obs;
+  final formKey = GlobalKey<FormState>();
+
 
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
 
@@ -34,7 +36,7 @@ class SignupController extends GetxController {
   Future<void> checkEmailAndProceed({bool showPrimaryLoader = true}) async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
-      Get.snackbar("Missing Email", "Please enter an email.");
+     
       return;
     }
 
@@ -117,16 +119,7 @@ Future<void> pickDate(BuildContext context) async {
   }
 
   Future<void> createAccount() async {
-    // if (!acceptTerms.value) {
-    //   Get.snackbar('Terms Required', 'Please accept terms and conditions.');
-    //   return;
-    // }
-    // if (nameController.text.isEmpty ||
-    //     emailController.text.isEmpty ||
-    //     passwordController.text.isEmpty) {
-    //   Get.snackbar('Error', 'Please fill all fields');
-    //   return;
-    // }
+   
     try {
       isLoading.value = true;
 

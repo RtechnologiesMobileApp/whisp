@@ -23,10 +23,19 @@ class LoginController extends GetxController {
   }) async {
     email = email ?? emailController.text.trim();
     password = password ?? passwordController.text.trim();
-    if (email.isEmpty || password.isEmpty && type == "email") {
-      Get.snackbar("Error", "Please fill all fields");
-      return;
-    }
+   if (type == "email") {
+  if (email.isEmpty && password.isEmpty) {
+    Get.snackbar("Error", "Please fill all fields");
+    return;
+  } else if (email.isEmpty) {
+    Get.snackbar("Error", "Email is required");
+    return;
+  } else if (password.isEmpty) {
+    Get.snackbar("Error", "Password is required");
+    return;
+  }
+}
+
     debugPrint("[login api] email: $email, password: $password, type: $type");
     try {
       if (showLoadingIndicator) {
@@ -49,7 +58,7 @@ class LoginController extends GetxController {
     if (error == 'INCORRECT_PASSWORD') {
       throw Exception("Incorrect password");
     } else if (error == 'USER_NOT_FOUND') {
-      throw Exception("User not found");
+      throw Exception("Email Does not exist");
     } else {
       throw Exception(error.toString());
     }

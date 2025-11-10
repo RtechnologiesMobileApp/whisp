@@ -96,7 +96,7 @@ onSelectedItemChanged: (index) {
                         month,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.deepPurple,
+                          color:  const Color(0xFF58245E),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -144,7 +144,7 @@ onSelectedItemChanged: (index) {
                         day.toString(),
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.deepPurple,
+                          color:  const Color(0xFF58245E),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -195,7 +195,8 @@ onSelectedItemChanged: (index) {
                         year.toString(),
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.deepPurple,
+                          color:  const Color(0xFF58245E),
+
                           fontWeight: FontWeight.w500,
                         ),
                       ),

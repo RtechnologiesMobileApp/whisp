@@ -13,6 +13,8 @@ class SignupView extends GetView<SignupController> {
 
   @override
   Widget build(BuildContext context) {
+  final controller = Get.put(SignupController());
+
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -44,27 +46,50 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 20),
 
               // Text Fields
-              CustomTextField(
-                controller: controller.nameController,
-                hint: 'Name',
-                icon: Icons.person_2_outlined,
-              ),
-              const SizedBox(height: 14),
-              CustomTextField(
-                controller: controller.emailController,
-                hint: 'Email',
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 14),
-              CustomTextField(
-                controller: controller.passwordController,
-                hint: 'Password',
-                icon: Icons.lock_outline,
-                isPassword: true,
-              ),
-
-              const SizedBox(height: 14),
+             Form(
+              key: controller.formKey,
+               child: Column(
+                children: [
+                   // Text Fields
+                CustomTextField(
+                  controller: controller.nameController,
+                  hint: 'Name',
+                  icon: Icons.person_2_outlined,
+                    validator: (value) {
+          if (value == null || value.isEmpty) return "Name is required";
+          return null;
+        },
+                ),
+                const SizedBox(height: 14),
+                CustomTextField(
+                  controller: controller.emailController,
+                  hint: 'Email',
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                       {return ("Email is required");};
+                    if (!value.contains('@')) return "Enter a valid email";
+                    return null;  
+                  },
+                ),
+                const SizedBox(height: 14),
+                CustomTextField(
+                  controller: controller.passwordController,
+                  hint: 'Password',
+                  icon: Icons.lock_outline,
+                  isPassword: true,
+                    validator: (value) {
+          if (value == null || value.isEmpty) return "Password is required";
+          
+          return null;
+        },
+                ),
+               
+                ],
+               ),
+             ),
+               SizedBox(height: 14),
 
               const SizedBox(height: 12),
 
@@ -124,15 +149,12 @@ class SignupView extends GetView<SignupController> {
                         ? 'Loading...'
                         : 'Create Account',
                     onPressed: () {
-                      if (controller.nameController.text.isEmpty) {
-                        Get.snackbar("Name", "Please enter a name.");
+                      if (controller.formKey.currentState!.validate()) {
+                        controller.checkEmailAndProceed();
                         return;
                       }
-                      if (controller.passwordController.text.isEmpty) {
-                        Get.snackbar("Password", "Please enter a password.");
-                        return;
-                      }
-                      controller.checkEmailAndProceed();
+                      
+                     
                     },
                     borderRadius: 24,
                     isLoading: controller

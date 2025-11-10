@@ -8,6 +8,9 @@ class CustomTextField extends StatefulWidget {
   final bool isPassword;
   final TextInputType keyboardType;
 
+  // ✅ Optional validator function
+  final String? Function(String?)? validator;
+
   const CustomTextField({
     super.key,
     required this.controller,
@@ -15,6 +18,7 @@ class CustomTextField extends StatefulWidget {
     required this.icon,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
+    this.validator, // new optional validator
   });
 
   @override
@@ -23,53 +27,74 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   bool _isObscured = true;
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
     _isObscured = widget.isPassword;
+
+    // Listen to changes and validate if validator is provided
+    widget.controller.addListener(() {
+      if (widget.validator != null) {
+        final error = widget.validator!(widget.controller.text);
+        setState(() {
+          _errorText = error;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: widget.controller,
-      obscureText: widget.isPassword ? _isObscured : false,
-      keyboardType: widget.keyboardType,
-      decoration: InputDecoration(
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: Icon(widget.icon, color: Colors.grey[600]),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: widget.controller,
+          obscureText: widget.isPassword ? _isObscured : false,
+          keyboardType: widget.keyboardType,
+          decoration: InputDecoration(
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Icon(widget.icon, color: Colors.grey[600]),
+            ),
+            hintText: widget.hint,
+            hintStyle: TextStyle(color: AppColors.grey),
+            filled: true,
+            fillColor: const Color(0xFFF0F0F0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 18,
+              horizontal: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: BorderSide.none,
+            ),
+            suffixIcon: widget.isPassword
+                ? GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Icon(
+                        _isObscured ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.black,
+                      ),
+                    ),
+                  )
+                : null,
+            // ✅ Show error text if validation fails
+            errorText: _errorText,
+          ),
         ),
-        hintText: widget.hint,
-        hintStyle: TextStyle(color: AppColors.grey),
-        filled: true,
-        fillColor: Color(0xFFF0F0F0),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 18,
-          horizontal: 16,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide.none,
-        ),
-        suffixIcon: widget.isPassword
-            ? GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isObscured = !_isObscured;
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Icon(
-                    _isObscured ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.black,
-                  ),
-                ),
-              )
-            : null,
-      ),
+       
+      ],
     );
   }
 }
+
+ 

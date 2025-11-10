@@ -22,7 +22,7 @@ class ApiException implements Exception {
           case 'INCORRECT_PASSWORD':
             return ApiException('Incorrect password');
           case 'USER_NOT_FOUND':
-            return ApiException('User not found');
+            return ApiException('Email Does not exist');
           default:
             return ApiException(err.toString());
         }

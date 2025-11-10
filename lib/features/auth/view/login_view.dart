@@ -42,11 +42,19 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 40),
 
               // Email
-              CustomTextField(
+              Column(
+                children: [
+                  CustomTextField(
                 controller: controller.emailController,
                 hint: "Email",
                 icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                       {return ("Email is required");};
+                    if (!value.contains('@')) return "Enter a valid email";
+                    return null;  
+                  },
               ),
               const SizedBox(height: 16),
 
@@ -56,7 +64,15 @@ class LoginView extends GetView<LoginController> {
                 hint: "Password",
                 icon: Icons.lock_outline,
                 isPassword: true,
+                 validator: (value) {
+          if (value == null || value.isEmpty) return "Password is required";
+           
+          return null;
+        },
+              )
+                ],
               ),
+
 
               const SizedBox(height: 12),
 
