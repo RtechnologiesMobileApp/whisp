@@ -21,12 +21,13 @@ class MessageInputField extends StatelessWidget {
               child: TextField(
                 controller: controller.messageController,
                 decoration: InputDecoration(
-                  hintText: "Hello, how are you today?",
+                  hintText: "Write a message",
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25),
                     borderSide: BorderSide.none,
                   ),
+                  hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: const Color(0xffF1F2F5),
                 ),
