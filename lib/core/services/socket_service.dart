@@ -102,8 +102,10 @@ class SocketService extends GetxService {
       socket?.on('MESSAGE', (data) => cb(Map.from(data)));
   void onTyping(void Function(Map) cb) =>
       socket?.on('TYPING', (data) => cb(Map.from(data)));
-  void onPartnerLeft(void Function() cb) =>
-      socket?.on('PARTNER_LEFT', (_) => cb());
+  void onPartnerLeft(void Function() cb) {
+    socket?.off('PARTNER_LEFT');
+    socket?.on('PARTNER_LEFT', (_) => cb());
+  }
   void onSessionEnded(void Function() cb) =>
       socket?.on('SESSION_ENDED', (_) => cb());
   void onError(void Function(Map) cb) =>

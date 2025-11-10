@@ -58,7 +58,27 @@ class FindingMatchController extends GetxController {
     });
 
     socketService.onPartnerLeft(() {
-      Get.back();
+      final navigatorState = Get.key.currentState;
+      final canPop = navigatorState?.canPop() ?? false;
+      final currentRoute = Get.currentRoute;
+
+      if (Get.isOverlaysOpen) {
+        Get.back();
+      }
+
+      if (currentRoute == Routes.chatscreen) {
+        if (canPop) {
+          Get.until(
+            (route) =>
+                (route.settings.name != null &&
+                    route.settings.name == Routes.welcomehome) ||
+                route.isFirst,
+          );
+        }
+      } else if (canPop) {
+        Get.back();
+      }
+
       Get.snackbar(
         'Partner Disconnected',
         'Your chat partner has left the chat.',
