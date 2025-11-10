@@ -66,11 +66,11 @@ void _showExitDialog(SocketService socketService) {
         mainAxisSize: MainAxisSize.min,
         children: [
            Align(
-            alignment: Alignment.topRight,
+            alignment: Alignment.topLeft,
             child: IconButton(icon:Icon(Icons.close, color: Colors.grey), onPressed: () => Get.back(),),
           ),
           const SizedBox(height: 10),
-          const Text("Exit Chat?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Text("Exit Chat?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
           const SizedBox(height: 8),
           const Text(
             "You won't be able to undo this. Are you sure you want to continue?",
@@ -78,22 +78,35 @@ void _showExitDialog(SocketService socketService) {
             style: TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              socketService.endSession(); // ✅ end session before leaving
-              Get.offAllNamed(Routes.welcomehome);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              minimumSize: const Size(double.infinity, 45),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: ElevatedButton(
+              onPressed: () {
+                socketService.endSession(); // ✅ end session before leaving
+                Get.offAllNamed(Routes.welcomehome);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                minimumSize: const Size(double.infinity, 45),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              ),
+              child: const Text("Yes, Exit", style: TextStyle(color: Colors.white)),
             ),
-            child: const Text("Yes, Exit", style: TextStyle(color: Colors.white)),
           ),
           const SizedBox(height: 8),
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text("No", style: TextStyle(color: Colors.black)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: ElevatedButton(
+              onPressed: () {
+                Get.back();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFCFCFCF),
+                minimumSize: const Size(double.infinity, 45),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              ),
+              child: const Text("No", style: TextStyle(color: Colors.white)),
+            ),
           ),
         ],
       ),
