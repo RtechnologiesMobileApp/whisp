@@ -41,7 +41,7 @@ class SignupView extends GetView<SignupController> {
                 ],
               ),
 
-               const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Text Fields
               CustomTextField(
@@ -66,7 +66,6 @@ class SignupView extends GetView<SignupController> {
 
               const SizedBox(height: 14),
 
-            
               const SizedBox(height: 12),
 
               // Terms Checkbox
@@ -116,53 +115,64 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 12),
 
               // Create Account Button
-             SizedBox(
-  width: double.infinity,
-  height: 52,
-  child: Obx(() {
-    return CustomButton(
-      text: controller.isLoading.value ? 'Loading...' : 'Create Account',
-      onPressed: controller.checkEmailAndProceed,
-      borderRadius: 24,
-      isLoading: controller.isLoading.value, // agar CustomButton loader support karta hai
-    );
-  }),
-),
-
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: Obx(() {
+                  return CustomButton(
+                    text: controller.isLoading.value
+                        ? 'Loading...'
+                        : 'Create Account',
+                    onPressed: () {
+                      if (controller.nameController.text.isEmpty) {
+                        Get.snackbar("Name", "Please enter a name.");
+                        return;
+                      }
+                      if (controller.passwordController.text.isEmpty) {
+                        Get.snackbar("Password", "Please enter a password.");
+                        return;
+                      }
+                      controller.checkEmailAndProceed();
+                    },
+                    borderRadius: 24,
+                    isLoading: controller
+                        .isLoading
+                        .value, // agar CustomButton loader support karta hai
+                  );
+                }),
+              ),
 
               const SizedBox(height: 16),
               const Text('or Signup with'),
 
               const SizedBox(height: 12),
               Obx(() {
-  return InkWell(
-    onTap: controller.isGoogleLoading.value
-        ? null // disable while loading
-        : controller.googleSignIn,
-    child: Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFEFEF),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Center(
-        child: controller.isGoogleLoading.value
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.black,
-                ),
-              )
-            : Image.asset(AppImages.googleLogo, height: 24),
-      ),
-    ),
-  );
-}),
-
-         
+                return InkWell(
+                  onTap: controller.isGoogleLoading.value
+                      ? null // disable while loading
+                      : controller.googleSignIn,
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFEFEF),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Center(
+                      child: controller.isGoogleLoading.value
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.black,
+                              ),
+                            )
+                          : Image.asset(AppImages.googleLogo, height: 24),
+                    ),
+                  ),
+                );
+              }),
 
               const SizedBox(height: 20),
 

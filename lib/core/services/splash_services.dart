@@ -9,6 +9,8 @@ class SplashServices {
 
     await sC.loadSession();
 
+    await Future.delayed(const Duration(seconds: 1), () {});
+
     if (sC.user == null) {
        Get.offAll(() => GetStartedScreen());
       return;

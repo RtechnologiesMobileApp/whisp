@@ -31,14 +31,16 @@ class SignupController extends GetxController {
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
 
   // Step 1: Check email existence
-  Future<void> checkEmailAndProceed() async {
+  Future<void> checkEmailAndProceed({bool showPrimaryLoader = true}) async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
       Get.snackbar("Missing Email", "Please enter an email.");
       return;
     }
 
-    isLoading.value = true;
+    if (showPrimaryLoader) {
+      isLoading.value = true;
+    }
     try {
       if (!acceptTerms.value) {
         Get.snackbar('Terms Required', 'Please accept terms and conditions.');
@@ -56,7 +58,9 @@ class SignupController extends GetxController {
     } catch (e) {
       Get.snackbar("Error", e.toString());
     } finally {
-      isLoading.value = false;
+      if (showPrimaryLoader) {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -89,22 +93,23 @@ Future<void> pickDate(BuildContext context) async {
 
 
   Future<void> googleSignIn() async {
-      if (!acceptTerms.value) {
-    Get.snackbar('Terms Required', 'Please accept terms and conditions before continuing.');
-    return;
-  }
+    if (!acceptTerms.value) {
+      Get.snackbar(
+        'Terms Required',
+        'Please accept terms and conditions before continuing.',
+      );
+      return;
+    }
     try {
-     isGoogleLoading.value = true;
+      isGoogleLoading.value = true;
       isGoogle.value = true;
       final user = await _authRepo.signInWithGoogle();
 
       nameController.text = user.name;
       emailController.text = user.email;
-      checkEmailAndProceed();
+      await checkEmailAndProceed(showPrimaryLoader: false);
       // Get.toNamed(Routes.genderview);
-
     } catch (e) {
-      isGoogleLoading.value = false;
       Get.snackbar("Error", e.toString());
     } finally {
       isGoogleLoading.value = false;
@@ -154,12 +159,9 @@ Future<void> pickDate(BuildContext context) async {
             await socketService.reconnectWithToken(token);
           }
         } catch (e) {
-          print('[socket] Error reconnecting after signup: $e');
+          debugPrint('[socket] Error reconnecting after signup: $e');
         }
       }
-
-      /// :white_tick: Success
-      Get.snackbar("Success", "Account created successfully");
       Get.offAll(() => ProfileView());
     } catch (e) {
       Get.snackbar("Signup Failed", e.toString());
@@ -201,7 +203,7 @@ Future<void> pickDate(BuildContext context) async {
       // 👇 navigate to DOB screen next
       Get.toNamed(Routes.dob);
     } catch (e) {
-      print(":x: Gender update failed: $e");
+      debugPrint(":x: Gender update failed: $e");
       // Get.snackbar("Error", "Failed to update gender: $e");
     } finally {
       isLoading.value = false;
@@ -224,7 +226,7 @@ Future<void> saveDateOfBirth() async {
       age--;
     }
 
-    print("🎂 User age: $age years");
+    debugPrint("🎂 User age: $age years");
 
     // 🚫 Check if user is under 13
     if (age < 13) {
@@ -239,11 +241,11 @@ Future<void> saveDateOfBirth() async {
 
     // ✅ Save date if valid
     dob.value = DateFormat('yyyy-MM-dd').format(birth);
-    print('Navigating to: ${Routes.country}');
+    debugPrint('Navigating to: ${Routes.country}');
     Get.toNamed(Routes.country);
 
   } catch (e) {
-    print("❌ Unexpected error: $e");
+    debugPrint("❌ Unexpected error: $e");
     Get.snackbar("Error", "Failed to update Date of Birth");
   } finally {
     isLoading.value = false;
@@ -270,7 +272,7 @@ Future<void> saveDateOfBirth() async {
       // ✅ Navigate to Welcome screen
       Get.offAllNamed(Routes.welcomehome);
     } catch (e) {
-      print("❌ Country update failed: $e");
+      debugPrint("❌ Country update failed: $e");
       Get.snackbar("Error", "Failed to update country: $e");
     } finally {
       isLoading.value = false;

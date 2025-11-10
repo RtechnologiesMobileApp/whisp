@@ -75,8 +75,8 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 30),
 
               // Sign in button
-              Obx(()=>
-                CustomButton(
+              Obx(
+                () => CustomButton(
                   isLoading: controller.isLoading.value,
                   text: "Sign in",
                   onPressed: controller.login,
@@ -87,17 +87,17 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 20),
 
               // Google sign in button
-            Obx(() => CustomButton(
-  isLoading: controller.isGoogleLoading.value,
-  text: "Continue with Google",
-  color: Colors.grey[200]!,
-  textColor: Colors.black,
-  iconPath: AppImages.googleLogo,
-  onPressed:  controller.googleSignIn, // ✅ Fixed
-  borderRadius: 24,
-)),
-
-
+              Obx(
+                () => CustomButton(
+                  isLoading: controller.isGoogleLoading.value,
+                  text: "Continue with Google",
+                  color: Colors.grey[200]!,
+                  textColor: Colors.black,
+                  iconPath: AppImages.googleLogo,
+                  onPressed: controller.googleSignIn, // ✅ Fixed
+                  borderRadius: 24,
+                ),
+              ),
 
               const SizedBox(height: 30),
 

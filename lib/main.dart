@@ -37,14 +37,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Whisp',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialBinding: AppBindings(),
-      initialRoute: Routes.splash,
-      getPages: AppPages.routes,
-      home: SplashScreen(),
+    return SafeArea(
+      top: false,
+      child: GetMaterialApp(
+        title: 'Whisp',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        initialBinding: AppBindings(),
+        initialRoute: Routes.splash,
+        getPages: AppPages.routes,
+        home: SplashScreen(),
+      ),
     );
   }
 }

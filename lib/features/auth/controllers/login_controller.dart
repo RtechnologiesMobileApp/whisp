@@ -19,6 +19,7 @@ class LoginController extends GetxController {
     String type = "email",
     String? email,
     String? password,
+    bool showLoadingIndicator = true,
   }) async {
     email = email ?? emailController.text.trim();
     password = password ?? passwordController.text.trim();
@@ -28,7 +29,9 @@ class LoginController extends GetxController {
     }
     debugPrint("[login api] email: $email, password: $password, type: $type");
     try {
-      isLoading.value = true;
+      if (showLoadingIndicator) {
+        isLoading.value = true;
+      }
       final res = await _authRepository.login(
         email: email,
         password: password,
@@ -75,7 +78,9 @@ class LoginController extends GetxController {
       debugPrint("[login api] error: $e");
       Get.snackbar("Login Failed", e.toString());
     } finally {
-      isLoading.value = false;
+      if (showLoadingIndicator) {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -90,12 +95,15 @@ class LoginController extends GetxController {
 
       currentUser = user;
 
-      await login(email: user.email, type: "google");
+      await login(
+        email: user.email,
+        type: "google",
+        showLoadingIndicator: false,
+      );
     } catch (e) {
-      isGoogleLoading.value = false;
       Get.snackbar("Error", e.toString());
     } finally {
-      isLoading.value = false;
+      isGoogleLoading.value = false;
     }
   }
 
