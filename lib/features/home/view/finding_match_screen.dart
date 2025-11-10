@@ -32,7 +32,6 @@ class _FindingMatchScreenState extends State<FindingMatchScreen> {
 
   @override
   void dispose() {
-    ctrl.cancelSearch(); // stop ongoing match
     Get.delete<FindingMatchController>(); // cleanup
     super.dispose();
   }
