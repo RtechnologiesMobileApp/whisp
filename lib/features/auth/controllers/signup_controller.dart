@@ -28,12 +28,41 @@ class SignupController extends GetxController {
   final AuthRepository _authRepo = Get.find<AuthRepository>();
   var selectedDate = DateTime(2000, 1, 1).obs;
   final formKey = GlobalKey<FormState>();
+  RxBool isFormValid = false.obs;
+
 
 
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
 
+    @override
+  void onInit() {
+    super.onInit();
+
+    // ✅ Yahan listeners add karne hain
+    nameController.addListener(validateForm);
+    emailController.addListener(validateForm);
+    passwordController.addListener(validateForm);
+
+    ever(acceptTerms, (_) => validateForm());
+  }
+
+  void validateForm() {
+ bool valid = (nameController.text.isNotEmpty &&
+    emailController.text.isNotEmpty &&
+    emailController.text.contains('@') &&
+    passwordController.text.isNotEmpty);
+
+
+  isFormValid.value = valid;
+}
+
+
   // Step 1: Check email existence
   Future<void> checkEmailAndProceed({bool showPrimaryLoader = true}) async {
+
+     if (!formKey.currentState!.validate()) {
+    return;  
+  }
     final email = emailController.text.trim();
     if (email.isEmpty) {
      

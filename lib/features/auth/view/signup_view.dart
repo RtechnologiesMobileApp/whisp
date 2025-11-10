@@ -13,8 +13,6 @@ class SignupView extends GetView<SignupController> {
 
   @override
   Widget build(BuildContext context) {
-  final controller = Get.put(SignupController());
-
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -46,50 +44,54 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 20),
 
               // Text Fields
-             Form(
-              key: controller.formKey,
-               child: Column(
-                children: [
-                   // Text Fields
-                CustomTextField(
-                  controller: controller.nameController,
-                  hint: 'Name',
-                  icon: Icons.person_2_outlined,
-                    validator: (value) {
-          if (value == null || value.isEmpty) return "Name is required";
-          return null;
-        },
+              Form(
+                key: controller.formKey,
+                 
+                child: Column(
+                  children: [
+                    // Text Fields
+                    CustomTextField(
+                      controller: controller.nameController,
+                      hint: 'Name',
+                      icon: Icons.person_2_outlined,
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return "Name is required";
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      controller: controller.emailController,
+                      hint: 'Email',
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return ("Email is required");
+                        }
+                        ;
+                        if (!value.contains('@')) return "Enter a valid email";
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      controller: controller.passwordController,
+                      hint: 'Password',
+                      icon: Icons.lock_outline,
+                      isPassword: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return "Password is required";
+
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 14),
-                CustomTextField(
-                  controller: controller.emailController,
-                  hint: 'Email',
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty)
-                       {return ("Email is required");};
-                    if (!value.contains('@')) return "Enter a valid email";
-                    return null;  
-                  },
-                ),
-                const SizedBox(height: 14),
-                CustomTextField(
-                  controller: controller.passwordController,
-                  hint: 'Password',
-                  icon: Icons.lock_outline,
-                  isPassword: true,
-                    validator: (value) {
-          if (value == null || value.isEmpty) return "Password is required";
-          
-          return null;
-        },
-                ),
-               
-                ],
-               ),
-             ),
-               SizedBox(height: 14),
+              ),
+              SizedBox(height: 14),
 
               const SizedBox(height: 12),
 
@@ -140,29 +142,87 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 12),
 
               // Create Account Button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: Obx(() {
-                  return CustomButton(
-                    text: controller.isLoading.value
-                        ? 'Loading...'
-                        : 'Create Account',
-                    onPressed: () {
-                      if (controller.formKey.currentState!.validate()) {
-                        controller.checkEmailAndProceed();
-                        return;
-                      }
-                      
-                     
-                    },
-                    borderRadius: 24,
-                    isLoading: controller
-                        .isLoading
-                        .value, // agar CustomButton loader support karta hai
-                  );
-                }),
-              ),
+ SizedBox(
+  width: double.infinity,
+  height: 52,
+  child: Obx(() {
+    bool isActive = controller.isFormValid.value;
+
+    return CustomButton(
+      text: controller.isLoading.value ? 'Loading...' : 'Create Account',
+
+      // ✅ DISABLED STATE — null when form invalid
+      onPressed: isActive
+          ? () {
+              // ✅ Step 1: Validate form fields
+              if (!controller.formKey.currentState!.validate()) {
+                return;
+              }
+
+              // ✅ Step 2: Check terms
+              if (!controller.acceptTerms.value) {
+                Get.snackbar(
+                  'Terms Required',
+                  'Please accept terms and conditions.',
+                );
+                return;
+              }
+
+              // ✅ Step 3: Run the API call (async allowed inside)
+              controller.checkEmailAndProceed();
+            }
+          : null,
+
+      // ✅ Button styling when enabled/disabled
+      borderRadius: 24,
+      isLoading: controller.isLoading.value,
+      color: isActive
+          ? AppColors.primary
+          : Colors.grey.withOpacity(0.4),
+      textColor: isActive
+          ? Colors.white
+          : Colors.white.withOpacity(0.6),
+    );
+  }),
+),
+
+//               SizedBox(
+//                 width: double.infinity,
+//                 height: 52,
+//                 child: Obx(() {
+//                   return CustomButton(
+//                     text: controller.isLoading.value
+//                         ? 'Loading...'
+//                         : 'Create Account',
+//                onPressed: () async {
+//   // ✅ Step 1: Run validation here
+//   if (!controller.formKey.currentState!.validate()) {
+//     return; // stop execution if invalid
+//   }
+
+//   // ✅ Step 2: Check terms accepted before calling API
+//   if (!controller.acceptTerms.value) {
+//     Get.snackbar(
+//       'Terms Required',
+//       'Please accept terms and conditions.',
+//     );
+//     return;
+//   }
+
+//   // ✅ Step 3: Run the actual function only if all valid
+//   await controller.checkEmailAndProceed();
+// },
+
+                   
+//                     borderRadius: 24,
+//                     isLoading: controller
+//                         .isLoading
+//                         .value, // agar CustomButton loader support karta hai
+//                   );
+//                 }),
+            
+            
+//               ),
 
               const SizedBox(height: 16),
               const Text('or Signup with'),
