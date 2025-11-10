@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
+import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/auth/controllers/otp_controller.dart';
 
 class EnterOtpView extends StatelessWidget {
@@ -9,6 +10,7 @@ class EnterOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(EnterOtpController());
+    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -20,7 +22,7 @@ class EnterOtpView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          "Forget Password",
+          "Verify OTP",
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -92,22 +94,33 @@ class EnterOtpView extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Resend OTP
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Didn’t get OTP? "),
-                GestureDetector(
-                  onTap: controller.resendOtp,
-                  child: const Text(
-                    "Resend OTP",
-                    style: TextStyle(
-                      color: Color(0xFFD90166),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+           Obx(() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Text("Didn’t get OTP? "),
+      controller.canResend.value
+          ? GestureDetector(
+              onTap: controller.resendOtp,
+              child: const Text(
+                "Resend OTP",
+                style: TextStyle(
+                  color: Color(0xFFD90166),
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
+              ),
+            )
+          : Text(
+              "Resend in 00:${controller.remainingSeconds.value.toString().padLeft(2, '0')}",
+              style: const TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+    ],
+  );
+})
+
           ],
         ),
       ),

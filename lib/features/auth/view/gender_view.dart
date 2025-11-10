@@ -83,7 +83,8 @@ class GenderView extends StatelessWidget {
             label,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.black,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
+              fontSize: 16
             ),
           ),
         ),

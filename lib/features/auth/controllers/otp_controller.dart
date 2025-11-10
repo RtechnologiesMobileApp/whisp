@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/auth/view/reset_password_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,14 +12,32 @@ class EnterOtpController extends GetxController {
   final Dio _dio = Dio();
   final RxBool isLoading = false.obs;
   late final String email;
-
+  final forgetController=Get.find<ForgetPasswordController>();
   // For 5 OTP boxes
   final otpControllers = List.generate(5, (_) => TextEditingController());
-
+   RxInt remainingSeconds = 60.obs;
+  RxBool canResend = false.obs;
+  Timer? _timer;
   @override
   void onInit() {
     super.onInit();
     email = (Get.arguments ?? const {})['email'] ?? '';
+    startTimer();
+  }
+
+  void startTimer() {
+    canResend.value = false;
+    remainingSeconds.value = 60;
+
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds.value > 0) {
+        remainingSeconds.value--;
+      } else {
+        canResend.value = true;
+        timer.cancel();
+      }
+    });
   }
 
   /// Called when user taps Continue
@@ -88,6 +109,15 @@ class EnterOtpController extends GetxController {
   }
 
   void resendOtp() {
-    Get.snackbar("OTP Sent", "A new OTP has been sent!");
+     if (!canResend.value) return;
+     startTimer();
+    forgetController.sendResetOtp();
+   
+  }
+
+   @override
+  void onClose() {
+    _timer?.cancel();
+    super.onClose();
   }
 }

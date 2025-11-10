@@ -17,6 +17,7 @@ class ForgetPasswordController extends GetxController {
     }
 
     try {
+      
       isLoading.value = true;
       await _dio.post(
         ApiEndpoints.forgotPassword,

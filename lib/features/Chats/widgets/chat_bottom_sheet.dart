@@ -65,9 +65,9 @@ void _showExitDialog(SocketService socketService) {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Align(
+           Align(
             alignment: Alignment.topRight,
-            child: Icon(Icons.close, color: Colors.grey),
+            child: IconButton(icon:Icon(Icons.close, color: Colors.grey), onPressed: () => Get.back(),),
           ),
           const SizedBox(height: 10),
           const Text("Exit Chat?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),

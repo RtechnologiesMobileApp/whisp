@@ -98,7 +98,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     "Online",
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.green,
+                      color: Color(0xff771F98),
                       fontWeight: FontWeight.w500,
                     ),
                   ),

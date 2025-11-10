@@ -19,7 +19,7 @@ class CustomButton extends StatelessWidget {
     this.color = AppColors.primary,
     this.textColor = AppColors.whiteColor,
     this.height = 52,
-    this.borderRadius = 12,
+    this.borderRadius = 24,
     this.isLoading = false,
     this.iconPath,
   });

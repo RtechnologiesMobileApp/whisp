@@ -39,6 +39,7 @@ class HomeHeader extends StatelessWidget {
         overlay.size.height - tapPosition!.dy),
                   context: context, items: [
                    PopupMenuItem(
+                     height: 20,
         child: Text("Logout", style: TextStyle(color: Colors.black)),
         value: "logout",
       ),

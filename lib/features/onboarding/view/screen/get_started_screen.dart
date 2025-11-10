@@ -65,7 +65,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                         // background color
                         textColor: AppColors.whiteColor,
                         height: 48,
-                        borderRadius: 8,
+                        borderRadius: 24,
                       ),
                     ),
                   ],
