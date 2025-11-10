@@ -24,42 +24,60 @@ class HomeHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(AppImages.logo, height: 70, fit: BoxFit.contain),
-            GestureDetector(
-                               onTapDown: (details) {
+          
+
+GestureDetector(
+  onTapDown: (details) {
+    // Save the tap position for accurate dropdown placement
     tapPosition = details.globalPosition;
   },
-              onTap: () {
-                  
-                     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-                showMenu(
-                   position: RelativeRect.fromLTRB(
+  onTap: () async {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
         tapPosition!.dx,
-        tapPosition!.dy,
+        tapPosition!.dy + 20, // 👈 Adds slight spacing below avatar
         overlay.size.width - tapPosition!.dx,
-        overlay.size.height - tapPosition!.dy),
-                  context: context, items: [
-                   PopupMenuItem(
-                     height: 20,
-        child: Text("Logout", style: TextStyle(color: Colors.black)),
-        value: "logout",
+        overlay.size.height - tapPosition!.dy,
       ),
-                ]).then((value) {
-    if (value == "logout") {
-         SessionController().clearSession();
-                Get.offAll(() => LoginView());
-    }
-  });
-            
-              },
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.grey.shade200,
-                backgroundImage: (userImage.isNotEmpty)
-                    ? NetworkImage(userImage)
-                    : const AssetImage(AppImages.placeholderpic)
-                          as ImageProvider,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      color: Colors.white,
+      items: [
+        PopupMenuItem<String>(
+          value: "logout",
+          height: 40,
+          child: Row(
+            children: const [
+              Icon(Icons.logout, color: Colors.redAccent, size: 18),
+              SizedBox(width: 10),
+              Text(
+                "Logout",
+                style: TextStyle(color: Colors.black, fontSize: 14),
               ),
-            ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (selected == "logout") {
+      SessionController().clearSession();
+      Get.offAll(() => LoginView());
+    }
+  },
+  child: CircleAvatar(
+    radius: 20,
+    backgroundColor: Colors.grey.shade200,
+    backgroundImage: userImage.isNotEmpty
+        ? NetworkImage(userImage)
+        : const AssetImage(AppImages.placeholderpic) as ImageProvider,
+  ),
+)
+
           ],
         ),
         const SizedBox(height: 20),
