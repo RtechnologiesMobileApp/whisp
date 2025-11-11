@@ -37,7 +37,7 @@ class PremiumController extends GetxController {
   }
   void selectPlan(int index) {
     selectedPlan.value = index;
-    print('✅ Selected plan: ${premiumPlans[selectedPlan.value].title}');
+    print('✅ Selected plan: ${premiumPlans[selectedPlan.value].subscription}');
   }
 
   

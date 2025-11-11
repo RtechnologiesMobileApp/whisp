@@ -40,12 +40,12 @@ Future<void> handleSubscription(String plan) async {
       customerId: customerId,
     );
 
-    await _notifyBackendPaymentSuccess(paymentIntentId);
+    // await _notifyBackendPaymentSuccess(paymentIntentId);
 
     // 🔹 Wait a tick to ensure context is stable
     Future.delayed(const Duration(milliseconds: 300), () {
       if (context.mounted) {
-        _showSnack('Payment successful! Welcome to Kratos Pro! 🎉', Colors.green);
+        _showSnack('Payment successful! Welcome to Whisp Pro! 🎉', Colors.green);
       }
     });
 
@@ -129,7 +129,7 @@ Future<void> handleSubscription(String plan) async {
     await Stripe.instance.initPaymentSheet(
       paymentSheetParameters: SetupPaymentSheetParameters(
         paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: 'Kratos Pro',
+        merchantDisplayName: 'Whisp Pro',
         customerEphemeralKeySecret: ephemeralKey,
         customerId: customerId,
         style: ThemeMode.dark,
@@ -138,44 +138,44 @@ Future<void> handleSubscription(String plan) async {
     await Stripe.instance.presentPaymentSheet();
   }
 
-Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
-  final res = await http.post(
-    Uri.parse('$baseUrl/billing/payment-success'),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-device-id': deviceId,
-    },
-    body: jsonEncode({'paymentIntentId': paymentIntentId}),
-  );
+// Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
+//   final res = await http.post(
+//     Uri.parse('$baseUrl/billing/payment-success'),
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-device-id': deviceId,
+//     },
+//     body: jsonEncode({'paymentIntentId': paymentIntentId}),
+//   );
 
-  if (res.statusCode != 200) {
-    throw Exception('Failed to notify backend of payment success.');
-  }
+//   if (res.statusCode != 200) {
+//     throw Exception('Failed to notify backend of payment success.');
+//   }
 
-  // // ✅ Notify backend done, now refresh credits via socket
-  // try {
-  //   final chatSocket = ChatSocketService();
-  //   chatSocket.requestCredits(); // 🔥 trigger credits_info event
-  //   print('📡 Requested updated credits after payment success');
-  // } catch (e) {
-  //   print('⚠️ Could not refresh credits via socket: $e');
-  // }
-}
+//   // // ✅ Notify backend done, now refresh credits via socket
+//   // try {
+//   //   final chatSocket = ChatSocketService();
+//   //   chatSocket.requestCredits(); // 🔥 trigger credits_info event
+//   //   print('📡 Requested updated credits after payment success');
+//   // } catch (e) {
+//   //   print('⚠️ Could not refresh credits via socket: $e');
+//   // }
+// }
 
-  // Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
-  //   final res = await http.post(
-  //     Uri.parse('$baseUrl/billing/payment-success'),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'x-device-id': deviceId,
-  //     },
-  //     body: jsonEncode({'paymentIntentId': paymentIntentId}),
-  //   );
+//   // Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
+//   //   final res = await http.post(
+//   //     Uri.parse('$baseUrl/billing/payment-success'),
+//   //     headers: {
+//   //       'Content-Type': 'application/json',
+//   //       'x-device-id': deviceId,
+//   //     },
+//   //     body: jsonEncode({'paymentIntentId': paymentIntentId}),
+//   //   );
 
-  //   if (res.statusCode != 200) {
-  //     throw Exception('Failed to notify backend of payment success.');
-  //   }
-  // }
+//   //   if (res.statusCode != 200) {
+//   //     throw Exception('Failed to notify backend of payment success.');
+//   //   }
+//   // }
 
 
   void _handlePaymentError(dynamic error) {

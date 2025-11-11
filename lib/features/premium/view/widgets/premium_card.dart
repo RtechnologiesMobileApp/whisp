@@ -6,7 +6,8 @@ import 'package:whisp/features/premium/model/premium_model.dart';
 class PremiumCard extends StatelessWidget {
   final PremiumModel plan;
   final int index; // :point_left: add this
-  const PremiumCard({super.key, required this.plan, required this.index});
+  final Color ? borderColor;
+  const PremiumCard({super.key, required this.plan, required this.index, this.borderColor});
   @override
   Widget build(BuildContext context) {
     // Define colors based on card index
@@ -23,6 +24,7 @@ class PremiumCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: bgColor,
+        border: Border.all(color: borderColor ?? Colors.transparent,width: 2),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

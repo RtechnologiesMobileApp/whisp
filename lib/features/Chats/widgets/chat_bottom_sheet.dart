@@ -34,7 +34,7 @@ void showChatBottomSheet(BuildContext context) {
               },
             ),
             _tile("Report", Colors.red, onTap: () {}),
-            _tile("Cancel", Colors.grey, onTap: () => Get.back()),
+            _tile("Cancel", Colors.black, onTap: () => Get.back()),
           ],
         ),
       );

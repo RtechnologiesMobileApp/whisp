@@ -33,7 +33,7 @@ class PremiumScreen extends StatelessWidget {
               Center(
                 child: Text(
                   "Chat without limits. Connect without ads.\nUnlock everything with Whisp Premium.",
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   style: GoogleFonts.inter(
                     color: AppColors.whiteColor,
                     fontSize: 15.sp,
@@ -56,11 +56,20 @@ class PremiumScreen extends StatelessWidget {
                     final plan = controller.premiumPlans[index];
                     return SizedBox(
                       //width: 330,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 15.0),
-                        child: InkWell(
-                          onTap: () => controller.selectPlan(index),
-                          child: PremiumCard(plan: plan, index: index),
+                      child: Obx(
+                        () => Padding(
+                          padding: const EdgeInsets.only(left: 15.0),
+                          child: InkWell(
+                            onTap: () => controller.selectPlan(index),
+                            child: PremiumCard(
+                              plan: plan,
+                              index: index,
+                              borderColor:
+                                  controller.selectedPlan.value == index
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                            ),
+                          ),
                         ),
                       ),
                     );
