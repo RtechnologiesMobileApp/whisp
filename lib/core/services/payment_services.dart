@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisp/core/services/session_manager.dart';
 
 
 class PaymentService {
@@ -96,7 +97,7 @@ Future<void> handleSubscription(String plan) async {
   Future<void> _testBackendConnection() async {
     final res = await http.get(
       Uri.parse('$baseUrl/status'),
-      headers: {'x-device-id': deviceId},
+      headers: {'x-device-id': SessionController().user!.token!},
     );
     if (res.statusCode != 200) {
       throw Exception('Backend not reachable');
