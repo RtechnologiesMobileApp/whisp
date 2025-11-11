@@ -23,6 +23,8 @@ class AppImages {
       'assets/icons/setting_unselected.png';
   static const String profile_selected = 'assets/icons/user_unselected.png';
   static const String profile_unselected = 'assets/icons/user_unselected.png';
+  static const String home_selected = 'assets/icons/home_selected.png';
+  static const String home_unselected = 'assets/icons/home_unselected.png';
 
   static const String daim = 'assets/images/daim.png';
   static const String startChating = 'assets/images/Startgif.gif';

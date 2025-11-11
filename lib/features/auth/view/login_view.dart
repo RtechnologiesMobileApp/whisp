@@ -12,8 +12,10 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
@@ -42,35 +44,41 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 40),
 
               // Email
-              Column(
-                children: [
-                  CustomTextField(
-                controller: controller.emailController,
-                hint: "Email",
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty)
-                       {return ("Email is required");};
-                    if (!value.contains('@')) return "Enter a valid email";
-                    return null;  
-                  },
-              ),
-              const SizedBox(height: 16),
-
-              // Password
-              CustomTextField(
-                controller: controller.passwordController,
-                hint: "Password",
-                icon: Icons.lock_outline,
-                isPassword: true,
-                 validator: (value) {
-          if (value == null || value.isEmpty) return "Password is required";
-           
-          return null;
-        },
-              )
-                ],
+              Form(
+                key: controller.formKey,
+                autovalidateMode: AutovalidateMode.disabled,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                    
+                  controller: controller.emailController,
+                  hint: "Email",
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                 
+                    validator: (value) {
+                      if (value == null || value.isEmpty)
+                         {return ("Email is required");};
+                      if (!value.contains('@')) return "Enter a valid email";
+                      return null;  
+                    },
+                ),
+                const SizedBox(height: 16),
+                
+                // Password
+                CustomTextField(
+                  controller: controller.passwordController,
+                  hint: "Password",
+                  icon: Icons.lock_outline,
+                  isPassword: true,
+                   validator: (value) {
+                          if (value == null || value.isEmpty) return "Password is required";
+                           
+                          return null;
+                        },
+                )
+                  ],
+                ),
               ),
 
 
@@ -95,7 +103,12 @@ class LoginView extends GetView<LoginController> {
                 () => CustomButton(
                   isLoading: controller.isLoading.value,
                   text: "Sign in",
-                  onPressed: controller.login,
+                  onPressed: () {
+                    // 👇 validate before login
+                    if (controller.formKey.currentState!.validate()) {
+                      controller.login();
+                    }
+                  },
                   borderRadius: 24,
                 ),
               ),

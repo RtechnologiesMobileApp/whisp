@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
 import 'package:whisp/features/premium/model/premium_model.dart';
-
 class PremiumController extends GetxController {
   final premiumPlans = <PremiumModel>[
     PremiumModel(
-      title: "Premium Pass",
-      price: "\$15 / month",
+      title: "Premium",
+      price: "\$15",
+      planMonth: 'per month',
       features: [
         "Add & accept friends",
         "Reconnect with previous partners",
@@ -14,8 +14,9 @@ class PremiumController extends GetxController {
       ],
     ),
     PremiumModel(
-      title: "Premium Pass",
-      price: "\$150 / year",
+      title: "Premium",
+      price: "\$150",
+      planMonth: 'per year  (2 months free)',
       features: [
         "Add & accept friends",
         "Reconnect with previous partners",
@@ -24,9 +25,7 @@ class PremiumController extends GetxController {
       ],
     ),
   ].obs;
-
   final currentPage = 0.obs;
-
   void onPageChanged(int index) {
     currentPage.value = index;
   }
