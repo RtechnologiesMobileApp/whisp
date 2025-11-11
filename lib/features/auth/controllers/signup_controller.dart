@@ -60,7 +60,7 @@ class SignupController extends GetxController {
   // Step 1: Check email existence
   Future<void> checkEmailAndProceed({bool showPrimaryLoader = true}) async {
 
-     if (!formKey.currentState!.validate()) {
+     if (!formKey.currentState!.validate() && !isGoogle.value) {
     return;  
   }
     final email = emailController.text.trim();

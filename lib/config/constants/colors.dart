@@ -5,7 +5,7 @@ class AppColors {
   static const Color primary = Color(0xFFD32FE8);
   static const Color secondary = Color(0xFFD90166);
   static const Color whiteColor = Colors.white;
-
+  static const Color brightYellow = Color(0xFFFFE225);
   static const splashBackColor = Color(0xFF00002D);
   static const Color deepblue = Color(0xFF03023C);
   static const Color darkgrey = Color(0xFF21262D);
@@ -14,4 +14,5 @@ class AppColors {
   static const Color grey = Color(0xFF727272);
   static const Color deepPurpleColor = Color(0xFF58245E);
   static const Color pinkColor = Color(0xFFFF56B8);
+  static const Color deepPurple = Color(0xFF58245E);
 }

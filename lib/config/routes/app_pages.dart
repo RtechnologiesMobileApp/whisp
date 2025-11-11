@@ -57,7 +57,10 @@ class AppPages {
       binding: AppBindings(),
     ),
     GetPage(name: Routes.findMatch, page: () => const FindingMatchScreen()),
-    GetPage(name: Routes.home, page: () => MainHomeScreen()),
+ 
+ 
+    GetPage(name: Routes.mainHome, page: ()=>MainHomeScreen()),
+ 
     GetPage(
       name: Routes.chatscreen,
       page: () {

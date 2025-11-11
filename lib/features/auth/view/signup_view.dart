@@ -82,7 +82,7 @@ class SignupView extends GetView<SignupController> {
                       icon: Icons.lock_outline,
                       isPassword: true,
                       validator: (value) {
-                        if (value == null || value.isEmpty)
+                        if ((value == null || value.isEmpty ) && !controller.isGoogle.value)
                           return "Password is required";
 
                         return null;
