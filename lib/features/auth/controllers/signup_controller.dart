@@ -292,7 +292,7 @@ Future<void> saveDateOfBirth() async {
       await createAccount();
 
       // ✅ Navigate to Welcome screen
-      Get.offAllNamed(Routes.welcomehome);
+      Get.offAllNamed(Routes.mainHome);
     } catch (e) {
       debugPrint("❌ Country update failed: $e");
       Get.snackbar("Error", "Failed to update country: $e");

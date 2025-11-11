@@ -6,6 +6,7 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/premium/controller/premium_controller.dart';
 import '../widgets/premium_card.dart';
+
 class PremiumScreen extends StatelessWidget {
   PremiumScreen({super.key});
   final controller = Get.put(PremiumController());
@@ -57,7 +58,10 @@ class PremiumScreen extends StatelessWidget {
                       //width: 330,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 15.0),
-                        child: PremiumCard(plan: plan, index: index),
+                        child: InkWell(
+                          onTap: () => controller.selectPlan(index),
+                          child: PremiumCard(plan: plan, index: index),
+                        ),
                       ),
                     );
                   },
@@ -108,7 +112,18 @@ class PremiumScreen extends StatelessWidget {
                   height: 52,
                   child: CustomButton(
                     text: 'Upgrade to Premium',
-                    onPressed: () {},
+                    onPressed: () {
+                      if (controller.selectedPlan.value == 2) {
+                        Get.snackbar('Error', 'Please select a plan');
+                        return;
+                      }
+                      controller.handleSubscription(
+                        context,
+                        controller
+                            .premiumPlans[controller.selectedPlan.value]
+                            .subscription,
+                      );
+                    },
                     borderRadius: 8,
                   ),
                 ),

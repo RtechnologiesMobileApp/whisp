@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/config/routes/app_pages.dart';
@@ -14,7 +15,7 @@ void main() async {
 
    await AdService().init();
   await AdService().loadInterstitialAd();
-
+  Stripe.publishableKey = 'pk_test_zvk0Ygki42YJ1PXtxMlj0kxq';
   // Initialize Firebase before runApp
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

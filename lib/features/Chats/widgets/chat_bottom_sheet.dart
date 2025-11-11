@@ -83,7 +83,7 @@ void _showExitDialog(SocketService socketService) {
             child: ElevatedButton(
               onPressed: () {
                 socketService.endSession(); // ✅ end session before leaving
-                Get.offAllNamed(Routes.welcomehome);
+                Get.offAllNamed(Routes.mainHome);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
