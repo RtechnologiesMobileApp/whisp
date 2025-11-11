@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
 import 'package:whisp/features/auth/controllers/otp_controller.dart';
@@ -65,17 +66,21 @@ class EnterOtpView extends StatelessWidget {
                     decoration: InputDecoration(
                       counterText: '',
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(24),
                         borderSide:
-                            BorderSide(color: Colors.purple.shade200, width: 1),
+                            BorderSide(color: AppColors.deepPurple, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(24),
                         borderSide:
-                            BorderSide(color: Colors.purple.shade400, width: 2),
+                            BorderSide(color: AppColors.deepPurple, width: 2),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide:
+                            BorderSide(color: AppColors.deepPurple, width: 1),)
                     ),
                   ),
                 );

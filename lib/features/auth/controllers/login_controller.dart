@@ -12,6 +12,7 @@ class LoginController extends GetxController {
   final AuthRepository _authRepository = Get.find<AuthRepository>();
   var isLoading = false.obs;
   final isGoogleLoading = false.obs;
+  final formKey = GlobalKey<FormState>(); 
 
   UserModel? currentUser;
 
@@ -82,7 +83,7 @@ class LoginController extends GetxController {
         debugPrint('[socket] Error reconnecting after login: $e');
       }
 
-      Get.offAllNamed(Routes.welcomehome);
+      Get.offAllNamed(Routes.mainHome);
     } catch (e) {
       debugPrint("[login api] error: $e");
       Get.snackbar("Login Failed", e.toString());

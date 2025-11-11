@@ -27,7 +27,7 @@ class EnterOtpController extends GetxController {
 
   void startTimer() {
     canResend.value = false;
-    remainingSeconds.value = 60;
+    remainingSeconds.value = 180;
 
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
