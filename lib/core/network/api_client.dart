@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 import 'api_exception.dart';
 
@@ -14,14 +15,27 @@ class ApiClient {
     ),
   );
 
-  Future<dynamic> get(String endpoint) async {
-    try {
-      final response = await _dio.get(endpoint);
-      return response.data;
-    } catch (e) {
-      throw ApiException.handleError(e);
-    }
+Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
+  try {
+    // ✅ token only if required
+    final token = requireAuth ? SessionController().user!.token : "";
+
+    final response = await _dio.get(
+      endpoint,
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json',
+          if (requireAuth && token!.isNotEmpty)
+            'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+    return response.data;
+  } catch (e) {
+    throw ApiException.handleError(e);
   }
+}
+
     Future<dynamic> postMultipart(
     String endpoint, {
     required Map<String, dynamic> data,
