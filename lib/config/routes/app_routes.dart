@@ -17,6 +17,7 @@ abstract class Routes {
   static const resetPassword = '/reset-password';
   static const findMatch='/find-match';
   static const chatscreen='/chatscreen';
+  static const home='/home';
  
 }
   

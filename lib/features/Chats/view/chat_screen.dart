@@ -18,7 +18,7 @@ class ChatScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
-      appBar: ChatAppBar(userName: partnerName, userAvatar: partnerAvatar),
+      appBar: ChatAppBar(partnerId: partnerId, userName: partnerName, userAvatar: partnerAvatar),
       body: Column(
         children: [
           Expanded(

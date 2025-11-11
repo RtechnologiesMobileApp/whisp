@@ -14,6 +14,7 @@ import 'package:whisp/features/auth/view/gender_view.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
 import 'package:whisp/features/auth/view/signup_view.dart';
 import 'package:whisp/features/home/view/finding_match_screen.dart';
+import 'package:whisp/features/home/view/home_screen.dart';
 import 'package:whisp/features/home/view/welcome_home.dart';
 import 'package:whisp/features/onboarding/view/screen/splash_screen.dart';
 import 'package:whisp/features/auth/view/reset_password_screen.dart';
@@ -26,11 +27,7 @@ class AppPages {
       page: () => SignupView(),
       binding: SignupBinding(),
     ),
-    GetPage(
-      name: Routes.genderview,
-      page: () => GenderView(),
-   
-    ),
+    GetPage(name: Routes.genderview, page: () => GenderView()),
     GetPage(
       name: Routes.login,
       page: () => const LoginView(),
@@ -60,6 +57,7 @@ class AppPages {
       binding: AppBindings(),
     ),
     GetPage(name: Routes.findMatch, page: () => const FindingMatchScreen()),
+    GetPage(name: Routes.home, page: () => MainHomeScreen()),
     GetPage(
       name: Routes.chatscreen,
       page: () {
