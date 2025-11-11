@@ -6,18 +6,23 @@ import 'package:whisp/features/friends/model/friend_model.dart';
 
 class FriendCard extends StatelessWidget {
   final FriendModel friend;
-  final VoidCallback onToggleFriend;
+
+  // Callbacks
+  final VoidCallback? onToggleFriend; // Friends tab
+  final VoidCallback? onAccept;       // Requests tab
+  final VoidCallback? onReject;       // Requests tab
 
   const FriendCard({
     super.key,
     required this.friend,
-    required this.onToggleFriend,
+    this.onToggleFriend,
+    this.onAccept,
+    this.onReject,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      //  margin: EdgeInsets.symmetric(vertical: 6.w),
       padding: EdgeInsets.symmetric(vertical: 5.h),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.transparent, width: 1.2.w),
@@ -32,7 +37,10 @@ class FriendCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 28.r,
-                  backgroundImage: AssetImage(friend.imageUrl),
+                  backgroundImage: friend.imageUrl.isNotEmpty
+                      ? NetworkImage(friend.imageUrl)
+                      : null,
+                  backgroundColor: Colors.grey[200],
                 ),
                 SizedBox(width: 12.h),
                 Expanded(
@@ -57,49 +65,83 @@ class FriendCard extends StatelessWidget {
                   ),
                 ),
 
-                ElevatedButton(
-                  onPressed: onToggleFriend,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purpleAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                // ------------------------------
+                // Friends tab buttons
+                // ------------------------------
+                if (onToggleFriend != null) ...[
+                  ElevatedButton(
+                    onPressed: onToggleFriend,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: friend.isFriend
+                          ? AppColors.grey
+                          : Colors.purpleAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 8.h,
+                      ),
                     ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 8.h,
-                    ),
-                  ),
-                  child: Text(
-                    "Friend",
-                    style: GoogleFonts.inter(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                ElevatedButton(
-                  onPressed: onToggleFriend,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                    child: Text(
+                      friend.isFriend ? "Unfriend" : "Friend",
+                      style: GoogleFonts.inter(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "Unfriend",
-                    style: GoogleFonts.inter(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                ],
+
+                // ------------------------------
+                // Requests tab buttons
+                // ------------------------------
+                if (onAccept != null && onReject != null) ...[
+                  ElevatedButton(
+                    onPressed: onAccept,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 8.h,
+                      ),
+                    ),
+                    child: Text(
+                      "Accept",
+                      style: GoogleFonts.inter(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
+                  SizedBox(width: 8.w),
+                  ElevatedButton(
+                    onPressed: onReject,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 8.h,
+                      ),
+                    ),
+                    child: Text(
+                      "Reject",
+                      style: GoogleFonts.inter(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

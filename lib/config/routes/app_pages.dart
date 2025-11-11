@@ -27,11 +27,7 @@ class AppPages {
       page: () => SignupView(),
       binding: SignupBinding(),
     ),
-    GetPage(
-      name: Routes.genderview,
-      page: () => GenderView(),
-   
-    ),
+    GetPage(name: Routes.genderview, page: () => GenderView()),
     GetPage(
       name: Routes.login,
       page: () => const LoginView(),
@@ -61,7 +57,10 @@ class AppPages {
       binding: AppBindings(),
     ),
     GetPage(name: Routes.findMatch, page: () => const FindingMatchScreen()),
+ 
+ 
     GetPage(name: Routes.mainHome, page: ()=>MainHomeScreen()),
+ 
     GetPage(
       name: Routes.chatscreen,
       page: () {

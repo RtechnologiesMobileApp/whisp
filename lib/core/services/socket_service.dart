@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisp/core/network/api_endpoints.dart';
@@ -16,15 +17,17 @@ class SocketService extends GetxService {
   }) async {
     // Dispose existing socket if any
     if (socket != null) {
-      print('[socket] Disposing existing socket before creating new one');
+      debugPrint('[socket] Disposing existing socket before creating new one');
       socket?.disconnect();
       socket?.dispose();
       socket = null;
     }
 
-    print('[socket] Initializing socket connection to $baseUrl');
-    print('[socket] Token provided: ${token.isNotEmpty ? "Yes (${token.substring(0, token.length > 10 ? 10 : token.length)}...)" : "No"}');
-    
+    debugPrint('[socket] Initializing socket connection to $baseUrl');
+    debugPrint(
+      '[socket] Token provided: ${token.isNotEmpty ? "Yes (${token.substring(0, token.length > 10 ? 10 : token.length)}...)" : "No"}',
+    );
+
     // Connect with token as query param for auth
     socket = IO.io(
       baseUrl,
@@ -35,22 +38,21 @@ class SocketService extends GetxService {
     );
 
     socket!.on('connect', (_) {
-      print('[socket] connected ${socket!.id}');
+      debugPrint('[socket] connected ${socket!.id}');
       _connected.value = true;
     });
 
-
     socket!.on('connect_error', (data) {
-      print('[socket] connect_error $data');
+      debugPrint('[socket] connect_error $data');
       _connected.value = false;
     });
 
     socket!.on('error', (data) {
-      print('[socket] error event: $data');
+      debugPrint('[socket] error event: $data');
     });
 
     socket!.on('disconnect', (reason) {
-      print('[socket] disconnected. Reason: $reason');
+      debugPrint('[socket] disconnected. Reason: $reason');
       _connected.value = false;
     });
 
@@ -62,16 +64,16 @@ class SocketService extends GetxService {
   void readyForRandom() {
     if (socket?.connected ?? false) {
       socket!.emit('READY_FOR_RANDOM');
-      print('[socket] READY_FOR_RANDOM emitted');
+      debugPrint('[socket] READY_FOR_RANDOM emitted');
     } else {
-      print('[socket] cannot emit READY_FOR_RANDOM: not connected');
+      debugPrint('[socket] cannot emit READY_FOR_RANDOM: not connected');
     }
   }
 
   void cancelRandom() {
     if (socket?.connected ?? false) {
       socket!.emit('CANCEL_RANDOM');
-      print('[socket] CANCEL_RANDOM emitted');
+      debugPrint('[socket] CANCEL_RANDOM emitted');
     }
   }
 
@@ -93,6 +95,59 @@ class SocketService extends GetxService {
     }
   }
 
+  void sendFriendRequest(String toUserId, void Function(Map) ackCb) {
+    if (socket?.connected ?? false) {
+      socket!.emitWithAck(
+        'FRIEND_REQUEST_SEND',
+        {'toUserId': toUserId},
+        ack: (data) {
+          ackCb(Map.from(data));
+        },
+      );
+      debugPrint('[socket] FRIEND_REQUEST_SEND emitted to $toUserId');
+    }
+  }
+
+  void acceptFriend(String requestId, void Function(Map) ackCb) {
+    socket?.emitWithAck(
+      'FRIEND_ACCEPT',
+      {'requestId': requestId},
+      ack: (data) {
+        ackCb(Map.from(data));
+      },
+    );
+  }
+
+  void rejectFriend(String requestId, void Function(Map) ackCb) {
+    socket?.emitWithAck(
+      'FRIEND_REJECT',
+      {'requestId': requestId},
+      ack: (data) {
+        ackCb(Map.from(data));
+      },
+    );
+  }
+
+  void cancelFriendRequest(String requestId, void Function(Map) ackCb) {
+    socket?.emitWithAck(
+      'FRIEND_REQUEST_CANCEL',
+      {'requestId': requestId},
+      ack: (data) {
+        ackCb(Map.from(data));
+      },
+    );
+  }
+
+  void getFriendList(void Function(Map) ackCb) {
+    socket?.emitWithAck(
+      'FRIEND_LIST',
+      {},
+      ack: (data) {
+        ackCb(Map.from(data));
+      },
+    );
+  }
+
   // Event listeners: attach callback functions
   void onAuthOk(void Function(Map) cb) =>
       socket?.on('AUTH_OK', (data) => cb(Map.from(data)));
@@ -106,23 +161,57 @@ class SocketService extends GetxService {
     socket?.off('PARTNER_LEFT');
     socket?.on('PARTNER_LEFT', (_) => cb());
   }
+
   void onSessionEnded(void Function() cb) =>
       socket?.on('SESSION_ENDED', (_) => cb());
   void onError(void Function(Map) cb) =>
       socket?.on('ERROR', (data) => cb(Map.from(data)));
 
+
+    void onFriendRequestIncoming(void Function(Map) cb) {
+    socket?.on('FRIEND_REQUEST_INCOMING', (data) {
+      cb(Map.from(data));
+      debugPrint('[socket] FRIEND_REQUEST_INCOMING: $data');
+    });
+  }
+
+   void onFriendRequestAccepted(void Function(Map) cb) {
+    socket?.on('FRIEND_REQUEST_ACCEPTED', (data) {
+      cb(Map.from(data));
+      debugPrint('[socket] FRIEND_REQUEST_ACCEPTED: $data');
+    });
+  }
+
+  void onFriendRequestRejected(void Function(Map) cb) {
+    socket?.on('FRIEND_REQUEST_REJECTED', (data) {
+      cb(Map.from(data));
+      debugPrint('[socket] FRIEND_REQUEST_REJECTED: $data');
+    });
+  }
+
+  void onFriendRequestCanceled(void Function(Map) cb) {
+    socket?.on('FRIEND_REQUEST_CANCELED', (data) {
+      cb(Map.from(data));
+      debugPrint('[socket] FRIEND_REQUEST_CANCELED: $data');
+    });
+  }
+
+  void onFriendAdded(void Function(Map) cb) {
+    socket?.on('FRIEND_ADDED', (data) {
+      cb(Map.from(data));
+      debugPrint('[socket] FRIEND_ADDED: $data');
+    });
+  }    
+
   // Reconnect with new token (useful after login)
   Future<void> reconnectWithToken(String token) async {
     if (token.isEmpty) {
-      print('[socket] Cannot reconnect: token is empty');
+      debugPrint('[socket] Cannot reconnect: token is empty');
       return;
     }
-    
-    print('[socket] Reconnecting with new token');
-    await init(
-      baseUrl: ApiEndpoints.baseUrl,
-      token: token,
-    );
+
+    debugPrint('[socket] Reconnecting with new token');
+    await init(baseUrl: ApiEndpoints.baseUrl, token: token);
   }
 
   // Disconnect
