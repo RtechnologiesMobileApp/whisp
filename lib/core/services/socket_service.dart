@@ -108,25 +108,58 @@ class SocketService extends GetxService {
     }
   }
 
-  void acceptFriend(String requestId, void Function(Map) ackCb) {
-    socket?.emitWithAck(
-      'FRIEND_ACCEPT',
-      {'requestId': requestId},
-      ack: (data) {
-        ackCb(Map.from(data));
-      },
-    );
-  }
+void acceptFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
+  if (socket == null) return;
 
-  void rejectFriend(String requestId, void Function(Map) ackCb) {
-    socket?.emitWithAck(
-      'FRIEND_REJECT',
-      {'requestId': requestId},
-      ack: (data) {
-        ackCb(Map.from(data));
-      },
-    );
-  }
+  socket!.emitWithAck(
+    'FRIEND_ACCEPT',
+    {'requestId': requestId},
+    ack: (data) {
+      // safe check
+      if (data is Map) {
+        ackCb(Map<String, dynamic>.from(data));
+      } else {
+        ackCb({'ok': false, 'code': 'Invalid response'});
+      }
+    },
+  );
+}
+
+void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
+  if (socket == null) return;
+
+  socket!.emitWithAck(
+    'FRIEND_REJECT',
+    {'requestId': requestId},
+    ack: (data) {
+      if (data is Map) {
+        ackCb(Map<String, dynamic>.from(data));
+      } else {
+        ackCb({'ok': false, 'code': 'Invalid response'});
+      }
+    },
+  );
+}
+
+  // void acceptFriend(String requestId, void Function(Map) ackCb) {
+  //   socket?.emitWithAck(
+  //     'FRIEND_ACCEPT',
+  //     {'requestId': requestId},
+  //     ack: (data) {
+  //       ackCb(Map.from(data));
+  //     },
+  //   );
+  // }
+
+  // void rejectFriend(String requestId, void Function(Map) ackCb) {
+  //   socket?.emitWithAck(
+  //     'FRIEND_REJECT',
+  //     {'requestId': requestId},
+  //     ack: (data) {
+  //       ackCb(Map.from(data));
+  //     },
+  //   );
+  // }
 
   void cancelFriendRequest(String requestId, void Function(Map) ackCb) {
     socket?.emitWithAck(
@@ -138,15 +171,7 @@ class SocketService extends GetxService {
     );
   }
 
-  void getFriendList(void Function(Map) ackCb) {
-    socket?.emitWithAck(
-      'FRIEND_LIST',
-      {},
-      ack: (data) {
-        ackCb(Map.from(data));
-      },
-    );
-  }
+ 
 
   // Event listeners: attach callback functions
   void onAuthOk(void Function(Map) cb) =>
@@ -168,12 +193,12 @@ class SocketService extends GetxService {
       socket?.on('ERROR', (data) => cb(Map.from(data)));
 
 
-    void onFriendRequestIncoming(void Function(Map) cb) {
-    socket?.on('FRIEND_REQUEST_INCOMING', (data) {
-      cb(Map.from(data));
-      debugPrint('[socket] FRIEND_REQUEST_INCOMING: $data');
-    });
-  }
+  //   void onFriendRequestIncoming(void Function(Map) cb) {
+  //   socket?.on('FRIEND_REQUEST_INCOMING', (data) {
+  //     cb(Map.from(data));
+  //     debugPrint('[socket] FRIEND_REQUEST_INCOMING: $data');
+  //   });
+  // }
 
    void onFriendRequestAccepted(void Function(Map) cb) {
     socket?.on('FRIEND_REQUEST_ACCEPTED', (data) {

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/friends/model/friend_model.dart';
+import 'package:whisp/features/friends/model/friend_request_model.dart';
 
 class FriendCard extends StatelessWidget {
-  final FriendModel friend;
+  final dynamic friend;
 
-  // Callbacks
   final VoidCallback? onToggleFriend; // Friends tab
   final VoidCallback? onAccept;       // Requests tab
   final VoidCallback? onReject;       // Requests tab
@@ -22,131 +20,168 @@ class FriendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the type
+    final bool isFriendModel = friend is FriendModel;
+    final bool isRequestModel = friend is FriendRequestModel;
+
+    final String name = isFriendModel
+        ? (friend as FriendModel).name
+        : (friend as FriendRequestModel).name;
+
+    final String avatar = isFriendModel
+        ? (friend as FriendModel).imageUrl
+        : (friend as FriendRequestModel).imageUrl;
+
+    final bool isFriend = isFriendModel ? (friend as FriendModel).isFriend : false;
+
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.h),
+      margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 4.w),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.transparent, width: 1.2.w),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(16.r),
         color: Colors.white,
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28.r,
-                  backgroundImage: friend.imageUrl.isNotEmpty
-                      ? NetworkImage(friend.imageUrl)
-                      : null,
-                  backgroundColor: Colors.grey[200],
-                ),
-                SizedBox(width: 12.h),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Text(
-                        friend.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      if (friend.isVerified) ...[
-                        SizedBox(width: 4.h),
-                        Icon(
-                          Icons.verified,
-                          color: AppColors.blue,
-                          size: 14.sp,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-
-                // ------------------------------
-                // Friends tab buttons
-                // ------------------------------
-                if (onToggleFriend != null) ...[
-                  ElevatedButton(
-                    onPressed: onToggleFriend,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: friend.isFriend
-                          ? AppColors.grey
-                          : Colors.purpleAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 8.h,
-                      ),
-                    ),
-                    child: Text(
-                      friend.isFriend ? "Unfriend" : "Friend",
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-
-                // ------------------------------
-                // Requests tab buttons
-                // ------------------------------
-                if (onAccept != null && onReject != null) ...[
-                  ElevatedButton(
-                    onPressed: onAccept,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                    ),
-                    child: Text(
-                      "Accept",
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  ElevatedButton(
-                    onPressed: onReject,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                    ),
-                    child: Text(
-                      "Reject",
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
-          Divider(color: AppColors.kLightGray, height: 15.h),
         ],
+      ),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        child: Row(
+          children: [
+            // Profile Avatar with gradient border
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [Colors.purpleAccent, Colors.pinkAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              padding: EdgeInsets.all(2.5.w),
+              child: CircleAvatar(
+                radius: 22.r,
+                backgroundImage: avatar.isNotEmpty ? NetworkImage(avatar) : null,
+                backgroundColor: Colors.grey[200],
+                child: avatar.isEmpty
+                    ? Icon(Icons.person, size: 24.sp, color: Colors.grey[400])
+                    : null,
+              ),
+            ),
+            SizedBox(width: 14.w),
+
+            // Name Text
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.sp,
+                  color: Colors.black87,
+                  letterSpacing: 0.3,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+
+            // Friends tab button
+            if (onToggleFriend != null && isFriendModel) ...[
+              SizedBox(width: 8.w),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.r),
+                  gradient: isFriend
+                      ? null
+                      : LinearGradient(
+                          colors: [Colors.purpleAccent, Colors.purple],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  boxShadow: isFriend
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.purpleAccent.withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: ElevatedButton(
+                  onPressed: onToggleFriend,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isFriend ? Colors.grey[300] : Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+                  ),
+                  child: Text(
+                    isFriend ? "Unfriend" : "Friend",
+                    style: TextStyle(
+                      color: isFriend ? Colors.black54 : Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+
+            // Requests tab buttons
+            if (onAccept != null && onReject != null && isRequestModel) ...[
+              SizedBox(width: 6.w),
+              ElevatedButton(
+                onPressed: onAccept,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                ),
+                child: Text(
+                  "Accept",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(width: 6.w),
+              ElevatedButton(
+                onPressed: onReject,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                ),
+                child: Text(
+                  "Reject",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
