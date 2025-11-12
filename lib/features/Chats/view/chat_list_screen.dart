@@ -43,16 +43,18 @@ class ChatListScreen extends StatelessWidget {
             // ===== Chat List =====
             Expanded(
               child: Obx(
-                () => ListView.separated(
+                (){
+                    if(controller.chats.length==0){
+                      return Center(child: Text("No Chats"),);
+                    
+                    }
+                  return ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: controller.chats.length,
                   separatorBuilder: (_, __) =>
                       const Divider(height: 1, color: Colors.grey),
                   itemBuilder: (context, index) {
-                    if(controller.chats.length==0){
-                      return Center(child: Text("No Chats"),);
-                    
-                    }
+                  
                     final chat = controller.chats[index];
                     return Slidable(
                       endActionPane: ActionPane(
@@ -149,7 +151,9 @@ class ChatListScreen extends StatelessWidget {
                       ),
                     );
                   },
-                ),
+                );
+                }
+                
               ),
             ),
           ],
