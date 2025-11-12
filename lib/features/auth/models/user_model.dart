@@ -6,6 +6,8 @@ class UserModel {
   final String? dob;
    final String? gender;
    final String? token;
+   final bool premium;
+   final String ?country;
 
   UserModel({
     this.id,
@@ -15,6 +17,8 @@ class UserModel {
     this.dob,
     this.gender = "Not Specified",
     this.token,
+    this.premium = false,
+    this.country,
   });
 
   Map<String, dynamic> toJson() {
@@ -26,6 +30,8 @@ class UserModel {
       "dob": dob ?? "",
       "gender": gender,
       "token": token,
+      "premium": premium,
+      "country": country,
     };
   }
 
@@ -38,6 +44,8 @@ class UserModel {
       dob: json["dob"] ?? json['dateOfBirth'],
       gender: json["gender"] ?? "Not specified",
       token: json["token"] ?? "",
+      premium: json["premium"] ?? false,
+      country: json["country"] ?? "Unknown",
     );
   }
     UserModel copyWith({
@@ -57,6 +65,8 @@ class UserModel {
       dob: dob ?? this.dob,
       gender: gender ?? this.gender,
       token: token ?? this.token,
+      premium:  premium,
+     country:  country,
     );
   }
 }

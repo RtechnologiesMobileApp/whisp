@@ -12,32 +12,35 @@ class FriendsController extends GetxController {
   // Friends tab
   var friendsList = <FriendModel>[].obs;
   var searchQuery = ''.obs;
-   var isLoading = true.obs;
+  
 
   // Requests tab
   var friendRequests = <FriendRequestModel>[].obs;
 
-  final RxBool isLoadingFriends = false.obs;
-  final RxBool isLoadingRequests = false.obs;
+  final RxBool isLoadingFriends = true.obs;
+final RxBool isLoadingRequests = true.obs;
 
   @override
-  void onInit() {
-    super.onInit();
+  void onReady() {
+  super.onReady();
+  fetchFriends();
+  fetchIncomingRequests();
+}
 
-    // ✅ Load friends from API
-    fetchFriends();
+  // @override
+  // void onInit() {
+  //   super.onInit();
 
-    // ✅ Load friend requests from API
-    fetchIncomingRequests();
+    
 
   
-  }
+  // }
  
 // Fetch Friends List from API
  
   Future<void> fetchFriends() async {
     try {
-       isLoading.value = true;
+       
       isLoadingFriends.value = true;
 
       final res = await repo.getFriendsList();
@@ -45,7 +48,7 @@ class FriendsController extends GetxController {
     } catch (e) {
       log("Error fetching friends: $e");
     } finally {
-      isLoading.value = false;
+      
       isLoadingFriends.value = false;
     }
   }
@@ -55,7 +58,7 @@ class FriendsController extends GetxController {
  
  Future<void> fetchIncomingRequests() async {
     try {
-       isLoading.value = true;
+       
       isLoadingRequests.value = true;
 
       // ✅ Repo now returns List<FriendRequestModel>
@@ -65,7 +68,7 @@ class FriendsController extends GetxController {
     } catch (e) {
       log("Error fetching incoming requests: $e");
     } finally {
-      isLoading.value = false;
+     
       isLoadingRequests.value = false;
     }
   }

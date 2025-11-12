@@ -17,22 +17,39 @@ class FriendsScreen extends StatefulWidget {
 class _FriendsScreenState extends State<FriendsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final controller = Get.put(FriendsController());
+  //final controller = Get.put(FriendsController());
+  final controller = Get.find<FriendsController>();
+
   final RxInt currentTabIndex = 0.obs;
   
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+ @override
+void initState() {
+  super.initState();
+  _tabController = TabController(length: 2, vsync: this);
 
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        currentTabIndex.value = _tabController.index;
-      }
-    });
- 
+ _tabController.addListener(() {
+  if (!_tabController.indexIsChanging) {
+    currentTabIndex.value = _tabController.index;
+
+    // 🔹 Lazy-load requests only when user visits Requests tab
+    if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
+      controller.isLoadingRequests.value = true;
+      controller.fetchIncomingRequests();
+    }
   }
+});
+
+
+  // 🔹 Force loaders and fetch data when screen opens
+  controller.isLoadingFriends.value = true;
+  controller.isLoadingRequests.value = true;
+
+  controller.fetchFriends();
+  controller.fetchIncomingRequests();
+}
+
 
   @override
   void dispose() {
@@ -42,7 +59,7 @@ class _FriendsScreenState extends State<FriendsScreen>
 
 Widget _buildFriendsTab() {
   return Obx(() {
-    if (controller.isLoading.value) {
+    if (controller.isLoadingFriends.value) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -76,7 +93,7 @@ Widget _buildFriendsTab() {
  // Requests tab
 Widget _buildRequestsTab() {
   return Obx(() {
-    if (controller.isLoading.value) {
+    if (controller.isLoadingRequests.value) {
       // 🔹 Loader while requests are loading
       return const Center(child: CircularProgressIndicator());
     }

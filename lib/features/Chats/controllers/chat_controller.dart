@@ -37,10 +37,7 @@ class ChatController extends GetxController {
   chatListController.updateLastMessage(friendId!, msgText, partnerId);
 });
 
-//    SocketService.to.onMessage((Map data) {
-//   final message = Map<String, dynamic>.from(data);
-//   messages.add(message);
-// });
+ 
 
   }
 
