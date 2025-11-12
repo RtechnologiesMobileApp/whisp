@@ -50,20 +50,25 @@ void loadFriendChatHistory() async {
   if (isFriend && friendId != null) {
     try {
       isLoading.value = true;
+
+      // ✅ Repo already returns List<Map<String, dynamic>>
       final history = await FriendRepo().getFriendChatHistory(friendId!);
- history.forEach((msg) {
+
+      // Debug print to verify messages
+      history.forEach((msg) {
         print("from: ${msg['from']}, to: ${msg['to']}, body: ${msg['body']}");
       });
 
+      // Assign messages to observable list
       messages.assignAll(
-        
         history.map((msg) => {
-          "fromMe": msg["from"].toString().trim() == currentUserId!.toString().trim(),
-          "message": msg["body"],
+          "fromMe": msg["from"]?.toString().trim() == currentUserId?.toString().trim(),
+          "message": msg["message"] ?? '', // Repo is already mapping 'body' to 'message'
         }),
       );
 
       print("💬 Loaded ${messages.length} messages for friend $friendId");
+
     } catch (e) {
       print("❌ Failed to load chat history: $e");
     } finally {

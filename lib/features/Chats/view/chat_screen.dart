@@ -43,30 +43,14 @@ final ChatController controller = Get.isRegistered<ChatController>(tag: isFriend
         itemBuilder: (context, index) {
           final msg = controller.messages[index];
           final bool isFromMe = msg['fromMe'] ?? false;
-         final String message = msg['body'] ?? msg['message'] ?? '';
+          final String message = msg['message'] ?? '';
           return ChatBubble(fromMe: isFromMe, message: message);
         },
       );
     },
   ),
 ),
-
-          // Expanded(
-          //   child: Obx(
-          //     () => ListView.builder(
-          //       padding: const EdgeInsets.only(top: 12),
-          //       itemCount: controller.messages.length,
-          //       itemBuilder: (context, index) {
-          //         final msg = controller.messages[index];
-          //         final bool isFromMe = msg['fromMe'] ?? false;
-          //         final String message = msg['body'] ?? msg['message'] ?? '';
-          //         return ChatBubble(fromMe: isFromMe, message: message);
-          //       },
-          //     ),
-          //   ),
-          // ),
-      
-            MessageInputField(  controller: controller  ),
+             MessageInputField(  controller: controller  ),
         ],
       ),
     );

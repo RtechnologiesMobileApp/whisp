@@ -38,37 +38,26 @@ Future<List<FriendModel>> getFriendsList() async {
   }
 }
 
- Future<List<Map<String, dynamic>>> getFriendChatHistory(String friendId) async {
-    try {
-      debugPrint("Fetching chat history for friendId: $friendId...");
+Future<List<Map<String, dynamic>>> getFriendChatHistory(String friendId) async {
+  try {
+    final res = await _api.get("${ApiEndpoints.getFriendChatHistory}$friendId", requireAuth: true);
+    if (res["messages"] == null) return [];
 
-      final res = await _api.get(
-        "${ApiEndpoints.getFriendChatHistory}$friendId",
-        requireAuth: true, // ✅ automatically sends token
-      );
-
-      debugPrint("Chat history API response: $res");
-
-      if (res["messages"] == null) {
-        debugPrint("No messages found in response.");
-        return [];
-      }
-
-      // Map API messages to the format used in ChatController
-      final messages = (res["messages"] as List)
-          .map((msg) => {
-                "fromMe": msg["from"] == SessionController().user!.id, // assuming ApiClient has current user ID
-                "message": msg["body"],
-              })
-          .toList();
-
-      debugPrint("Parsed ${messages.length} messages for friend $friendId");
-      return messages;
-    } catch (e) {
-      debugPrint("Error fetching chat history: $e");
-      return [];
-    }
+    return (res["messages"] as List)
+        .map((msg) => {
+              "fromMe": msg["from"] == SessionController().user!.id,
+              "message": msg["body"] ?? '',
+              "from": msg["from"],
+              "to": msg["to"],
+            })
+        .toList();
+  } catch (e) {
+    debugPrint("Error fetching chat history: $e");
+    return [];
   }
+}
+
+ 
 
 
 Future<List<FriendRequestModel>> getIncomingRequestsList() async {
