@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
+import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/session_manager.dart';
 
 
@@ -19,26 +21,30 @@ class PaymentService {
     required this.onCreditsRefresh,
   });
 
+final uuid = Uuid();
+
 Future<void> handleSubscription(String plan) async {
   try {
     _showLoadingSnack('Preparing payment for $plan plan...');
 
-    await _testBackendConnection();
+    // await _testBackendConnection();
     final data = await _createPaymentIntent(plan);
 
     final clientSecret = data['clientSecret'] as String?;
     final ephemeralKey = data['ephemeralKey'] as String?;
     final customerId = data['customerId'] as String?;
     final paymentIntentId = data['paymentIntentId'];
+    final idempotencyKey = data['idempotencyKey'];
 
     if (clientSecret == null) throw Exception('No payment intent received');
 
-    Navigator.pop(context); // closes bottom sheet
+   
 
     await _initAndPresentPaymentSheet(
       clientSecret: clientSecret,
       ephemeralKey: ephemeralKey,
       customerId: customerId,
+      
     );
 
     // await _notifyBackendPaymentSuccess(paymentIntentId);
@@ -50,7 +56,7 @@ Future<void> handleSubscription(String plan) async {
       }
     });
 
-    await onCreditsRefresh();
+   
   } catch (error) {
     print('❌ Payment error: $error');
     if (context.mounted) _handlePaymentError(error);
@@ -94,24 +100,26 @@ Future<void> handleSubscription(String plan) async {
     );
   }
 
-  Future<void> _testBackendConnection() async {
-    final res = await http.get(
-      Uri.parse('$baseUrl/status'),
-      headers: {'x-device-id': SessionController().user!.token!},
-    );
-    if (res.statusCode != 200) {
-      throw Exception('Backend not reachable');
-    }
-  }
+  // Future<void> _testBackendConnection() async {
+  //   final res = await http.get(
+  //     Uri.parse('$baseUrl/status'),
+  //     headers: {'Authorization': SessionController().user!.token!},
+  //   );
+  //   if (res.statusCode != 200) {
+  //     throw Exception('Backend not reachable');
+  //   }
+  // }
 
   Future<Map<String, dynamic>> _createPaymentIntent(String plan) async {
+    
     final response = await http.post(
-      Uri.parse('$baseUrl/billing/create-payment-intent'),
+      Uri.parse('${ApiEndpoints.baseUrl}/api/payments/create-payment-intent'),
       headers: {
         'Content-Type': 'application/json',
-        'x-device-id': deviceId,
+        'Authorization': 'Bearer ${SessionController().user!.token!}',
+        'Idempotency-Key': uuid.v4(),
       },
-      body: jsonEncode({'plan': plan, 'deviceId': deviceId}),
+      body: jsonEncode({'plan': plan}),
     );
     print('🛑 Payment intent response: ${response.body}');
     if (response.statusCode != 200) {
@@ -134,8 +142,10 @@ Future<void> handleSubscription(String plan) async {
         customerEphemeralKeySecret: ephemeralKey,
         customerId: customerId,
         style: ThemeMode.dark,
+        
       ),
     );
+    
     await Stripe.instance.presentPaymentSheet();
   }
 
