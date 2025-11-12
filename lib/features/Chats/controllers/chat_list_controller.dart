@@ -2,21 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/features/Chats/repo/chat_repo.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
  
 
 class ChatListController extends GetxController {
   final ChatRepository _chatRepository = ChatRepository();
 
   var chats = <Map<String, dynamic>>[].obs;
-  var isLoading = false.obs;
+  var isLoading = true.obs; // Start as true
+
+  final FriendsController friendController = Get.find<FriendsController>();
 
   @override
   void onInit() {
     super.onInit();
     loadChatList();
   }
+ 
 
   Future<void> loadChatList() async {
+      isLoading.value = true;
     try {
       isLoading.value = true;
 

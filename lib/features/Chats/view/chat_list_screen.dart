@@ -8,6 +8,7 @@ import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:whisp/features/Chats/widgets/friends_chat_sheet.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
 
@@ -19,6 +20,9 @@ class ChatListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    controller.loadChatList();
+  });
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -40,7 +44,19 @@ class ChatListScreen extends StatelessWidget {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (_) => SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: FriendsChatSheet(),
+                        ),
+                      );
+                    },
                     child: Image.asset(
                       AppImages.add_message,
                       height: 24,
@@ -54,9 +70,18 @@ class ChatListScreen extends StatelessWidget {
             // ===== Chat List =====
             Expanded(
               child: Obx(() {
-                if (controller.chats.length == 0) {
-                  return Center(child: Text("No Chats"));
+                if (controller.isLoading.value) {
+                  // Show loader while fetching chat list
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
+
+                if (controller.chats.isEmpty) {
+                  // Show "No Chats" if API returns empty
+                  return const Center(child: Text("No Chats"));
+                }
+
                 return ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: controller.chats.length,
@@ -89,8 +114,8 @@ class ChatListScreen extends StatelessWidget {
                           SlidableAction(
                             onPressed: (_) =>
                                 showUnfriendDialog(chat['name'], "Block", () {
-                                  Get.back();
-                                }),
+                              Get.back();
+                            }),
                             backgroundColor: AppColors.brownOrange,
                             foregroundColor: Colors.white,
                             label: 'Block',
@@ -100,8 +125,8 @@ class ChatListScreen extends StatelessWidget {
                             spacing: 6,
                             onPressed: (_) =>
                                 showUnfriendDialog(chat['name'], "Report", () {
-                                  Get.back();
-                                }),
+                              Get.back();
+                            }),
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
                             label: 'Report',
@@ -118,13 +143,9 @@ class ChatListScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundImage:
-                                  chat['avatar'] != null && chat['avatar'] != ''
+                              backgroundImage: chat['avatar'] != null && chat['avatar'] != ''
                                   ? NetworkImage(chat['avatar'])
-                                  : AssetImage(
-                                          'assets/images/place_holder_pic.jpg',
-                                        )
-                                        as ImageProvider,
+                                  : const AssetImage('assets/images/place_holder_pic.jpg') as ImageProvider,
                             ),
                             if (chat['isOnline'] == true)
                               Positioned(
@@ -166,15 +187,10 @@ class ChatListScreen extends StatelessWidget {
                                 )
                               : Builder(
                                   builder: (_) {
-                                    final currentUserId =
-                                        SessionController().user!.id;
-                                    final lastUserId =
-                                        chat['lastMessageUserId'];
-                                    final isFromMe =
-                                        lastUserId == currentUserId;
-
-                                    final messageText =
-                                        chat['lastMessage'] ?? '';
+                                    final currentUserId = SessionController().user!.id;
+                                    final lastUserId = chat['lastMessageUserId'];
+                                    final isFromMe = lastUserId == currentUserId;
+                                    final messageText = chat['lastMessage'] ?? '';
 
                                     return RichText(
                                       text: TextSpan(
@@ -202,7 +218,7 @@ class ChatListScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              chat['time'] ?? '',
+                              chat['lastMessageTime'] ?? '',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade500,
@@ -211,10 +227,10 @@ class ChatListScreen extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                            log("🧠 Chat item tapped:");
-  log("id: ${chat['id']}");
-  log("name: ${chat['name']}");
-  log("image: ${chat['avatar']}");
+                          log("🧠 Chat item tapped:");
+                          log("id: ${chat['id']}");
+                          log("name: ${chat['name']}");
+                          log("image: ${chat['avatar']}");
                           // Navigate to ChatScreen
                           Get.to(
                             () => ChatScreen(
@@ -236,4 +252,6 @@ class ChatListScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
+
+ 
