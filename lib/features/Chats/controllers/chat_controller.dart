@@ -22,10 +22,20 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-   SocketService.to.onMessage((Map data) {
-  final message = Map<String, dynamic>.from(data);
-  messages.add(message);
+    SocketService.to.onMessage((data) {
+  final msgText = data['message'] ?? data['body'] ?? ''; // <-- normalize
+  if (msgText.trim().isEmpty) return; // prevent blank
+
+  messages.add({
+    'fromMe': false,
+    'message': msgText,
+  });
 });
+
+//    SocketService.to.onMessage((Map data) {
+//   final message = Map<String, dynamic>.from(data);
+//   messages.add(message);
+// });
 
   }
 
