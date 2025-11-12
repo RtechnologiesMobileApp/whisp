@@ -41,32 +41,32 @@ class ChatListController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  void updateLastMessage(String chatId, String lastMessage, String lastUserId) {
+  final index = chats.indexWhere((c) => c['id'] == chatId);
+  if (index != -1) {
+    chats[index]['lastMessage'] = lastMessage;
+    chats[index]['lastMessageUserId'] = lastUserId;
+    chats[index]['lastMessageTime'] = DateTime.now().toString();
+
+    // Move chat to top of list
+    final updatedChat = chats.removeAt(index);
+    chats.insert(0, updatedChat);
+
+    chats.refresh(); // 🔥 notify UI instantly
+  } else {
+    // Optional: If it's a new chat not in list, you can insert it
+    chats.insert(0, {
+      'id': chatId,
+      'name': 'Unknown',
+      'avatar': '',
+      'lastMessage': lastMessage,
+      'lastMessageUserId': lastUserId,
+      'lastMessageTime': DateTime.now().toString(),
+    });
+  }
 }
 
-// import 'package:get/get.dart';
-// import 'package:whisp/features/friends/controller/friend_controller.dart';
+}
+
  
-
-// class ChatListController extends GetxController {
-//   var chats = <Map<String, dynamic>>[].obs;
-
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     loadFriendsForChatList();
-//   }
-
-//   void loadFriendsForChatList() {
-//     final friendController = Get.find<FriendsController>();
-    
-//     // Wait for friends to load if not already
-//     friendController.fetchFriends().then((_) {
-//       chats.assignAll(friendController.friendsList.map((f) => {
-//         'id': f.id,
-//         'name': f.name,
-//         'image': f.imageUrl,
-//         'lastMessage': '', // optional, ya fir backend se le sakte ho
-//       }).toList());
-//     });
-//   }
-// }
