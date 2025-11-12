@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
@@ -5,12 +7,14 @@ import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
 
   final ChatListController controller = Get.put(ChatListController());
+  final FriendsController friendController = Get.find<FriendsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,8 @@ class ChatListScreen extends StatelessWidget {
                           SlidableAction(
                             onPressed: (_) =>
                                 showUnfriendDialog(chat['name'], "Disconnect", (){
+                                  log("💡 Disconnecting from ${chat['id']}");
+                                   friendController.unfriendUser(chat['id']);
                Get.back();
               }),
                             backgroundColor: Colors.black,
