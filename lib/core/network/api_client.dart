@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -57,6 +58,7 @@ Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     try {
       final response = await _dio.post(endpoint, data: data);
+      log(data.toString());
       return response.data;
     } catch (e) {
       throw ApiException.handleError(e);

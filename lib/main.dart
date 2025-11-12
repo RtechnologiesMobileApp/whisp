@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/config/theme/theme.dart';
+import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/core/services/fcm_service.dart';
 import 'package:whisp/features/onboarding/view/screen/splash_screen.dart';
 import 'package:whisp/firebase_options.dart';
 import 'package:whisp/core/services/ad_service.dart';
@@ -18,6 +20,9 @@ void main() async {
   Stripe.publishableKey = 'pk_test_zvk0Ygki42YJ1PXtxMlj0kxq';
   // Initialize Firebase before runApp
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+   // Initialize FCM service with baseUrls
+ await FCMService().init(baseUrl: ApiEndpoints.baseUrl);
+  print('✅ FCM Initialized');
 
   runApp(
     ScreenUtilInit(

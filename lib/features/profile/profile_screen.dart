@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,6 +16,18 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool notificationsEnabled = true;
+ _getNotificationState() async {
+    SharedPreferences prefs=await SharedPreferences.getInstance();
+    setState(() {
+      notificationsEnabled=prefs.getBool('notificationsEnabled') ?? true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getNotificationState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,12 +199,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Switch(
                     value: notificationsEnabled,
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         notificationsEnabled = value;
                       });
                       // TODO: Call API here to update notification settings
                       debugPrint('Notifications: $value');
+                      try {
+                 
+
+                  final response = await http.put(
+                    Uri.parse('${ApiEndpoints.baseUrl}/api/auth/notifications'),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer ${SessionController().user!.token!}',
+                    },
+                    body: jsonEncode({
+                      'enabled': value,
+                    }),
+                  );
+
+                  if (response.statusCode != 200) {
+                    setState(() => notificationsEnabled = !value);
+                     SharedPreferences prefs=await SharedPreferences.getInstance();
+                     prefs.setBool('notificationsEnabled', notificationsEnabled);
+                  }else{
+                     SharedPreferences prefs=await SharedPreferences.getInstance();
+                     prefs.setBool('notificationsEnabled', notificationsEnabled);
+                  }
+                } catch (e) {
+                  setState(() => notificationsEnabled = !value);
+                }
                     },
                     activeColor: Colors.black,
                     activeTrackColor: Colors.grey.shade300,
