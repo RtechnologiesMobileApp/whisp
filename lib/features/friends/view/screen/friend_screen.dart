@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
+import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
 import '../widgets/friend_card.dart';
 
 class FriendsScreen extends StatefulWidget {
@@ -59,7 +60,9 @@ Widget _buildFriendsTab() {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
           child: FriendCard(
             friend: friend,
-            onToggleFriend: () => controller.unfriendUser(friend.id),
+            onToggleFriend: () {
+              showUnfriendDialog(controller,friend);
+              }
           ),
         );
       },

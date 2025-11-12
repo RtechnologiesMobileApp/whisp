@@ -39,6 +39,7 @@ dependencies:
     sdk: flutter
   flutter_cupertino_date_picker_fork: ^1.0.7
   flutter_screenutil: ^5.9.3
+  flutter_slidable: ^4.0.3
   flutter_stripe: ^12.1.0
   get: ^4.7.2
   google_fonts: ^6.3.2
