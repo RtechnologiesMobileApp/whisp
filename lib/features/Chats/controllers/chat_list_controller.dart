@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/features/Chats/repo/chat_repo.dart';
  
@@ -20,6 +21,7 @@ class ChatListController extends GetxController {
       isLoading.value = true;
 
       final data = await _chatRepository.getChatList();
+       debugPrint('🟢 Chat list raw response: $data');
 
       chats.assignAll(
         data.map<Map<String, dynamic>>((chat) {

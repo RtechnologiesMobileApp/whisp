@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:whisp/core/services/session_manager.dart';
+import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
 import 'package:whisp/features/home/view/home_screen.dart';
 import 'package:whisp/features/home/view/welcome_home.dart';
@@ -25,6 +26,8 @@ class SplashServices {
     }
 
     if (sC.user != null) {
+      final socketService = Get.find<SocketService>();
+  await socketService.safeInitIfNeeded();
       Get.offAll(() => MainHomeScreen());
     }
 
