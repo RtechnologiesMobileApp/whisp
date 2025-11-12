@@ -12,6 +12,7 @@ class FriendsController extends GetxController {
   // Friends tab
   var friendsList = <FriendModel>[].obs;
   var searchQuery = ''.obs;
+   var isLoading = true.obs;
 
   // Requests tab
   var friendRequests = <FriendRequestModel>[].obs;
@@ -36,6 +37,7 @@ class FriendsController extends GetxController {
  
   Future<void> fetchFriends() async {
     try {
+       isLoading.value = true;
       isLoadingFriends.value = true;
 
       final res = await repo.getFriendsList();
@@ -43,6 +45,7 @@ class FriendsController extends GetxController {
     } catch (e) {
       log("Error fetching friends: $e");
     } finally {
+      isLoading.value = false;
       isLoadingFriends.value = false;
     }
   }

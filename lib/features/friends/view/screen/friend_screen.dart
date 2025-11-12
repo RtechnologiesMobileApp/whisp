@@ -38,34 +38,47 @@ class _FriendsScreenState extends State<FriendsScreen>
     super.dispose();
   }
 
-  Widget _buildFriendsTab() {
-    return Obx(() {
-      final friends = controller.filteredFriends;
-      if (friends.isEmpty) {
-        return const Center(child: Text("No friends yet."));
-      }
-      return ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
-        itemCount: friends.length,
-        itemBuilder: (context, index) {
-          final friend = friends[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
-            child: FriendCard(
-              friend: friend,
-             onToggleFriend: () => controller.unfriendUser(friend.id),
-            ),
-          );
-        },
-      );
-    });
-  }
+Widget _buildFriendsTab() {
+  return Obx(() {
+    if (controller.isLoading.value) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final friends = controller.filteredFriends;
+    if (friends.isEmpty) {
+      return const Center(child: Text("No friends yet."));
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      itemCount: friends.length,
+      itemBuilder: (context, index) {
+        final friend = friends[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+          child: FriendCard(
+            friend: friend,
+            onToggleFriend: () => controller.unfriendUser(friend.id),
+          ),
+        );
+      },
+    );
+  });
+}
 
  // Requests tab
 Widget _buildRequestsTab() {
   return Obx(() {
+    if (controller.isLoading.value) {
+      // 🔹 Loader while requests are loading
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final requests = controller.friendRequests;
-    if (requests.isEmpty) return const Center(child: Text("No friend requests."));
+    if (requests.isEmpty) {
+      return const Center(child: Text("No friend requests."));
+    }
+
     return ListView.builder(
       padding: EdgeInsets.symmetric(vertical: 8.h),
       itemCount: requests.length,
@@ -74,7 +87,7 @@ Widget _buildRequestsTab() {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
           child: FriendCard(
-            friend: req,         // FriendRequestModel
+            friend: req, // FriendRequestModel
             onAccept: () => controller.acceptRequest(req.id),
             onReject: () => controller.rejectRequest(req.id),
           ),

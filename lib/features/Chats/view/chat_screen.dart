@@ -9,16 +9,26 @@ class ChatScreen extends StatelessWidget {
  final String partnerId;
   final String partnerName;
   final String partnerAvatar;
+  final bool isFriend;
 
-  const ChatScreen({super.key, required this.partnerId, required this.partnerName, required this.partnerAvatar});
+  const ChatScreen({super.key, required this.partnerId, required this.partnerName, required this.partnerAvatar,this.isFriend = false});
 
   @override
   Widget build(BuildContext context) {
-    final ChatController controller = Get.put(ChatController());
+   // final ChatController controller = Get.put(ChatController(friendId: partnerId,isFriend: isFriend));
+   
+final ChatController controller = Get.isRegistered<ChatController>(tag: isFriend ? partnerId : 'random')
+    ? Get.find<ChatController>(tag: isFriend ? partnerId : 'random')
+    : Get.put(
+        ChatController(friendId: partnerId, isFriend: isFriend),
+        tag: isFriend ? partnerId : 'random',
+      );
+
+     
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
-      appBar: ChatAppBar(partnerId: partnerId, userName: partnerName, userAvatar: partnerAvatar),
+      appBar: ChatAppBar(partnerId: partnerId, userName: partnerName, userAvatar: partnerAvatar, isFriend: isFriend,),
       body: Column(
         children: [
           Expanded(
@@ -35,7 +45,7 @@ class ChatScreen extends StatelessWidget {
               ),
             ),
           ),
-          const MessageInputField(),
+            MessageInputField(  controller: controller  ),
         ],
       ),
     );

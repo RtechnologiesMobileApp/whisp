@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
@@ -65,10 +66,12 @@ class AppPages {
       name: Routes.chatscreen,
       page: () {
         final args = Get.arguments as Map<String, dynamic>;
+         debugPrint("📦 ChatScreen Get.arguments: $args");
         return ChatScreen(
           partnerId: args['partnerId'],
           partnerName: args['partnerName'],
           partnerAvatar: args['partnerAvatar'],
+          isFriend: args['isFriend'] ?? false,
         );
       },
       binding: AppBindings(),

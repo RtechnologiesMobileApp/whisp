@@ -6,6 +6,9 @@ class ChatController extends GetxController {
   final SocketService socketService = Get.find<SocketService>();
   final TextEditingController messageController = TextEditingController();
   RxList<Map<String, dynamic>> messages = <Map<String, dynamic>>[].obs;
+  String? friendId; // 👈 optional: null means random chat
+  bool isFriend;
+  ChatController({this.friendId,this.isFriend = false});
 
   @override
   void onInit() {
@@ -17,11 +20,22 @@ class ChatController extends GetxController {
 
   }
 
-  void sendMessage() {
-    final text = messageController.text.trim();
-    if (text.isEmpty) return;
+void sendMessage() {
+  final text = messageController.text.trim();
+  if (text.isEmpty) return;
+  print("💡 Sending message, friendId: $friendId, isFriend: $isFriend");
+
+  // ✅ Use isFriend flag instead of null check
+  if (isFriend) {
+    socketService.sendMessageToFriend(friendId!, text);
+    debugPrint('[chat] Message sent to friend $friendId');
+  } else {
     socketService.sendMessage(text);
-    messages.add({"fromMe": true, "message": text});
-    messageController.clear();
+    debugPrint('[chat] Message sent in random session');
   }
+
+  messages.add({"fromMe": true, "message": text});
+  messageController.clear();
+}
+
 }

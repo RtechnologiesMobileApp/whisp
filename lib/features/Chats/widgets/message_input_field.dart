@@ -5,11 +5,13 @@ import 'package:whisp/features/Chats/controllers/chat_controller.dart';
  
 
 class MessageInputField extends StatelessWidget {
-  const MessageInputField({super.key});
+   final ChatController controller;
+  
+  const MessageInputField({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    final ChatController controller = Get.find<ChatController>();
+   
 
     return SafeArea(
       child: Container(

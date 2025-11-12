@@ -76,12 +76,26 @@ class SocketService extends GetxService {
       debugPrint('[socket] CANCEL_RANDOM emitted');
     }
   }
-
+     // send msg to random partner
   void sendMessage(String body) {
     if (socket?.connected ?? false) {
       socket!.emit('SEND_MESSAGE', {'body': body});
     }
   }
+  // send msg to friend
+
+  void sendMessageToFriend(String toUserId, String body) {
+  if (socket?.connected ?? false) {
+    socket!.emit('SEND_MESSAGE_TO_FRIEND', {
+      'toUserId': toUserId,
+      'body': body,
+    });
+    debugPrint('[socket] SEND_MESSAGE_TO_FRIEND emitted to $toUserId with message: $body');
+  } else {
+    debugPrint('[socket] cannot emit SEND_MESSAGE_TO_FRIEND: not connected');
+  }
+}
+
 
   void typing(bool isTyping) {
     if (socket?.connected ?? false) {
@@ -141,25 +155,7 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
   );
 }
 
-  // void acceptFriend(String requestId, void Function(Map) ackCb) {
-  //   socket?.emitWithAck(
-  //     'FRIEND_ACCEPT',
-  //     {'requestId': requestId},
-  //     ack: (data) {
-  //       ackCb(Map.from(data));
-  //     },
-  //   );
-  // }
-
-  // void rejectFriend(String requestId, void Function(Map) ackCb) {
-  //   socket?.emitWithAck(
-  //     'FRIEND_REJECT',
-  //     {'requestId': requestId},
-  //     ack: (data) {
-  //       ackCb(Map.from(data));
-  //     },
-  //   );
-  // }
+  
 
   void cancelFriendRequest(String requestId, void Function(Map) ackCb) {
     socket?.emitWithAck(
