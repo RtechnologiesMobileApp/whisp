@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -45,7 +46,7 @@ class ChatListScreen extends StatelessWidget {
                       height: 24,
                       width: 24,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -54,9 +55,7 @@ class ChatListScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.chats.length == 0) {
-                  return Center(
-                    child: Text("No Chats"),
-                  );
+                  return Center(child: Text("No Chats"));
                 }
                 return ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -73,21 +72,25 @@ class ChatListScreen extends StatelessWidget {
                         motion: const ScrollMotion(),
                         children: [
                           SlidableAction(
-                            onPressed: (_) =>
-                                showUnfriendDialog(chat['name'], "Disconnect", (){
-                                  log("💡 Disconnecting from ${chat['id']}");
-                                   friendController.unfriendUser(chat['id']);
-               Get.back();
-              }),
+                            onPressed: (_) => showUnfriendDialog(
+                              chat['name'],
+                              "Disconnect",
+                              () {
+                                log("💡 Disconnecting from ${chat['id']}");
+                                friendController.unfriendUser(chat['id']);
+                                Get.back();
+                              },
+                            ),
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             label: 'Disconnect',
                             flex: 3,
                           ),
                           SlidableAction(
-                            onPressed: (_) =>  showUnfriendDialog(chat['name'], "Block", (){
-               Get.back();
-              }),
+                            onPressed: (_) =>
+                                showUnfriendDialog(chat['name'], "Block", () {
+                                  Get.back();
+                                }),
                             backgroundColor: AppColors.brownOrange,
                             foregroundColor: Colors.white,
                             label: 'Block',
@@ -95,9 +98,10 @@ class ChatListScreen extends StatelessWidget {
                           ),
                           SlidableAction(
                             spacing: 6,
-                            onPressed: (_) =>showUnfriendDialog(chat['name'], "Report", (){
-               Get.back();
-              }),
+                            onPressed: (_) =>
+                                showUnfriendDialog(chat['name'], "Report", () {
+                                  Get.back();
+                                }),
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
                             label: 'Report',
@@ -107,17 +111,20 @@ class ChatListScreen extends StatelessWidget {
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 8),
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
                         leading: Stack(
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundImage: chat['image'] != null &&
-                                      chat['image'] != ''
-                                  ? NetworkImage(chat['image'])
+                              backgroundImage:
+                                  chat['avatar'] != null && chat['avatar'] != ''
+                                  ? NetworkImage(chat['avatar'])
                                   : AssetImage(
-                                          'assets/images/place_holder_pic.jpg')
-                                      as ImageProvider,
+                                          'assets/images/place_holder_pic.jpg',
+                                        )
+                                        as ImageProvider,
                             ),
                             if (chat['isOnline'] == true)
                               Positioned(
@@ -130,7 +137,9 @@ class ChatListScreen extends StatelessWidget {
                                     color: Colors.green,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                        color: Colors.white, width: 2),
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -155,14 +164,37 @@ class ChatListScreen extends StatelessWidget {
                                     color: Colors.grey,
                                   ),
                                 )
-                              : Text(
-                                  chat['lastMessage'] ?? '',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
-                                  ),
+                              : Builder(
+                                  builder: (_) {
+                                    final currentUserId =
+                                        SessionController().user!.id;
+                                    final lastUserId =
+                                        chat['lastMessageUserId'];
+                                    final isFromMe =
+                                        lastUserId == currentUserId;
+
+                                    final messageText =
+                                        chat['lastMessage'] ?? '';
+
+                                    return RichText(
+                                      text: TextSpan(
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        children: [
+                                          if (isFromMe)
+                                            const TextSpan(
+                                              text: 'You: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          TextSpan(text: messageText),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
                         ),
                         trailing: Column(
@@ -179,13 +211,19 @@ class ChatListScreen extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
+                            log("🧠 Chat item tapped:");
+  log("id: ${chat['id']}");
+  log("name: ${chat['name']}");
+  log("image: ${chat['avatar']}");
                           // Navigate to ChatScreen
-                          Get.to(() => ChatScreen(
-                                partnerId: chat['id'],
-                                partnerName: chat['name'],
-                                partnerAvatar: chat['image'],
-                                isFriend: true,
-                              ));
+                          Get.to(
+                            () => ChatScreen(
+                              partnerId: chat['id'],
+                              partnerName: chat['name'],
+                              partnerAvatar: chat['avatar'],
+                              isFriend: true,
+                            ),
+                          );
                         },
                       ),
                     );
@@ -198,4 +236,4 @@ class ChatListScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
