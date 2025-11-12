@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
+ 
 
 class ChatListController extends GetxController {
   var chats = <Map<String, dynamic>>[].obs;
@@ -6,49 +8,20 @@ class ChatListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadFriendsForChatList();
+  }
 
-    // Dummy data (replace later with backend/socket)
-    chats.value = [
-      {
-        'name': 'Sam',
-        'lastMessage': 'You: Hey just saw you sitting at the bar. Cute dog :)',
-        'time': '9:25 pm',
-        'image': 'assets/images/user1.png',
-        'isOnline': false,
-        'isTyping': false,
-      },
-      {
-        'name': 'Daniella',
-        'lastMessage': '',
-        'time': '',
-        'image': 'assets/images/user2.png',
-        'isOnline': true,
-        'isTyping': true,
-      },
-      {
-        'name': 'Karen',
-        'lastMessage': 'Sure, meet me at the bar in 5?',
-        'time': '9:25 pm',
-        'image': 'assets/images/user3.png',
-        'isOnline': false,
-        'isTyping': false,
-      },
-      {
-        'name': 'James',
-        'lastMessage': 'Just going to the bar to get a drink.',
-        'time': '9:25 pm',
-        'image': 'assets/images/user4.png',
-        'isOnline': false,
-        'isTyping': false,
-      },
-      {
-        'name': 'Melissa',
-        'lastMessage': 'Sure, meet me at the bar in 5?',
-        'time': '9:25 pm',
-        'image': 'assets/images/user5.png',
-        'isOnline': false,
-        'isTyping': false,
-      },
-    ];
+  void loadFriendsForChatList() {
+    final friendController = Get.find<FriendsController>();
+    
+    // Wait for friends to load if not already
+    friendController.fetchFriends().then((_) {
+      chats.assignAll(friendController.friendsList.map((f) => {
+        'id': f.id,
+        'name': f.name,
+        'image': f.imageUrl,
+        'lastMessage': '', // optional, ya fir backend se le sakte ho
+      }).toList());
+    });
   }
 }

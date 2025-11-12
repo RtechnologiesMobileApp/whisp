@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
- 
+import 'package:whisp/features/Chats/view/chat_screen.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -54,10 +54,13 @@ class ChatListScreen extends StatelessWidget {
                           horizontal: 20, vertical: 10),
                       leading: Stack(
                         children: [
-                          CircleAvatar(
-                            radius: 26,
-                            backgroundImage: AssetImage(chat['image'] ?? ''),
-                          ),
+                         CircleAvatar(
+  radius: 26,
+  backgroundImage: chat['image'] != null && chat['image'] != ''
+      ? NetworkImage(chat['image'])
+      : AssetImage('assets/images/place_holder_pic.jpg') as ImageProvider,
+),
+
                           if (chat['isOnline'] == true)
                             Positioned(
                               right: 0,
@@ -106,7 +109,13 @@ class ChatListScreen extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        // 👉 Navigate to ChatDetailScreen later
+                        // 👉 Navigate to friend ChatScreen
+                        Get.to(() => ChatScreen(
+                              partnerId: chat['id'],
+                              partnerName: chat['name'],
+                              partnerAvatar: chat['image'],
+                              isFriend: true,
+                            ));
                       },
                     );
                   },

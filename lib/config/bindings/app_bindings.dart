@@ -8,6 +8,7 @@ import 'package:whisp/features/auth/repo/auth_repo.dart';
 import 'package:whisp/features/auth/controllers/otp_controller.dart';
 import 'package:whisp/features/auth/controllers/reset_password_controller.dart';
 import 'package:whisp/features/auth/controllers/forgot_password_controller.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/home/controllers/finding_match_controller.dart';
 import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/core/services/session_manager.dart';
@@ -26,6 +27,7 @@ class AppBindings extends Bindings {
     Get.lazyPut<ForgetPasswordController>(() => ForgetPasswordController(), fenix: true);
     Get.lazyPut<FindingMatchController>(() => FindingMatchController(), fenix: true);
     Get.lazyPut<ChatController>(() => ChatController(), fenix: true);
+    Get.lazyPut<FriendsController>(() => FriendsController(), fenix: true);
 
       // 🧩 Socket Service (global singleton)
     // Only initialize if not already initialized
