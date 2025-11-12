@@ -35,9 +35,11 @@ dependencies:
   dio: ^5.9.0
   firebase_auth: ^6.1.2
   firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
   flutter:
     sdk: flutter
   flutter_cupertino_date_picker_fork: ^1.0.7
+  flutter_local_notifications: ^19.5.0
   flutter_screenutil: ^5.9.3
   flutter_slidable: ^4.0.3
   flutter_stripe: ^12.1.0

@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:whisp/core/services/fcm_service.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
@@ -14,7 +16,7 @@ class AuthRepository {
   final ApiClient _apiClient = Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : Get.put(ApiClient());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-
+ 
 Future<dynamic> login({
     required String email,
     String? password,
@@ -22,10 +24,13 @@ Future<dynamic> login({
   }) async {
     print("[login api] url: ${ApiEndpoints.login}");
     try {
+      String? fcm=await FCMService().getToken();
+      log("${FCMService().getToken()}");
       final response = await _apiClient.post(ApiEndpoints.login, {
         "email": email,
         if (password != null) "password": password,
         "type": type,
+        'fcmToken':"${fcm}"
       });
 
       print("[login api] success: ${response}");
@@ -138,6 +143,7 @@ Future<dynamic> login({
     String type = "email",
   }) async {
     try {
+      String? fcm=await FCMService().getToken();
       final data = {
         "fullName": name,
         "email": email,
@@ -146,6 +152,7 @@ Future<dynamic> login({
         "dateOfBirth": dob,
         "country": country,
         "type": type,
+        'fcmToken':"$fcm"
       };
 
       final response = await _apiClient.postMultipart(
