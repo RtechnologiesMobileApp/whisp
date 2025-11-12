@@ -5,6 +5,7 @@ import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -69,14 +70,18 @@ class ChatListScreen extends StatelessWidget {
                         children: [
                           SlidableAction(
                             onPressed: (_) =>
-                                debugPrint('Disconnect ${chat['name']}'),
+                                showUnfriendDialog(chat['name'], "Disconnect", (){
+               Get.back();
+              }),
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             label: 'Disconnect',
                             flex: 3,
                           ),
                           SlidableAction(
-                            onPressed: (_) => debugPrint('Block ${chat['name']}'),
+                            onPressed: (_) =>  showUnfriendDialog(chat['name'], "Block", (){
+               Get.back();
+              }),
                             backgroundColor: AppColors.brownOrange,
                             foregroundColor: Colors.white,
                             label: 'Block',
@@ -84,8 +89,9 @@ class ChatListScreen extends StatelessWidget {
                           ),
                           SlidableAction(
                             spacing: 6,
-                            onPressed: (_) =>
-                                debugPrint('Report ${chat['name']}'),
+                            onPressed: (_) =>showUnfriendDialog(chat['name'], "Report", (){
+               Get.back();
+              }),
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
                             label: 'Report',

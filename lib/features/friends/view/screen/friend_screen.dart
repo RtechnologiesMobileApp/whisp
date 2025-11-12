@@ -61,7 +61,10 @@ Widget _buildFriendsTab() {
           child: FriendCard(
             friend: friend,
             onToggleFriend: () {
-              showUnfriendDialog(controller,friend);
+              showUnfriendDialog(friend.name, "Unfriend", (){
+               controller.unfriendUser(friend.id);
+               Get.back();
+              });
               }
           ),
         );

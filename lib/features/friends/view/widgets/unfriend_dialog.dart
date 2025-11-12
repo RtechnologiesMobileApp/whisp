@@ -6,7 +6,7 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/model/friend_model.dart';
 
-void showUnfriendDialog(FriendsController controller, FriendModel friend) {
+void showUnfriendDialog( String name,String action,VoidCallback? callback) {
   Get.back(); // close bottom sheet first
 
   showDialog(
@@ -22,7 +22,7 @@ void showUnfriendDialog(FriendsController controller, FriendModel friend) {
             child: IconButton(icon:Icon(Icons.close, color: Colors.grey), onPressed: () => Get.back(),),
           ),
           const SizedBox(height: 10),
-          Text("Unfriend ${friend.name}?", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
+          Text("$action ${name}?", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
           const SizedBox(height: 8),
           const Text(
             "You won't be able to undo this. Are you sure you want to continue?",
@@ -33,15 +33,13 @@ void showUnfriendDialog(FriendsController controller, FriendModel friend) {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: ElevatedButton(
-              onPressed: () {
-               controller.unfriendUser(friend.id);
-              },
+              onPressed:callback,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 minimumSize: const Size(double.infinity, 45),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
               ),
-              child: const Text("Yes, Unfriend", style: TextStyle(color: Colors.white)),
+              child:  Text("Yes, $action", style: TextStyle(color: Colors.white)),
             ),
           ),
           const SizedBox(height: 8),
