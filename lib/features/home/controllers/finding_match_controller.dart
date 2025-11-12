@@ -2,21 +2,40 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:whisp/core/services/ad_service.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import '../../../core/services/socket_service.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+ 
+
+
 
 class FindingMatchController extends GetxController {
   final SocketService socketService = SocketService.to;
+  final box = GetStorage();
+
 
   final isSearching = false.obs;
   final partnerId = RxnString();
   final hasMatched = false.obs;
+  final isPremium = false.obs;
+  // track how many chats done
+  int chatCount = 0;
 
   // init: connect already done at app start or do it here
   @override
   void onInit() {
     super.onInit();
+      final user = SessionController().user;
+  if (user != null) {
+    isPremium.value = user.premium; // default to false if null
+  }
+
+     final storedCount = box.read('chatCount');
+  chatCount = (storedCount is int) ? storedCount : 0;
 
     // Listen server events:
     socketService.onAuthOk((data) {
@@ -35,8 +54,20 @@ class FindingMatchController extends GetxController {
       if (id != null) {
         partnerId.value = id;
         hasMatched.value = true;
+          if (isPremium.value) {
+          chatCount++;
+          box.write('chatCount', chatCount);
 
-        AdService().showInterstitialAd();
+          // show ad only every 4th chat
+          if (chatCount % 4 == 0) {
+            AdService().showInterstitialAd();
+          }
+        } else {
+          // normal user => show every time
+          AdService().showInterstitialAd();
+        }
+
+        //AdService().showInterstitialAd();
 
         await Future.delayed(const Duration(seconds: 1));
 
