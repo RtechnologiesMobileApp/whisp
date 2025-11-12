@@ -25,6 +25,7 @@ class AppImages {
   static const String profile_unselected = 'assets/icons/user_unselected.png';
   static const String home_selected = 'assets/icons/home_selected.png';
   static const String home_unselected = 'assets/icons/home_unselected.png';
+  static const String add_message = 'assets/icons/add-message.png';
 
   static const String daim = 'assets/images/daim.png';
   static const String startChating = 'assets/images/Startgif.gif';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -31,11 +33,11 @@ class ChatListScreen extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.inbox_outlined,
-                        color: Colors.black, size: 24),
-                  ),
+                 InkWell(
+                  onTap: () {
+                    
+                  },
+                  child: Image.asset(AppImages.add_message, height: 24, width: 24,))
                 ],
               ),
             ),
@@ -57,27 +59,35 @@ class ChatListScreen extends StatelessWidget {
                   
                     final chat = controller.chats[index];
                     return Slidable(
+                     
                       endActionPane: ActionPane(
               motion: const ScrollMotion(),
               children: [
                 SlidableAction(
+                 
                   onPressed: (_) => debugPrint('Disconnect ${chat['name']}'),
-                  backgroundColor: Colors.grey.shade700,
-                  foregroundColor: Colors.white,
-                  label: 'Disconnect',
-                ),
-                SlidableAction(
-                  onPressed: (_) => debugPrint('Block ${chat['name']}'),
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
-                  label: 'Block',
+                  label: 'Disconnect',
+                  flex: 3,
                 ),
                 SlidableAction(
+                 
+                  onPressed: (_) => debugPrint('Block ${chat['name']}'),
+                  backgroundColor: AppColors.brownOrange,
+                  foregroundColor: Colors.white,
+                  label: 'Block',
+                  flex: 2,
+                ),
+                SlidableAction(
+                  spacing: 6,
                   onPressed: (_) => debugPrint('Report ${chat['name']}'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.brown,
                   foregroundColor: Colors.white,
                   label: 'Report',
+                  flex: 2,
                 ),
+
               ],
             ),
                       child: ListTile(
