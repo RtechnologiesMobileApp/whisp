@@ -45,7 +45,7 @@ class ChatListScreen extends StatelessWidget {
                       height: 24,
                       width: 24,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -54,9 +54,7 @@ class ChatListScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.chats.length == 0) {
-                  return Center(
-                    child: Text("No Chats"),
-                  );
+                  return Center(child: Text("No Chats"));
                 }
                 return ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -73,21 +71,25 @@ class ChatListScreen extends StatelessWidget {
                         motion: const ScrollMotion(),
                         children: [
                           SlidableAction(
-                            onPressed: (_) =>
-                                showUnfriendDialog(chat['name'], "Disconnect", (){
-                                  log("💡 Disconnecting from ${chat['id']}");
-                                   friendController.unfriendUser(chat['id']);
-               Get.back();
-              }),
+                            onPressed: (_) => showUnfriendDialog(
+                              chat['name'],
+                              "Disconnect",
+                              () {
+                                log("💡 Disconnecting from ${chat['id']}");
+                                friendController.unfriendUser(chat['id']);
+                                Get.back();
+                              },
+                            ),
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             label: 'Disconnect',
                             flex: 3,
                           ),
                           SlidableAction(
-                            onPressed: (_) =>  showUnfriendDialog(chat['name'], "Block", (){
-               Get.back();
-              }),
+                            onPressed: (_) =>
+                                showUnfriendDialog(chat['name'], "Block", () {
+                                  Get.back();
+                                }),
                             backgroundColor: AppColors.brownOrange,
                             foregroundColor: Colors.white,
                             label: 'Block',
@@ -95,9 +97,10 @@ class ChatListScreen extends StatelessWidget {
                           ),
                           SlidableAction(
                             spacing: 6,
-                            onPressed: (_) =>showUnfriendDialog(chat['name'], "Report", (){
-               Get.back();
-              }),
+                            onPressed: (_) =>
+                                showUnfriendDialog(chat['name'], "Report", () {
+                                  Get.back();
+                                }),
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
                             label: 'Report',
@@ -107,17 +110,20 @@ class ChatListScreen extends StatelessWidget {
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 8),
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
                         leading: Stack(
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundImage: chat['image'] != null &&
-                                      chat['image'] != ''
+                              backgroundImage:
+                                  chat['image'] != null && chat['image'] != ''
                                   ? NetworkImage(chat['image'])
                                   : AssetImage(
-                                          'assets/images/place_holder_pic.jpg')
-                                      as ImageProvider,
+                                          'assets/images/place_holder_pic.jpg',
+                                        )
+                                        as ImageProvider,
                             ),
                             if (chat['isOnline'] == true)
                               Positioned(
@@ -130,7 +136,9 @@ class ChatListScreen extends StatelessWidget {
                                     color: Colors.green,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                        color: Colors.white, width: 2),
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -180,12 +188,14 @@ class ChatListScreen extends StatelessWidget {
                         ),
                         onTap: () {
                           // Navigate to ChatScreen
-                          Get.to(() => ChatScreen(
-                                partnerId: chat['id'],
-                                partnerName: chat['name'],
-                                partnerAvatar: chat['image'],
-                                isFriend: true,
-                              ));
+                          Get.to(
+                            () => ChatScreen(
+                              partnerId: chat['id'],
+                              partnerName: chat['name'],
+                              partnerAvatar: chat['image'],
+                              isFriend: true,
+                            ),
+                          );
                         },
                       ),
                     );
@@ -198,4 +208,4 @@ class ChatListScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
