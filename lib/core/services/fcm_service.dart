@@ -49,7 +49,7 @@ class FCMService {
       _fcm.onTokenRefresh.listen((token) {
         _fcmToken = token;
         print('♻️ FCM Token refreshed: $token');
-        _sendTokenToBackend(token);
+        // _sendTokenToBackend(token);
       });
 
       // Background handler
@@ -62,7 +62,7 @@ class FCMService {
       await _initializeLocalNotifications();
 
       if (_fcmToken != null) {
-        await _sendTokenToBackend(_fcmToken!);
+        // await _sendTokenToBackend(_fcmToken!);
       }
 
       print('✅ FCM Service initialized');
@@ -115,19 +115,19 @@ class FCMService {
     );
   }
 
-  Future<void> _sendTokenToBackend(String token) async {
-    if (_backendUrl.isEmpty) return;
-    try {
-      await http.post(
-        Uri.parse('$_backendUrl/fcm-token'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'fcmToken': token}),
-      );
-      print('✅ Sent FCM token to backend');
-    } catch (e) {
-      print('⚠️ Failed to send FCM token: $e');
-    }
-  }
+  // Future<void> _sendTokenToBackend(String token) async {
+  //   if (_backendUrl.isEmpty) return;
+  //   try {
+  //     await http.put(
+  //       Uri.parse('$_backendUrl/fcm-token'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: json.encode({'fcmToken': token}),
+  //     );
+  //     print('✅ Sent FCM token to backend');
+  //   } catch (e) {
+  //     print('⚠️ Failed to send FCM token: $e');
+  //   }
+  // }
 
   Future<String?> getToken() async {
     return _fcmToken ?? await _fcm.getToken();
