@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/friends/model/friend_model.dart';
 import 'package:whisp/features/friends/model/friend_request_model.dart';
+import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 
 class FriendCard extends StatelessWidget {
   final dynamic friend;
@@ -118,7 +120,20 @@ class FriendCard extends StatelessWidget {
               // Accept/Reject buttons for Requests tab
               SizedBox(width: 6.w),
               ElevatedButton(
-                onPressed: onAccept,
+               // onPressed: onAccept,
+               onPressed: () {
+    final user = SessionController().user;
+
+    // 🔹 Check premium status
+    if (user?.premium == false) {
+      // Not premium -> redirect to premium screen
+      Get.to(PremiumScreen);
+      return; // stop here, don't call accept API
+    }
+
+    // 🔹 If premium -> proceed to accept request
+    onAccept?.call();
+  },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,

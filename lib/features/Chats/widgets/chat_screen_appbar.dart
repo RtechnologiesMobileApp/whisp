@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
+import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 import 'chat_bottom_sheet.dart';
 
 class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -29,17 +31,19 @@ class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {
 class _ChatAppBarState extends State<ChatAppBar> {
   final socketService = Get.find<SocketService>();
   final RxBool isRequestSent = false.obs;
-  final bool isPremium = true; // TODO: later replace with real user premium flag
+  bool get isPremium => SessionController().user?.premium == true;
+
 
 @override
 void initState() {
   super.initState();
-  print("🟢 ChatAppBar initialized — isFriend: ${widget.isFriend}");
+  debugPrint("🟢 ChatAppBar initialized — isFriend: ${widget.isFriend}");
+  debugPrint("💎 Premium status: $isPremium");
 }
 
   @override
   Widget build(BuildContext context) {
-     print("📌 ChatScreen partnerId: ${widget.partnerId}, isFriend: ${widget.isFriend}");
+     debugPrint("📌 ChatScreen partnerId: ${widget.partnerId}, isFriend: ${widget.isFriend}");
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.white,
@@ -127,9 +131,9 @@ if (!widget.isFriend) Obx(() {
   return InkWell(
     onTap: () {
       if (!isPremium) {
-        Get.snackbar("Premium Feature", "Upgrade to send friend requests!");
-        return;
-      }
+                        Get.to(() =>   PremiumScreen());
+                        return;
+                      }
 
       if (isRequestSent.value) {
         socketService.cancelFriendRequest(widget.partnerId, (ack) {

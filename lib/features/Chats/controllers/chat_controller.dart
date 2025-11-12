@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
+import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/friends/repo/friends_repo.dart';
 
 class ChatController extends GetxController {
@@ -30,12 +31,13 @@ class ChatController extends GetxController {
     'fromMe': false,
     'message': msgText,
   });
+  // 🧠 Update chat list in real time
+  final chatListController = Get.find<ChatListController>();
+  final partnerId = data['fromUserId'] ?? friendId; // <--- this replaces '<partnerId>'
+  chatListController.updateLastMessage(friendId!, msgText, partnerId);
 });
 
-//    SocketService.to.onMessage((Map data) {
-//   final message = Map<String, dynamic>.from(data);
-//   messages.add(message);
-// });
+ 
 
   }
 
@@ -54,6 +56,10 @@ void sendMessage() {
   }
 
   messages.add({"fromMe": true, "message": text});
+   final chatListController = Get.find<ChatListController>();
+  final myUserId = SessionController().user!.id;
+  chatListController.updateLastMessage(friendId!, text, myUserId!);
+
   messageController.clear();
 }
 void loadFriendChatHistory() async {

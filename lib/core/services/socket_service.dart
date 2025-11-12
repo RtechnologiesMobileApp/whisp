@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class SocketService extends GetxService {
   static SocketService get to => Get.find();
@@ -234,6 +235,24 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
     debugPrint('[socket] Reconnecting with new token');
     await init(baseUrl: ApiEndpoints.baseUrl, token: token);
   }
+
+  //helper method
+  Future<void> safeInitIfNeeded() async {
+  if (socket != null && socket!.connected) {
+    print('[socket] Already connected ✅');
+    return;
+  }
+
+  final token = SessionController().user?.token;
+  if (token == null || token.isEmpty) {
+    print('[socket] ⚠️ No token found — will retry after login or session load.');
+    return;
+  }
+
+  await init(baseUrl: ApiEndpoints.baseUrl, token: token);
+  print('[socket] ✅ Reconnected successfully');
+}
+
 
   // Disconnect
   void disposeSocket() {
