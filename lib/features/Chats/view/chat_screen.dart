@@ -32,19 +32,40 @@ final ChatController controller = Get.isRegistered<ChatController>(tag: isFriend
       body: Column(
         children: [
           Expanded(
-            child: Obx(
-              () => ListView.builder(
-                padding: const EdgeInsets.only(top: 12),
-                itemCount: controller.messages.length,
-                itemBuilder: (context, index) {
-                  final msg = controller.messages[index];
-                  final bool isFromMe = msg['fromMe'] ?? false;
-                  final String message = msg['body'] ?? msg['message'] ?? '';
-                  return ChatBubble(fromMe: isFromMe, message: message);
-                },
-              ),
-            ),
-          ),
+  child: Obx(
+    () {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 12),
+        itemCount: controller.messages.length,
+        itemBuilder: (context, index) {
+          final msg = controller.messages[index];
+          final bool isFromMe = msg['fromMe'] ?? false;
+         final String message = msg['body'] ?? msg['message'] ?? '';
+          return ChatBubble(fromMe: isFromMe, message: message);
+        },
+      );
+    },
+  ),
+),
+
+          // Expanded(
+          //   child: Obx(
+          //     () => ListView.builder(
+          //       padding: const EdgeInsets.only(top: 12),
+          //       itemCount: controller.messages.length,
+          //       itemBuilder: (context, index) {
+          //         final msg = controller.messages[index];
+          //         final bool isFromMe = msg['fromMe'] ?? false;
+          //         final String message = msg['body'] ?? msg['message'] ?? '';
+          //         return ChatBubble(fromMe: isFromMe, message: message);
+          //       },
+          //     ),
+          //   ),
+          // ),
+      
             MessageInputField(  controller: controller  ),
         ],
       ),

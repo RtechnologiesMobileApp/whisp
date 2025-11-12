@@ -10,6 +10,7 @@ class ApiEndpoints {
   static const String getFriends = "$baseUrl/api/friend/list";
   static const String getFriendRequests = "$baseUrl/api/friend/incoming-requests";
   static const String unfriend="$baseUrl/api/friend/unfriend";   ///api/friend/unfriend/<userId>
+  static const String getFriendChatHistory = "$baseUrl/api/chat/history/";  ///api/chat/history/userID   ( friends id whose history you want to see )
  
 }
  

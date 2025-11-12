@@ -55,6 +55,7 @@ class FriendsController extends GetxController {
  
  Future<void> fetchIncomingRequests() async {
     try {
+       isLoading.value = true;
       isLoadingRequests.value = true;
 
       // ✅ Repo now returns List<FriendRequestModel>
@@ -64,6 +65,7 @@ class FriendsController extends GetxController {
     } catch (e) {
       log("Error fetching incoming requests: $e");
     } finally {
+      isLoading.value = false;
       isLoadingRequests.value = false;
     }
   }

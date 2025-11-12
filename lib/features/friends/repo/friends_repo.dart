@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisp/core/network/api_client.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
+import 'package:whisp/core/services/session_manager.dart';
  
 import 'package:whisp/features/friends/model/friend_model.dart';
 import 'package:whisp/features/friends/model/friend_request_model.dart';
@@ -36,6 +37,38 @@ Future<List<FriendModel>> getFriendsList() async {
     rethrow;
   }
 }
+
+ Future<List<Map<String, dynamic>>> getFriendChatHistory(String friendId) async {
+    try {
+      debugPrint("Fetching chat history for friendId: $friendId...");
+
+      final res = await _api.get(
+        "${ApiEndpoints.getFriendChatHistory}$friendId",
+        requireAuth: true, // ✅ automatically sends token
+      );
+
+      debugPrint("Chat history API response: $res");
+
+      if (res["messages"] == null) {
+        debugPrint("No messages found in response.");
+        return [];
+      }
+
+      // Map API messages to the format used in ChatController
+      final messages = (res["messages"] as List)
+          .map((msg) => {
+                "fromMe": msg["from"] == SessionController().user!.id, // assuming ApiClient has current user ID
+                "message": msg["body"],
+              })
+          .toList();
+
+      debugPrint("Parsed ${messages.length} messages for friend $friendId");
+      return messages;
+    } catch (e) {
+      debugPrint("Error fetching chat history: $e");
+      return [];
+    }
+  }
 
 
 Future<List<FriendRequestModel>> getIncomingRequestsList() async {

@@ -18,6 +18,7 @@ class _FriendsScreenState extends State<FriendsScreen>
   late TabController _tabController;
   final controller = Get.put(FriendsController());
   final RxInt currentTabIndex = 0.obs;
+  
 
   @override
   void initState() {
