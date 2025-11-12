@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -118,8 +119,8 @@ class ChatListScreen extends StatelessWidget {
                             CircleAvatar(
                               radius: 22,
                               backgroundImage:
-                                  chat['image'] != null && chat['image'] != ''
-                                  ? NetworkImage(chat['image'])
+                                  chat['avatar'] != null && chat['avatar'] != ''
+                                  ? NetworkImage(chat['avatar'])
                                   : AssetImage(
                                           'assets/images/place_holder_pic.jpg',
                                         )
@@ -163,14 +164,37 @@ class ChatListScreen extends StatelessWidget {
                                     color: Colors.grey,
                                   ),
                                 )
-                              : Text(
-                                  chat['lastMessage'] ?? '',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
-                                  ),
+                              : Builder(
+                                  builder: (_) {
+                                    final currentUserId =
+                                        SessionController().user!.id;
+                                    final lastUserId =
+                                        chat['lastMessageUserId'];
+                                    final isFromMe =
+                                        lastUserId == currentUserId;
+
+                                    final messageText =
+                                        chat['lastMessage'] ?? '';
+
+                                    return RichText(
+                                      text: TextSpan(
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        children: [
+                                          if (isFromMe)
+                                            const TextSpan(
+                                              text: 'You: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          TextSpan(text: messageText),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
                         ),
                         trailing: Column(
@@ -187,12 +211,16 @@ class ChatListScreen extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
+                            log("🧠 Chat item tapped:");
+  log("id: ${chat['id']}");
+  log("name: ${chat['name']}");
+  log("image: ${chat['avatar']}");
                           // Navigate to ChatScreen
                           Get.to(
                             () => ChatScreen(
                               partnerId: chat['id'],
                               partnerName: chat['name'],
-                              partnerAvatar: chat['image'],
+                              partnerAvatar: chat['avatar'],
                               isFriend: true,
                             ),
                           );
@@ -208,4 +236,4 @@ class ChatListScreen extends StatelessWidget {
       ),
     );
   }
-}
+} 
