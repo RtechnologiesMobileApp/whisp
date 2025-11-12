@@ -33,87 +33,92 @@ class ChatListScreen extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                 InkWell(
-                  onTap: () {
-                    
-                  },
-                  child: Image.asset(AppImages.add_message, height: 24, width: 24,))
+                  InkWell(
+                    onTap: () {},
+                    child: Image.asset(
+                      AppImages.add_message,
+                      height: 24,
+                      width: 24,
+                    ),
+                  )
                 ],
               ),
             ),
 
             // ===== Chat List =====
             Expanded(
-              child: Obx(
-                (){
-                    if(controller.chats.length==0){
-                      return Center(child: Text("No Chats"),);
-                    
-                    }
-                  return ListView.separated(
+              child: Obx(() {
+                if (controller.chats.length == 0) {
+                  return Center(
+                    child: Text("No Chats"),
+                  );
+                }
+                return ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: controller.chats.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: Colors.grey),
+                  separatorBuilder: (_, __) => Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    color: Colors.grey.shade200,
+                  ),
                   itemBuilder: (context, index) {
-                  
                     final chat = controller.chats[index];
                     return Slidable(
-                     
                       endActionPane: ActionPane(
-              motion: const ScrollMotion(),
-              children: [
-                SlidableAction(
-                 
-                  onPressed: (_) => debugPrint('Disconnect ${chat['name']}'),
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  label: 'Disconnect',
-                  flex: 3,
-                ),
-                SlidableAction(
-                 
-                  onPressed: (_) => debugPrint('Block ${chat['name']}'),
-                  backgroundColor: AppColors.brownOrange,
-                  foregroundColor: Colors.white,
-                  label: 'Block',
-                  flex: 2,
-                ),
-                SlidableAction(
-                  spacing: 6,
-                  onPressed: (_) => debugPrint('Report ${chat['name']}'),
-                  backgroundColor: AppColors.brown,
-                  foregroundColor: Colors.white,
-                  label: 'Report',
-                  flex: 2,
-                ),
-
-              ],
-            ),
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (_) =>
+                                debugPrint('Disconnect ${chat['name']}'),
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            label: 'Disconnect',
+                            flex: 3,
+                          ),
+                          SlidableAction(
+                            onPressed: (_) => debugPrint('Block ${chat['name']}'),
+                            backgroundColor: AppColors.brownOrange,
+                            foregroundColor: Colors.white,
+                            label: 'Block',
+                            flex: 2,
+                          ),
+                          SlidableAction(
+                            spacing: 6,
+                            onPressed: (_) =>
+                                debugPrint('Report ${chat['name']}'),
+                            backgroundColor: AppColors.brown,
+                            foregroundColor: Colors.white,
+                            label: 'Report',
+                            flex: 2,
+                          ),
+                        ],
+                      ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                            horizontal: 20, vertical: 8),
                         leading: Stack(
                           children: [
-                           CircleAvatar(
-                        radius: 26,
-                        backgroundImage: chat['image'] != null && chat['image'] != ''
-                            ? NetworkImage(chat['image'])
-                            : AssetImage('assets/images/place_holder_pic.jpg') as ImageProvider,
-                      ),
-                      
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundImage: chat['image'] != null &&
+                                      chat['image'] != ''
+                                  ? NetworkImage(chat['image'])
+                                  : AssetImage(
+                                          'assets/images/place_holder_pic.jpg')
+                                      as ImageProvider,
+                            ),
                             if (chat['isOnline'] == true)
                               Positioned(
-                                right: 0,
-                                bottom: 0,
+                                right: 2,
+                                bottom: 2,
                                 child: Container(
-                                  height: 10,
-                                  width: 10,
+                                  height: 12,
+                                  width: 12,
                                   decoration: BoxDecoration(
                                     color: Colors.green,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                        color: Colors.white, width: 1.5),
+                                        color: Colors.white, width: 2),
                                   ),
                                 ),
                               ),
@@ -124,33 +129,45 @@ class ChatListScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
                         ),
-                        subtitle: chat['isTyping'] == true
-                            ? const Text(
-                                'typing...',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.grey,
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: chat['isTyping'] == true
+                              ? const Text(
+                                  'typing...',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                )
+                              : Text(
+                                  chat['lastMessage'] ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                chat['lastMessage'] ?? '',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              chat['time'] ?? '',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade500,
                               ),
-                        trailing: Text(
-                          chat['time'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
+                            ),
+                          ],
                         ),
                         onTap: () {
-                          // 👉 Navigate to friend ChatScreen
+                          // Navigate to ChatScreen
                           Get.to(() => ChatScreen(
                                 partnerId: chat['id'],
                                 partnerName: chat['name'],
@@ -162,13 +179,11 @@ class ChatListScreen extends StatelessWidget {
                     );
                   },
                 );
-                }
-                
-              ),
+              }),
             ),
           ],
         ),
       ),
     );
   }
-}
+} 

@@ -28,107 +28,86 @@ class FriendCard extends StatelessWidget {
     final String name = isFriendModel
         ? (friend as FriendModel).name
         : (friend as FriendRequestModel).name;
-
     final String avatar = isFriendModel
         ? (friend as FriendModel).imageUrl
         : (friend as FriendRequestModel).imageUrl;
 
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 4.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
+          child: InkWell(
+        onTap: isFriendModel
+            ? () {
+                Get.toNamed(
+                  Routes.chatscreen,
+                  arguments: {
+                    'partnerId': (friend as FriendModel).id,
+                    'partnerName': name,
+                    'partnerAvatar': avatar,
+                    'isFriend': true,
+                  },
+                );
+              }
+            : null,
+        borderRadius: BorderRadius.circular(12.r),
         child: Row(
           children: [
-            // 👇 Avatar + Name clickable section
+            // Avatar - Figma style (larger, no gradient border for cleaner look)
+            CircleAvatar(
+              radius: 20.r,
+              backgroundImage:
+                  avatar.isNotEmpty ? NetworkImage(avatar) : null,
+              backgroundColor: Colors.grey[300],
+              child: avatar.isEmpty
+                  ? Icon(Icons.person, size: 32.sp, color: Colors.grey[600])
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+
+            // Name with verified badge (if needed)
             Expanded(
-              child: InkWell(
-                onTap: () {
-                  if (isFriendModel) {
-                    Get.toNamed(
-                      Routes.chatscreen,
-                      arguments: {
-                        'partnerId': (friend as FriendModel).id,
-                        'partnerName': name,
-                        'partnerAvatar': avatar,
-                        'isFriend': true,
-                      },
-                    );
-                  }
-                },
-                borderRadius: BorderRadius.circular(12.r),
-                child: Row(
-                  children: [
-                    // Avatar
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [Colors.purpleAccent, Colors.pinkAccent],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17.sp,
+                        color: Colors.black87,
                       ),
-                      padding: EdgeInsets.all(2.5.w),
-                      child: CircleAvatar(
-                        radius: 22.r,
-                        backgroundImage:
-                            avatar.isNotEmpty ? NetworkImage(avatar) : null,
-                        backgroundColor: Colors.grey[200],
-                        child: avatar.isEmpty
-                            ? Icon(Icons.person,
-                                size: 24.sp, color: Colors.grey[400])
-                            : null,
-                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(width: 14.w),
-                    // Name
-                    Flexible(
-                      child: Text(
-                        name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                          color: Colors.black87,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  // Optional: Add verified badge if needed
+                  // SizedBox(width: 6.w),
+                  // Icon(Icons.verified, color: Colors.blue, size: 18.sp),
+                ],
               ),
             ),
 
-            // 👇 Right-side buttons
+            SizedBox(width: 8.w),
+
+            // Buttons based on model type
             if (onToggleFriend != null && isFriendModel) ...[
-              SizedBox(width: 8.w),
+              // Single Unfriend button for Friends tab
               ElevatedButton(
                 onPressed: onToggleFriend,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  elevation: 2,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   padding:
-                      EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 11.h),
                 ),
                 child: Text(
                   "Unfriend",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14.sp,
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -136,6 +115,7 @@ class FriendCard extends StatelessWidget {
             ],
 
             if (onAccept != null && onReject != null && isRequestModel) ...[
+              // Accept/Reject buttons for Requests tab
               SizedBox(width: 6.w),
               ElevatedButton(
                 onPressed: onAccept,
@@ -184,8 +164,18 @@ class FriendCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
+        // Divider line
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Divider(
+            color: Colors.grey[300],
+            thickness: 0.5,
+            height: 1,
+          ),
+        ),
+      ],
     );
   }
 }
-
  
