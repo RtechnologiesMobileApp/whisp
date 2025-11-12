@@ -53,4 +53,31 @@ Future<List<FriendRequestModel>> getIncomingRequestsList() async {
   }).toList();
 }
 
+
+Future<bool> unfriend(String userId) async {
+  try {
+    final endpoint = "${ApiEndpoints.unfriend}/$userId";
+    debugPrint("Unfriending user: $endpoint");
+
+    final res = await _api.put(
+      endpoint,
+      requireAuth: true, // ✅ send token
+    );
+
+    debugPrint("Unfriend response: ${res.data}");
+
+    if (res.statusCode == 200) {
+      debugPrint("✅ User unfriended successfully!");
+      return true;
+    } else {
+      debugPrint("⚠️ Failed to unfriend user: ${res.statusMessage}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("❌ Error while unfriending: $e");
+    return false;
+  }
+}
+
+
 }

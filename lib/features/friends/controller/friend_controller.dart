@@ -65,6 +65,25 @@ class FriendsController extends GetxController {
     }
   }
 
+  Future<void> unfriendUser(String userId) async {
+  try {
+    debugPrint("Attempting to unfriend user: $userId");
+    final success = await repo.unfriend(userId);
+
+    if (success) {
+      Get.snackbar("Success", "User removed from friends list");
+      // Optionally update your UI list:
+      friendsList.removeWhere((f) => f.id == userId);
+      update();
+    } else {
+      Get.snackbar("Failed", "Could not unfriend this user");
+    }
+  } catch (e) {
+    debugPrint("❌ Error in controller while unfriending: $e");
+    Get.snackbar("Error", e.toString());
+  }
+}
+
  
   
   void toggleFriendStatus(FriendModel friend) {
@@ -126,32 +145,7 @@ void rejectRequest(String requestId) {
   }
 }
 
-  // //  Accept Request using Socket
  
-  // void acceptRequest(String requestId) {
-  //   SocketService.to.acceptFriend(requestId, (ack) {
-  //     if (ack['ok'] == true) {
-  //       friendRequests.removeWhere((r) => r.id == requestId);
-
-  //       // optionally refresh after accepting
-  //       fetchFriends();
-  //     } else {
-  //       Get.snackbar("Error", ack['code'] ?? "Failed to accept request");
-  //     }
-  //   });
-  // }
- 
-  // //   Reject Request using Socket
-  
-  // void rejectRequest(String requestId) {
-  //   SocketService.to.rejectFriend(requestId, (ack) {
-  //     if (ack['ok'] == true) {
-  //       friendRequests.removeWhere((r) => r.id == requestId);
-  //     } else {
-  //       Get.snackbar("Error", ack['code'] ?? "Failed to reject request");
-  //     }
-  //   });
-  // }
 }
 
  

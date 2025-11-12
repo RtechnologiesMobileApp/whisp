@@ -53,7 +53,7 @@ class _FriendsScreenState extends State<FriendsScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
             child: FriendCard(
               friend: friend,
-              onToggleFriend: () => controller.toggleFriendStatus(friend),
+             onToggleFriend: () => controller.unfriendUser(friend.id),
             ),
           );
         },

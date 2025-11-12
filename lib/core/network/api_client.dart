@@ -71,7 +71,8 @@ Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
     bool requireAuth = false,
   }) async {
     try {
-      final token = ""; // Add token here if needed
+     final token = requireAuth ? SessionController().user?.token ?? "" : "";
+
 
       final options = Options(
         headers: {

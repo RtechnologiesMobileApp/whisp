@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/friends/model/friend_model.dart';
 import 'package:whisp/features/friends/model/friend_request_model.dart';
 
@@ -89,51 +90,29 @@ class FriendCard extends StatelessWidget {
             ),
 
             // Friends tab button
-            if (onToggleFriend != null && isFriendModel) ...[
-              SizedBox(width: 8.w),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  gradient: isFriend
-                      ? null
-                      : LinearGradient(
-                          colors: [Colors.purpleAccent, Colors.purple],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                  boxShadow: isFriend
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: Colors.purpleAccent.withOpacity(0.3),
-                            spreadRadius: 1,
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                ),
-                child: ElevatedButton(
-                  onPressed: onToggleFriend,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isFriend ? Colors.grey[300] : Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
-                  ),
-                  child: Text(
-                    isFriend ? "Unfriend" : "Friend",
-                    style: TextStyle(
-                      color: isFriend ? Colors.black54 : Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+         // FriendCard.dart
+if (onToggleFriend != null && isFriendModel) ...[
+  SizedBox(width: 8.w),
+  ElevatedButton(
+    onPressed: onToggleFriend,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: AppColors.primary,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+    ),
+    child: Text(
+      "Unfriend",
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+],
 
             // Requests tab buttons
             if (onAccept != null && onReject != null && isRequestModel) ...[
