@@ -142,7 +142,9 @@ Future<void> handleSubscription(String plan) async {
         customerEphemeralKeySecret: ephemeralKey,
         customerId: customerId,
         style: ThemeMode.dark,
-        
+        allowsDelayedPaymentMethods: true,
+        linkDisplayParams: LinkDisplayParams( linkDisplay: LinkDisplay.manual, ),
+      
       ),
     );
     

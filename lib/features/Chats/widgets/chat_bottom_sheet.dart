@@ -21,7 +21,7 @@ void showChatBottomSheet(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           children: [
             _tile(
-              "Exit",
+              "Exit Chat",
               Colors.black,
               onTap: () => _showExitDialog(socketService),
             ),
