@@ -73,8 +73,8 @@ void initState() {
               InkWell(
                 onTap: () {
                   socketService.endSession();
-                  Get.back();
-                  Get.toNamed(Routes.welcomehome);
+                 
+                  Get.offAllNamed(Routes.welcomehome);
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(

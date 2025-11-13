@@ -29,6 +29,7 @@ void showChatBottomSheet(BuildContext context) {
               "Next Chat",
               Colors.black,
               onTap: () {
+               
                 socketService.endSession(); // end current session
                 Get.offAllNamed(Routes.findMatch);
               },

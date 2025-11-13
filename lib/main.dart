@@ -8,12 +8,17 @@ import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/config/theme/theme.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/fcm_service.dart';
+import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/onboarding/view/screen/splash_screen.dart';
 import 'package:whisp/firebase_options.dart';
 import 'package:whisp/core/services/ad_service.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+   
+
 
    await AdService().init();
   await AdService().loadInterstitialAd();

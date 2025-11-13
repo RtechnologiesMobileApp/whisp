@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
+import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 
 import 'package:whisp/features/auth/controllers/login_controller.dart';
 import 'package:whisp/features/auth/controllers/signup_controller.dart';
@@ -28,6 +29,7 @@ class AppBindings extends Bindings {
     Get.lazyPut<FindingMatchController>(() => FindingMatchController(), fenix: true);
     Get.lazyPut<ChatController>(() => ChatController(), fenix: true);
     Get.lazyPut<FriendsController>(() => FriendsController(), fenix: true);
+    Get.lazyPut<ChatListController>(() => ChatListController(), fenix: true);
 
       // 🧩 Socket Service (global singleton)
     // Only initialize if not already initialized
@@ -35,28 +37,6 @@ class AppBindings extends Bindings {
   // Just register singleton, don’t init socket yet
   Get.put<SocketService>(SocketService(), permanent: true);
 }
-    // if (!Get.isRegistered<SocketService>()) {
-    //   Get.putAsync<SocketService>(() async {
-    //     final token = SessionController().user?.token;
-
-    //     // token stored in SharedPreferences with key "userToken"
-
-    //     if (token?.isEmpty ?? true) {
-    //       print('[socket] Warning: No token found in Session. Socket will connect after login.');
-    //     }
-
-    //     final service = SocketService();
-    //     // Only initialize socket if token exists
-    //     if (token?.isNotEmpty ?? false) {
-    //        service.init(
-    //         baseUrl: ApiEndpoints.baseUrl,  
-    //         token: token ?? '',
-    //       );
-    //     }
-
-    //     return service;
-    //   });
-   
-    // }
+     
   }
 }

@@ -107,6 +107,7 @@ class SocketService extends GetxService {
   void endSession() {
     if (socket?.connected ?? false) {
       socket!.emit('END_SESSION');
+      
     }
   }
 
