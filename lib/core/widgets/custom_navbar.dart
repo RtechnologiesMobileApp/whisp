@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
  
 import 'package:whisp/config/constants/images.dart'; // 👈 your icon paths
+ import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomNavBar extends StatelessWidget {
   final RxInt selectedIndex;
@@ -36,7 +37,7 @@ class CustomNavBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Flexible(child: _buildNavItem(0, "Home", AppImages.home_unselected, AppImages.home_selected)),
+            Flexible(child: _buildNavItem(0, "Home", AppImages.homeUnselectedSvg, AppImages.homeSelectedSvg)),
             Flexible(child: _buildNavItem(1, "Chats", AppImages.chat_unselected, AppImages.chat_selected)),
             Flexible(child: _buildNavItem(2, "Friends", AppImages.friends_unselected, AppImages.friends_selected)),
             Flexible(child: _buildNavItem(3, "Premium", AppImages.premium_unselected, AppImages.premium_selected)),
@@ -47,35 +48,46 @@ class CustomNavBar extends StatelessWidget {
     });
   }
 
-  Widget _buildNavItem(
-    int index,
-    String label,
-    String iconUnselected,
-    String iconSelected,
-  ) {
-    bool isSelected = selectedIndex.value == index;
 
-    return GestureDetector(
-      onTap: () => onItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            isSelected ? iconSelected : iconUnselected,
-            height: 26,
-            width: 26,
+
+Widget _buildNavItem(
+  int index,
+  String label,
+  String iconUnselected,
+  String iconSelected,
+) {
+  bool isSelected = selectedIndex.value == index;
+  final iconPath = isSelected ? iconSelected : iconUnselected;
+  final isSvg = iconPath.endsWith('.svg');
+
+  return GestureDetector(
+    onTap: () => onItemTapped(index),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        isSvg
+            ? SvgPicture.asset(
+                iconPath,
+                height: 24,
+                width: 24,
+              )
+            : Image.asset(
+                iconPath,
+                height: 26,
+                width: 26,
+              ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? AppColors.primary : Colors.grey,
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? AppColors.primary : Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }

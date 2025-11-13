@@ -182,38 +182,7 @@ Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
   }
 }
 
-// Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
-//   final res = await http.post(
-//     Uri.parse('${ApiEndpoints.baseUrl}/api/payments/payment-success'),
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': 'Bearer ${SessionController().user!.token!}',
-//     },
-//     body: jsonEncode({'paymentIntentId': paymentIntentId}),
-//   );
-
-//   if (res.statusCode != 200) {
-//     print('❌ Failed to notify backend of payment success: ${res.statusCode}');
-//     throw Exception('Failed to notify backend of payment success.');
-//   }
-
-  
-// }
-
-//   // Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
-//   //   final res = await http.post(
-//   //     Uri.parse('$baseUrl/billing/payment-success'),
-//   //     headers: {
-//   //       'Content-Type': 'application/json',
-//   //       'x-device-id': deviceId,
-//   //     },
-//   //     body: jsonEncode({'paymentIntentId': paymentIntentId}),
-//   //   );
-
-//   //   if (res.statusCode != 200) {
-//   //     throw Exception('Failed to notify backend of payment success.');
-//   //   }
-//   // }
+ 
 
 
   void _handlePaymentError(dynamic error) {
