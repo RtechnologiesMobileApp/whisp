@@ -51,7 +51,7 @@ Future<void> handleSubscription(BuildContext context, String plan) async {
   final paymentService = PaymentService(
     context: context,
     baseUrl: ApiEndpoints.baseUrl,
-     deviceId: '1234567890',
+    deviceId: '1234567890',
     onCreditsRefresh: () async {
       // Refresh credits after successful payment
       // voiceSocket.requestCredits();

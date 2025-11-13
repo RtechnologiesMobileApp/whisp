@@ -16,9 +16,9 @@ class FriendsChatSheet extends StatelessWidget {
 
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: friends.isEmpty
             ? Center(
@@ -40,11 +40,12 @@ class FriendsChatSheet extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final friend = friends[index];
                   return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(vertical: 4),
                     leading: CircleAvatar(
-                      radius: 22,
+                      radius: 24,
                       backgroundImage: friend.imageUrl != null && friend.imageUrl != ''
                           ? NetworkImage(friend.imageUrl!)
-                          : AssetImage('assets/images/place_holder_pic.jpg')
+                          : const AssetImage('assets/images/place_holder_pic.jpg')
                               as ImageProvider,
                     ),
                     title: Text(
@@ -55,12 +56,24 @@ class FriendsChatSheet extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
+                    subtitle: const Text(
+                      "💬 Tap to start chat",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     onTap: () {
                       Get.back(); // close the sheet
                       Get.to(() => ChatScreen(
                             partnerId: friend.id,
                             partnerName: friend.name,
-                            partnerAvatar: friend.imageUrl  ?? '',
+                            partnerAvatar: friend.imageUrl ?? '',
                             isFriend: true,
                           ));
                     },
@@ -71,3 +84,4 @@ class FriendsChatSheet extends StatelessWidget {
     });
   }
 }
+

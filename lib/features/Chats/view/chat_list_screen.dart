@@ -13,6 +13,7 @@ import 'package:whisp/features/Chats/widgets/friends_chat_sheet.dart';
 import 'package:whisp/features/Chats/widgets/report_bottom_sheet.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
+import 'package:intl/intl.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -26,6 +27,16 @@ class ChatListScreen extends StatelessWidget {
     controller.loadChatList();
     notificationUserId=null;
   });
+  String formatTime(String isoString) {
+  try {
+    final dateTime = DateTime.parse(isoString).toLocal(); // convert to local timezone
+    final formatter = DateFormat('h:mm a'); // e.g., 12:05 PM
+    return formatter.format(dateTime);
+  } catch (e) {
+    return ''; // fallback
+  }
+}
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -230,7 +241,7 @@ class ChatListScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              chat['lastMessageTime'] ?? '',
+                             formatTime(chat['lastMessageTime'] ?? ''),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade500,
