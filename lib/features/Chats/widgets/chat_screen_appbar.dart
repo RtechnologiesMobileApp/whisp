@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/premium/view/screens/premium_screen.dart';
@@ -73,6 +74,7 @@ void initState() {
                 onTap: () {
                   socketService.endSession();
                   Get.back();
+                  Get.toNamed(Routes.welcomehome);
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(
