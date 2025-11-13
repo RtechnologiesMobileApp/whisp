@@ -9,6 +9,7 @@ import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:whisp/features/Chats/widgets/friends_chat_sheet.dart';
+import 'package:whisp/features/Chats/widgets/report_bottom_sheet.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
 
@@ -114,6 +115,9 @@ class ChatListScreen extends StatelessWidget {
                           SlidableAction(
                             onPressed: (_) =>
                                 showUnfriendDialog(chat['name'], "Block", () {
+                              log("💡 Blocking ${chat['id']}");
+                              friendController.blockUser(chat['id']);
+                              friendController.getBlockedUsers();
                               Get.back();
                             }),
                             backgroundColor: AppColors.brownOrange,
@@ -123,10 +127,16 @@ class ChatListScreen extends StatelessWidget {
                           ),
                           SlidableAction(
                             spacing: 6,
-                            onPressed: (_) =>
-                                showUnfriendDialog(chat['name'], "Report", () {
-                              Get.back();
-                            }),
+                            onPressed: (_){ 
+                                
+                              log("💡 Reporting ${chat['id']}");
+                              showReportBottomSheet(context, (String reason) {
+                                print(reason);
+                                friendController.reportUser(chat['id'], "$reason");
+                              });
+                              
+                            
+                            },
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
                             label: 'Report',

@@ -101,5 +101,114 @@ Future<bool> unfriend(String userId) async {
   }
 }
 
+Future<bool> reportUser(String userId,String reason) async {
+  try {
+    final endpoint = "${ApiEndpoints.reportUser}";
+    debugPrint("Reporting user: $endpoint");
 
+    final res = await _api.post(
+      endpoint,
+      
+       {"targetUserId": userId,'reason': reason},
+       requireAuth: true  // ✅ send token
+    );
+
+    debugPrint("Report response: ${res.data}");
+
+    if (res.statusCode == 200) {
+      debugPrint("✅ User reported successfully!");
+      return true;
+    } else {
+      debugPrint("⚠️ Failed to report user: ${res.statusMessage}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("❌ Error while reporting user: $e");
+    return false;
+  }
+}
+
+Future<bool> blockUser(String userId) async {
+  try {
+    final endpoint = "${ApiEndpoints.blockUser}";
+    debugPrint("Blocking user: $endpoint");
+
+    final res = await _api.post(
+      endpoint,
+      
+       {"targetUserId": userId},  // ✅ send token
+       requireAuth: true
+      
+    );
+
+    debugPrint("Bock response: ${res.data}");
+
+    if (res.statusCode == 200) {
+      debugPrint("✅ User blocked successfully!");
+      return true;
+    } else {
+      debugPrint("⚠️ Failed to block user: ${res.statusMessage}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("❌ Error while blocking user: $e");
+    return false;
+  }
+}
+
+Future<bool> unblockUser(String userId) async {
+  try {
+    final endpoint = "${ApiEndpoints.unblockUser}/$userId";
+    debugPrint("Unblocking user: $endpoint");
+
+    final res = await _api.delete(
+      endpoint,
+      requireAuth: true,
+        // ✅ send token
+    );
+
+    debugPrint("Unblock response: ${res.data}");
+
+    if (res.statusCode == 200) {
+      debugPrint("✅ User unblocked successfully!");
+      return true;
+    } else {
+      debugPrint("⚠️ Failed to unblock user: ${res.statusMessage}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("❌ Error while unblocking user: $e");
+    return false;
+  }
+}
+
+
+Future<List<FriendModel>> getBlockedUsersList() async {
+  try {
+    debugPrint("Fetching Blocked list...");
+
+    // ✅ Add token from session
+    final res = await _api.get(
+      ApiEndpoints.getBlockedUsers,
+      requireAuth: true, // This will send token in header
+    );
+
+    debugPrint("Block list API response: $res");
+
+    if (res["blocked"] == null) {
+      debugPrint("No blocked users found in response.");
+      return [];
+    }
+
+    final friends = (res["blocked"] as List)
+        .map((e) => FriendModel.fromJson(e["user"]))
+        .toList();
+
+    debugPrint("Parsed friends count: ${friends.length}");
+    return friends;
+  } catch (e) {
+    debugPrint("Error fetching friends: $e");
+    rethrow;
+  }
+}
 }

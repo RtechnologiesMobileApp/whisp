@@ -17,5 +17,7 @@ class AppColors {
   static const Color deepPurple = Color(0xFF58245E);
   static const Color brownOrange = Color(0xFFDB340B);
   static const Color brown = Color(0xFFAD1D00);
+  static const Color bottomSheetBack = Colors.white;
+  static const Color bottomSheetTextColor = Colors.black;
 
 }

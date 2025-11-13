@@ -1,7 +1,7 @@
 class ApiEndpoints {
 
-   static const String baseUrl = "https://whisp-backend-production-1880.up.railway.app";  
-  //static const String baseUrl = "https://251fa787eeab.ngrok-free.app";  
+  //  static const String baseUrl = "https://whisp-backend-production-1880.up.railway.app";  
+  static const String baseUrl = "https://9f6e22e5f48d.ngrok-free.app";  
 
  
    
@@ -17,6 +17,9 @@ class ApiEndpoints {
   static const String unfriend="$baseUrl/api/friend/unfriend";   ///api/friend/unfriend/<userId>
   static const String getFriendChatHistory = "$baseUrl/api/chat/history/";  ///api/chat/history/userID   ( friends id whose history you want to see )
   static const String getFreindChatList="$baseUrl/api/friend/chat-list";
- 
+ static const String blockUser="$baseUrl/api/moderation/block";  
+  static const String unblockUser="$baseUrl/api/moderation/block";
+  static const String reportUser="$baseUrl/api/moderation/report"; // /api/moderation/block/{{targetUserId}}
+  static const String getBlockedUsers="$baseUrl/api/moderation/block";
 }
  

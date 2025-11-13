@@ -12,7 +12,7 @@ class FriendsController extends GetxController {
   // Friends tab
   var friendsList = <FriendModel>[].obs;
   var searchQuery = ''.obs;
-  
+  var blockedUsersList = <FriendModel>[].obs;
 
   // Requests tab
   var friendRequests = <FriendRequestModel>[].obs;
@@ -153,7 +153,55 @@ void rejectRequest(String requestId) {
   }
 }
 
+Future<void> reportUser(String userId, String reason) async {
+  try {
+    final success = await repo.reportUser(userId, reason);
+    if (success) {
+      Get.snackbar("Success", "User reported successfully");
+    } else {
+      Get.snackbar("Error", "Failed to report user");
+    }
+  } catch (e) {
+    Get.snackbar("Error", "Something went wrong");
+  }
+
+}
  
+Future<void> blockUser(String userId) async {
+  try {
+    final success = await repo.blockUser(userId);
+    if (success) {
+      Get.snackbar("Success", "User blocked successfully");
+    } else {
+      Get.snackbar("Error", "Failed to block user");
+    }
+  } catch (e) {
+    Get.snackbar("Error", "Something went wrong");
+  }
+}
+
+Future<void> unblockUser(String userId) async {
+  try {
+    final success = await repo.unblockUser(userId);
+    if (success) {
+      Get.snackbar("Success", "User unblocked successfully");
+    } else {
+      Get.snackbar("Error", "Failed to unblock user");
+    }
+  } catch (e) {
+    Get.snackbar("Error", "Something went wrong");
+  }
+}
+
+Future<void> getBlockedUsers() async {
+  try {
+    final blockedUsers = await repo.getBlockedUsersList();
+    blockedUsersList.assignAll(blockedUsers);
+  } catch (e) {
+    Get.snackbar("Error", "Something went wrong");
+  }
+}
+
 }
 
  

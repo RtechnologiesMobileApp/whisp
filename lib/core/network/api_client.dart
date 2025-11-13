@@ -9,8 +9,8 @@ import 'api_exception.dart';
 class ApiClient {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "https://whisp-backend-production-1880.up.railway.app",
-       // baseUrl: "https://251fa787eeab.ngrok-free.app",
+      // baseUrl: "https://whisp-backend-production-1880.up.railway.app",
+       baseUrl: "https://9f6e22e5f48d.ngrok-free.app",
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},
@@ -55,11 +55,20 @@ Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
     return response.data;
   }
 
-  Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> post(String endpoint, Map<String, dynamic> data, {bool requireAuth = false}) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
+       // ✅ token only if required
+    final token = requireAuth ? SessionController().user!.token : "";
+
+      final response = await _dio.post(endpoint, data: data, options: Options(
+        headers: {
+          'Content-Type': 'application/json',
+          if (requireAuth && token!.isNotEmpty)
+            'Authorization': 'Bearer $token',
+        },
+      ),);
       log(data.toString());
-      return response.data;
+      return response;
     } catch (e) {
       throw ApiException.handleError(e);
     }
@@ -95,6 +104,38 @@ Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
       throw Exception("Network error: ${e.message}");
     }
   }
+
+  //Delete
+
+  Future<Response> delete(
+    String endpoint, {
+    dynamic data,
+    bool isFormData = false,
+    bool requireAuth = false,
+  }) async {
+    try {
+     final token = requireAuth ? SessionController().user?.token ?? "" : "";
+
+
+      final options = Options(
+        headers: {
+          "Content-Type": isFormData
+              ? "multipart/form-data"
+              : "application/json",
+          if (requireAuth && token.isNotEmpty) "Authorization": "Bearer $token",
+        },
+      );
+
+      final response = await _dio.delete(endpoint, data: data, options: options);
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response?.data ?? e.message);
+      }
+      throw Exception("Network error: ${e.message}");
+    }
+  }
+
 }
 
  

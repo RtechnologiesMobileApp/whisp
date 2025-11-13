@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 import 'package:whisp/features/Chats/widgets/chat_screen_appbar.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/message_input_field.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
  final String partnerId;
   final String partnerName;
   final String partnerAvatar;
@@ -14,21 +16,28 @@ class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key, required this.partnerId, required this.partnerName, required this.partnerAvatar,this.isFriend = false});
 
   @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+
+  
+  @override
   Widget build(BuildContext context) {
    // final ChatController controller = Get.put(ChatController(friendId: partnerId,isFriend: isFriend));
-   
-final ChatController controller = Get.isRegistered<ChatController>(tag: isFriend ? partnerId : 'random')
-    ? Get.find<ChatController>(tag: isFriend ? partnerId : 'random')
+   final FriendsController friendController =Get.isRegistered<FriendsController>()? Get.find<FriendsController>() : Get.put(FriendsController());
+final ChatController controller = Get.isRegistered<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
+    ? Get.find<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
     : Get.put(
-        ChatController(friendId: partnerId, isFriend: isFriend),
-        tag: isFriend ? partnerId : 'random',
+        ChatController(friendId: widget.partnerId, isFriend: widget.isFriend),
+        tag: widget.isFriend ? widget.partnerId : 'random',
       );
-
+   friendController.getBlockedUsers();
      
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
-      appBar: ChatAppBar(partnerId: partnerId, userName: partnerName, userAvatar: partnerAvatar, isFriend: isFriend,),
+      appBar: ChatAppBar(partnerId: widget.partnerId, userName: widget.partnerName, userAvatar: widget.partnerAvatar, isFriend: widget.isFriend,),
       body: Column(
         children: [
           Expanded(
@@ -50,7 +59,30 @@ final ChatController controller = Get.isRegistered<ChatController>(tag: isFriend
     },
   ),
 ),
-             MessageInputField(  controller: controller  ),
+
+Obx((){
+  return
+      friendController.blockedUsersList.any((user) => user.id == widget.partnerId)
+    ? InkWell(
+      onTap: () {
+        friendController.unblockUser(widget.partnerId);
+        friendController.fetchFriends();
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(10),
+          
+          ),
+        
+        child: Text("You are blocked by this user",style: TextStyle(color: Colors.white),)),
+    )
+    : 
+
+
+             MessageInputField(  controller: controller  );
+             })
         ],
       ),
     );
