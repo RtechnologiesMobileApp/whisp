@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
+import 'package:whisp/config/global.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
@@ -23,6 +24,7 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
      WidgetsBinding.instance.addPostFrameCallback((_) {
     controller.loadChatList();
+    notificationUserId=null;
   });
     return Scaffold(
       backgroundColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/config/global.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 import 'package:whisp/features/Chats/widgets/chat_screen_appbar.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
@@ -24,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
   
   @override
   Widget build(BuildContext context) {
+    notificationUserId=widget.partnerId;
    // final ChatController controller = Get.put(ChatController(friendId: partnerId,isFriend: isFriend));
    final FriendsController friendController =Get.isRegistered<FriendsController>()? Get.find<FriendsController>() : Get.put(FriendsController());
 final ChatController controller = Get.isRegistered<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
@@ -67,8 +69,10 @@ Obx((){
       onTap: () {
         friendController.unblockUser(widget.partnerId);
         friendController.fetchFriends();
+        friendController.update();
       },
       child: Container(
+        margin: EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
         decoration: BoxDecoration(
           color: AppColors.primary,
@@ -76,7 +80,7 @@ Obx((){
           
           ),
         
-        child: Text("You are blocked by this user",style: TextStyle(color: Colors.white),)),
+        child: Text("You block this user",style: TextStyle(color: Colors.white),)),
     )
     : 
 
