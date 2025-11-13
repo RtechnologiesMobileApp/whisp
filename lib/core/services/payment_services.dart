@@ -150,29 +150,55 @@ Future<void> handleSubscription(String plan) async {
   }
 
 Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
+  print('➡️ Notifying backend about payment success...');
+
+  final session = SessionController();
+  print('Current user before notify: ${session.user?.toJson()}'); // 👈 check user
+
   final res = await http.post(
     Uri.parse('${ApiEndpoints.baseUrl}/api/payments/payment-success'),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${SessionController().user!.token!}',
+      'Authorization': 'Bearer ${session.user?.token ?? "NO TOKEN"}',
     },
     body: jsonEncode({'paymentIntentId': paymentIntentId}),
   );
 
+  print('Backend response: ${res.statusCode} | ${res.body}');
+
   if (res.statusCode != 200) {
-    print('❌ Failed to notify backend of payment success: ${res.statusCode}');
+    print('❌ Failed to notify backend of payment success');
     throw Exception('Failed to notify backend of payment success.');
   }
 
-  // // ✅ Notify backend done, now refresh credits via socket
-  // try {
-  //   final chatSocket = ChatSocketService();
-  //   chatSocket.requestCredits(); // 🔥 trigger credits_info event
-  //   print('📡 Requested updated credits after payment success');
-  // } catch (e) {
-  //   print('⚠️ Could not refresh credits via socket: $e');
-  // }
+  // ✅ Update local session instantly
+  final currentUser = session.user;
+  if (currentUser != null) {
+    final updatedUser = currentUser.copyWith(premium: true);
+    await session.saveUserSession(updatedUser);
+    print('✅ Premium activated locally for user: ${updatedUser.name}');
+  } else {
+    print('⚠️ currentUser is NULL — session not loaded!');
+  }
 }
+
+// Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
+//   final res = await http.post(
+//     Uri.parse('${ApiEndpoints.baseUrl}/api/payments/payment-success'),
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': 'Bearer ${SessionController().user!.token!}',
+//     },
+//     body: jsonEncode({'paymentIntentId': paymentIntentId}),
+//   );
+
+//   if (res.statusCode != 200) {
+//     print('❌ Failed to notify backend of payment success: ${res.statusCode}');
+//     throw Exception('Failed to notify backend of payment success.');
+//   }
+
+  
+// }
 
 //   // Future<void> _notifyBackendPaymentSuccess(String paymentIntentId) async {
 //   //   final res = await http.post(

@@ -56,6 +56,7 @@ class UserModel {
     String? dob,
     String? gender,
     String? token,
+    bool? premium,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -65,7 +66,7 @@ class UserModel {
       dob: dob ?? this.dob,
       gender: gender ?? this.gender,
       token: token ?? this.token,
-      premium:  premium,
+      premium: premium ?? this.premium, 
      country:  country,
     );
   }
