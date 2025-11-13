@@ -27,14 +27,7 @@ final RxBool isLoadingRequests = true.obs;
   fetchIncomingRequests();
 }
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-
-    
-
-  
-  // }
+ 
  
 // Fetch Friends List from API
  
@@ -201,6 +194,11 @@ Future<void> getBlockedUsers() async {
     Get.snackbar("Error", "Something went wrong");
   }
 }
+
+bool isUserFriend(String userId) {
+  return friendsList.any((f) => f.id == userId);
+}
+
 
 }
 

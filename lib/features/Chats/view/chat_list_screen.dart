@@ -244,12 +244,15 @@ class ChatListScreen extends StatelessWidget {
                           log("name: ${chat['name']}");
                           log("image: ${chat['avatar']}");
                           // Navigate to ChatScreen
+                          final friendController = Get.find<FriendsController>();
+final isStillFriend = friendController.isUserFriend(chat['id']);
                           Get.to(
                             () => ChatScreen(
                               partnerId: chat['id'],
                               partnerName: chat['name'],
                               partnerAvatar: chat['avatar'],
-                              isFriend: true,
+                             // isFriend: true,
+                               isFriend: isStillFriend,
                             ),
                           );
                         },
