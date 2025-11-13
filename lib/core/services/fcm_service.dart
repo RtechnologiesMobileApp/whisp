@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisp/config/global.dart';
 
 class FCMService {
   static final FCMService _instance = FCMService._internal();
@@ -80,8 +81,8 @@ class FCMService {
 
   /// 🧩 Handle foreground message and show local notification
   void _handleForegroundMessage(RemoteMessage message) {
-    print('📩 Foreground message received: ${message.data}');
-    if (message.notification != null) {
+    print('📩 Foreground message received: ${message.data['fromUserId']}');
+    if (message.notification != null && message.data['fromUserId'] != notificationUserId) {
       _showLocalNotification(message);
     }
   }
