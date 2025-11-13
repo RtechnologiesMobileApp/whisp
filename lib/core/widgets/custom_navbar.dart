@@ -68,8 +68,8 @@ Widget _buildNavItem(
         isSvg
             ? SvgPicture.asset(
                 iconPath,
-                height: 24,
-                width: 24,
+                height: 22,
+                width: 22,
               )
             : Image.asset(
                 iconPath,
