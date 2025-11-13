@@ -74,7 +74,7 @@ void initState() {
                 onTap: () {
                   socketService.endSession();
                  
-                  Get.offAllNamed(Routes.welcomehome);
+                  Get.offAllNamed(Routes.mainHome);
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(
