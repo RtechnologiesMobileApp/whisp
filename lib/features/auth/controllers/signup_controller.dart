@@ -59,43 +59,60 @@ class SignupController extends GetxController {
 
   // Step 1: Check email existence
   Future<void> checkEmailAndProceed({bool showPrimaryLoader = true}) async {
+  print('🔹 [checkEmailAndProceed] called');
 
-     if (!formKey.currentState!.validate() && !isGoogle.value) {
-    return;  
+  if (!formKey.currentState!.validate() && !isGoogle.value) {
+    print('⚠️ Form validation failed');
+    return;
   }
-    final email = emailController.text.trim();
-    if (email.isEmpty) {
-     
+
+  final email = emailController.text.trim();
+  print('📧 Email entered: $email');
+
+  if (email.isEmpty) {
+    print('⚠️ Email field is empty');
+    return;
+  }
+
+  if (showPrimaryLoader) {
+    isLoading.value = true;
+    print('⏳ Loader shown');
+  }
+
+  try {
+    if (!acceptTerms.value) {
+      print('⚠️ Terms not accepted');
+      Get.snackbar('Terms Required', 'Please accept terms and conditions.');
       return;
     }
 
-    if (showPrimaryLoader) {
-      isLoading.value = true;
+    print('🚀 Checking if email exists...');
+    final exists = await _authRepo.checkEmailExists(email);
+    print('✅ Backend response: $exists');
+
+    if (exists == true) {
+      print('❌ Email already exists, showing snackbar');
+      Get.snackbar(
+        "Email Exists",
+        "An account with this email already exists.",
+      );
+    } else {
+      print('✅ Email available — navigating to ProfileView');
+      Get.to(() => ProfileView());
     }
-    try {
-      if (!acceptTerms.value) {
-        Get.snackbar('Terms Required', 'Please accept terms and conditions.');
-        return;
-      }
-      final exists = await _authRepo.checkEmailExists(email);
-      if (exists) {
-        Get.snackbar(
-          "Email Exists",
-          "An account with this email already exists.",
-        );
-      } else {
-        Get.to(ProfileView());
-      }
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    } finally {
-      if (showPrimaryLoader) {
-        isLoading.value = false;
-      }
+  } catch (e, s) {
+    print('❌ Exception occurred: $e');
+    print('🧩 StackTrace: $s');
+    Get.snackbar("Error", e.toString());
+  } finally {
+    if (showPrimaryLoader) {
+      isLoading.value = false;
+      print('✅ Loader hidden');
     }
   }
+}
 
-  Future<void> pickImage() async {
+     Future<void> pickImage() async {
     final picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(
       source: ImageSource.gallery,

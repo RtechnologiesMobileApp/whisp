@@ -122,15 +122,48 @@ Future<dynamic> login({
       throw Exception(e.toString());
     }
   }
-  
   Future<bool> checkEmailExists(String email) async {
-    try {
-      final res = await _apiClient.post(ApiEndpoints.checkEmailExists, {"email": email});
-      return res['exists'] ?? false; // backend should return { exists: true/false }
-    } catch (e) {
-      rethrow;
+  try {
+    print('📨 [checkEmailExists] Sending email check request: $email');
+
+    final res = await _apiClient.post(
+      ApiEndpoints.checkEmailExists,
+      {"email": email},
+    );
+
+    // Debug log to verify structure
+    print('📡 [checkEmailExists] Raw response: $res (${res.runtimeType})');
+
+    // Ensure response is a Map (not Dio Response or null)
+    if (res == null) {
+      print('⚠️ Response is null');
+      return false;
     }
+
+    if (res is Map<String, dynamic>) {
+      final exists = res['exists'] == true;
+      print('✅ Parsed exists = $exists');
+      return exists;
+    } else {
+      print('⚠️ Unexpected response type — converting manually');
+      try {
+        final data = jsonDecode(res.toString());
+        final exists = data['exists'] == true;
+        print('✅ Parsed from string: exists = $exists');
+        return exists;
+      } catch (e) {
+        print('❌ Failed to parse response: $e');
+        return false;
+      }
+    }
+  } catch (e, s) {
+    print('❌ [checkEmailExists] Exception: $e');
+    print('🧩 StackTrace: $s');
+    return false; // avoid crash
   }
+}
+
+  
 
   Future<dynamic> registerUser({
     required String name,
