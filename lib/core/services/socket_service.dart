@@ -11,6 +11,7 @@ class SocketService extends GetxService {
 
   final _connected = false.obs;
   bool get connected => _connected.value;
+  final RxMap<String, bool> onlineStatus = <String, bool>{}.obs;
 
   Future<SocketService> init({
     required String baseUrl,
@@ -22,6 +23,7 @@ class SocketService extends GetxService {
       socket?.disconnect();
       socket?.dispose();
       socket = null;
+     
     }
 
     debugPrint('[socket] Initializing socket connection to $baseUrl');
@@ -56,6 +58,10 @@ class SocketService extends GetxService {
       debugPrint('[socket] disconnected. Reason: $reason');
       _connected.value = false;
     });
+      onFriendOnline((data) {
+    debugPrint("[socket] FRIEND_ONLINE event received: $data");
+  });
+
 
     // Generic server -> client events, we'll forward them via functions below
     return this;
@@ -71,13 +77,26 @@ class SocketService extends GetxService {
     }
   }
 
+  void onFriendOnline(void Function(Map) cb) {
+    socket?.off('FRIEND_ONLINE');
+    socket?.on('FRIEND_ONLINE', (data) {
+      cb(Map.from(data)); // forward raw data
+      final id = data["userId"];
+      final online = data["online"] ?? false;
+
+      onlineStatus[id] = online; // update rx map
+      debugPrint("[socket] FRIEND_ONLINE update => $id : $online");
+    });
+  }
+
   void cancelRandom() {
     if (socket?.connected ?? false) {
       socket!.emit('CANCEL_RANDOM');
       debugPrint('[socket] CANCEL_RANDOM emitted');
     }
   }
-     // send msg to random partner
+
+  // send msg to random partner
   void sendMessage(String body) {
     if (socket?.connected ?? false) {
       socket!.emit('SEND_MESSAGE', {'body': body});
@@ -86,17 +105,18 @@ class SocketService extends GetxService {
   // send msg to friend
 
   void sendMessageToFriend(String toUserId, String body) {
-  if (socket?.connected ?? false) {
-    socket!.emit('SEND_MESSAGE_TO_FRIEND', {
-      'toUserId': toUserId,
-      'body': body,
-    });
-    debugPrint('[socket] SEND_MESSAGE_TO_FRIEND emitted to $toUserId with message: $body');
-  } else {
-    debugPrint('[socket] cannot emit SEND_MESSAGE_TO_FRIEND: not connected');
+    if (socket?.connected ?? false) {
+      socket!.emit('SEND_MESSAGE_TO_FRIEND', {
+        'toUserId': toUserId,
+        'body': body,
+      });
+      debugPrint(
+        '[socket] SEND_MESSAGE_TO_FRIEND emitted to $toUserId with message: $body',
+      );
+    } else {
+      debugPrint('[socket] cannot emit SEND_MESSAGE_TO_FRIEND: not connected');
+    }
   }
-}
-
 
   void typing(bool isTyping) {
     if (socket?.connected ?? false) {
@@ -107,7 +127,6 @@ class SocketService extends GetxService {
   void endSession() {
     if (socket?.connected ?? false) {
       socket!.emit('END_SESSION');
-      
     }
   }
 
@@ -124,40 +143,44 @@ class SocketService extends GetxService {
     }
   }
 
-void acceptFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
-  if (socket == null) return;
+  void acceptFriend(
+    String requestId,
+    void Function(Map<String, dynamic>) ackCb,
+  ) {
+    if (socket == null) return;
 
-  socket!.emitWithAck(
-    'FRIEND_ACCEPT',
-    {'requestId': requestId},
-    ack: (data) {
-      // safe check
-      if (data is Map) {
-        ackCb(Map<String, dynamic>.from(data));
-      } else {
-        ackCb({'ok': false, 'code': 'Invalid response'});
-      }
-    },
-  );
-}
+    socket!.emitWithAck(
+      'FRIEND_ACCEPT',
+      {'requestId': requestId},
+      ack: (data) {
+        // safe check
+        if (data is Map) {
+          ackCb(Map<String, dynamic>.from(data));
+        } else {
+          ackCb({'ok': false, 'code': 'Invalid response'});
+        }
+      },
+    );
+  }
 
-void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
-  if (socket == null) return;
+  void rejectFriend(
+    String requestId,
+    void Function(Map<String, dynamic>) ackCb,
+  ) {
+    if (socket == null) return;
 
-  socket!.emitWithAck(
-    'FRIEND_REJECT',
-    {'requestId': requestId},
-    ack: (data) {
-      if (data is Map) {
-        ackCb(Map<String, dynamic>.from(data));
-      } else {
-        ackCb({'ok': false, 'code': 'Invalid response'});
-      }
-    },
-  );
-}
-
-  
+    socket!.emitWithAck(
+      'FRIEND_REJECT',
+      {'requestId': requestId},
+      ack: (data) {
+        if (data is Map) {
+          ackCb(Map<String, dynamic>.from(data));
+        } else {
+          ackCb({'ok': false, 'code': 'Invalid response'});
+        }
+      },
+    );
+  }
 
   void cancelFriendRequest(String requestId, void Function(Map) ackCb) {
     socket?.emitWithAck(
@@ -169,8 +192,6 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
     );
   }
 
- 
-
   // Event listeners: attach callback functions
   void onAuthOk(void Function(Map) cb) =>
       socket?.on('AUTH_OK', (data) => cb(Map.from(data)));
@@ -178,8 +199,30 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
       socket?.on('MATCH_FOUND', (data) => cb(Map.from(data)));
   void onMessage(void Function(Map) cb) =>
       socket?.on('MESSAGE', (data) => cb(Map.from(data)));
-  void onTyping(void Function(Map) cb) =>
-      socket?.on('TYPING', (data) => cb(Map.from(data)));
+  // void onTyping(void Function(Map) cb) =>
+  //     socket?.on('TYPING', (data) => cb(Map.from(data)));
+
+    void onTyping(void Function(Map) cb) {
+    socket?.off('TYPING'); // ensure no duplicate listener
+    socket?.on('TYPING', (data) {
+      debugPrint("[socket] >>> TYPING event received: $data");
+
+      // data expected: { "isTyping": true, "userId": "abc" }
+      try {
+        final map = Map<String, dynamic>.from(data);
+        final isTyping = map["isTyping"];
+        final userId = map["userId"];
+
+        debugPrint(
+          "[socket] TYPING => userId:$userId | isTyping:$isTyping",
+        );
+
+        cb(map);
+      } catch (e) {
+        debugPrint("[socket] TYPING error: $e");
+      }
+    });
+  }
   void onPartnerLeft(void Function() cb) {
     socket?.off('PARTNER_LEFT');
     socket?.on('PARTNER_LEFT', (_) => cb());
@@ -190,10 +233,7 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
   void onError(void Function(Map) cb) =>
       socket?.on('ERROR', (data) => cb(Map.from(data)));
 
-
- 
-
-   void onFriendRequestAccepted(void Function(Map) cb) {
+  void onFriendRequestAccepted(void Function(Map) cb) {
     socket?.on('FRIEND_REQUEST_ACCEPTED', (data) {
       cb(Map.from(data));
       debugPrint('[socket] FRIEND_REQUEST_ACCEPTED: $data');
@@ -219,7 +259,7 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
       cb(Map.from(data));
       debugPrint('[socket] FRIEND_ADDED: $data');
     });
-  }    
+  }
 
   // Reconnect with new token (useful after login)
   Future<void> reconnectWithToken(String token) async {
@@ -234,21 +274,22 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
 
   //helper method
   Future<void> safeInitIfNeeded() async {
-  if (socket != null && socket!.connected) {
-    print('[socket] Already connected ✅');
-    return;
+    if (socket != null && socket!.connected) {
+      print('[socket] Already connected ✅');
+      return;
+    }
+
+    final token = SessionController().user?.token;
+    if (token == null || token.isEmpty) {
+      print(
+        '[socket] ⚠️ No token found — will retry after login or session load.',
+      );
+      return;
+    }
+
+    await init(baseUrl: ApiEndpoints.baseUrl, token: token);
+    print('[socket] ✅ Reconnected successfully');
   }
-
-  final token = SessionController().user?.token;
-  if (token == null || token.isEmpty) {
-    print('[socket] ⚠️ No token found — will retry after login or session load.');
-    return;
-  }
-
-  await init(baseUrl: ApiEndpoints.baseUrl, token: token);
-  print('[socket] ✅ Reconnected successfully');
-}
-
 
   // Disconnect
   void disposeSocket() {
