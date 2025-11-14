@@ -74,8 +74,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
               InkWell(
                 onTap: () {
                   socketService.endSession();
-                  Get.back();
-                  // Get.to(MainHomeScreen(index: 1));
+                  // Get.back();
+                  Get.to(MainHomeScreen(index: 1));
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(
