@@ -56,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
     friendController.getBlockedUsers();
 
     // Scroll to bottom whenever messages change
-    // ever(controller.messages, (_) => _scrollToBottom());
+     ever(controller.messages, (_) => _scrollToBottom());
     ever(controller.partnerTyping, (_) {
   // only scroll when typing becomes visible (optional)
   if (controller.partnerTyping.value) {
