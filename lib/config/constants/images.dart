@@ -10,19 +10,19 @@ class AppImages {
   static const String googleLogo = 'assets/images/google_logo.png';
   static const String placeholderpic = 'assets/images/place_holder_pic.jpg';
 
-  static const String chat_selected = 'assets/icons/message_selected.png';
+  static const String chat_selected = 'assets/icons/chat.png';
   static const String chat_unselected = 'assets/icons/message_unselected.png';
   static const String friends_selected = 'assets/icons/friends_selected.png';
   static const String friends_unselected =
-      'assets/icons/Friends_unselected.png';
+      'assets/icons/Friends.png';
   static const String premium_selected = 'assets/icons/premium_selected.png';
   static const String premium_unselected =
-      'assets/icons/premium_unselected.png';
+      'assets/icons/Diamond.png';
   static const String settings_selected = 'assets/icons/setting_selected.png';
   static const String settings_unselected =
       'assets/icons/setting_unselected.png';
   static const String profile_selected = 'assets/icons/user_unselected.png';
-  static const String profile_unselected = 'assets/icons/user_unselected.png';
+  static const String profile_unselected = 'assets/icons/User.png';
   static const String home_selected = 'assets/icons/home_selected.png';
   static const String home_unselected = 'assets/icons/home_unselected.png';
    static const String homeSelectedSvg = 'assets/icons/homeselected.svg';
