@@ -20,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool notificationsEnabled = true;
+  bool notificationsEnabled = false;
 
   String userName = "User";
   String userEmail = "";
