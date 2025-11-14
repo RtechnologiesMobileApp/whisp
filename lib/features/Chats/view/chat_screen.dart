@@ -56,8 +56,16 @@ class _ChatScreenState extends State<ChatScreen> {
     friendController.getBlockedUsers();
 
     // Scroll to bottom whenever messages change
-    ever(controller.messages, (_) => _scrollToBottom());
-
+    // ever(controller.messages, (_) => _scrollToBottom());
+    ever(controller.partnerTyping, (_) {
+  // only scroll when typing becomes visible (optional)
+  if (controller.partnerTyping.value) {
+    _scrollToBottom();
+  } else {
+    // if you want to always ensure bottom when it disappears, remove the if-check
+    //_scrollToBottom();
+  }
+});
     // Optional: scroll to bottom on first frame
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
@@ -73,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 100),
           curve: Curves.easeOut,
         );
       }

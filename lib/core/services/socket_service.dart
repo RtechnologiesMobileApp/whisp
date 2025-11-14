@@ -243,7 +243,7 @@ class SocketService extends GetxService {
       // Determine who is typing
       final isTyping = map["isTyping"] ?? false;
       // for friend chat, server might send 'userId'; for your emitted 'toUserId' we can also include it
-      final userId = map["userId"] ?? map["fromUserId"] ?? 'unknown';
+      final userId = map["from"] ?? map["toUserId"] ??  'unknown';
 
       debugPrint("[socket] TYPING => userId:$userId | isTyping:$isTyping");
 

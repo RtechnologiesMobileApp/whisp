@@ -1,7 +1,7 @@
 class ApiEndpoints {
 
-  //  static const String baseUrl = "https://whisp-backend-production-1880.up.railway.app";  
-   static const String baseUrl = "https://c239c3cd3e4a.ngrok-free.app";  
+   static const String baseUrl = "https://whisp-backend-production-1880.up.railway.app";  
+  //  static const String baseUrl = "https://c239c3cd3e4a.ngrok-free.app";  
 
  
    

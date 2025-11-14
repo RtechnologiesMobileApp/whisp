@@ -27,8 +27,9 @@ class ChatController extends GetxController {
 
      // 🔹 Listen for typing event
   SocketService.to.onTyping((data) {
-    if (data["from"] == friendId) {
+    if (data["userId"] == friendId) {
       partnerTyping.value = data["isTyping"];
+      debugPrint("Partner typing value ${partnerTyping.value}");
     }
   });
     
