@@ -26,7 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     notificationUserId=widget.partnerId;
-   // final ChatController controller = Get.put(ChatController(friendId: partnerId,isFriend: isFriend));
+   
    final FriendsController friendController =Get.isRegistered<FriendsController>()? Get.find<FriendsController>() : Get.put(FriendsController());
 final ChatController controller = Get.isRegistered<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
     ? Get.find<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
@@ -61,6 +61,28 @@ final ChatController controller = Get.isRegistered<ChatController>(tag: widget.i
     },
   ),
 ),
+
+ Obx(() {
+      return controller.partnerTyping.value
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  Text(
+                    "${widget.partnerName} is typing...",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : SizedBox.shrink();
+    }),
+
 
 Obx((){
   return
