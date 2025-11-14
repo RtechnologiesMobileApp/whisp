@@ -20,7 +20,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool notificationsEnabled = false;
+  bool? _notificationsEnabled; // Null until loaded to prevent animation
+  int _switchKey = 0; // Key that only changes on user interaction
 
   String userName = "User";
   String userEmail = "";
@@ -28,17 +29,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final controller = Get.put(EditProfileController());
 
-  _getNotificationState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    _getNotificationState();
+    _initializeNotificationState();
     _loadUser();
 
     ever(controller.user, (updatedUser) {
@@ -49,6 +43,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         profilePic = updatedUser.profilePic;
       });
     });
+  }
+
+  Future<void> _initializeNotificationState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final savedValue = prefs.getBool('notificationsEnabled') ?? true;
+    // Set value before first build completes to prevent animation
+    if (mounted) {
+      setState(() {
+        _notificationsEnabled = savedValue;
+      });
+    }
   }
 
   Future<void> _loadUser() async {
@@ -221,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          notificationsEnabled
+                          (_notificationsEnabled ?? true)
                               ? "Receive push notifications"
                               : "Notifications are off",
                           style: TextStyle(
@@ -232,12 +237,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                  Switch(
-                    value: notificationsEnabled,
-                    onChanged: (value) async {
-                      setState(() {
-                        notificationsEnabled = value;
-                      });
+                  if (_notificationsEnabled != null)
+                    Switch(
+                      key: ValueKey(_switchKey),
+                      value: _notificationsEnabled!,
+                      onChanged: (value) async {
+                        // Only change key on user interaction to prevent animation on load
+                        _switchKey++;
+                        setState(() {
+                          _notificationsEnabled = value;
+                        });
                       // TODO: Call API here to update notification settings
                       debugPrint('Notifications: $value');
                       try {
@@ -254,28 +263,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
 
                         if (response.statusCode != 200) {
-                          setState(() => notificationsEnabled = !value);
+                          setState(() => _notificationsEnabled = !value);
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           prefs.setBool(
                             'notificationsEnabled',
-                            notificationsEnabled,
+                            _notificationsEnabled ?? true,
                           );
                         } else {
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           prefs.setBool(
                             'notificationsEnabled',
-                            notificationsEnabled,
+                            _notificationsEnabled ?? true,
                           );
                         }
                       } catch (e) {
-                        setState(() => notificationsEnabled = !value);
+                        setState(() => _notificationsEnabled = !value);
                       }
                     },
-                    activeColor: Colors.black,
-                    activeTrackColor: Colors.grey.shade300,
-                  ),
+                      activeThumbColor: Colors.black,
+                      activeTrackColor: Colors.grey.shade300,
+                    )
+                  else
+                    SizedBox(
+                      width: 48,
+                      height: 24,
+                      child: Switch(
+                        value: true,
+                        onChanged: null, // Disabled until loaded
+                        activeThumbColor: Colors.black,
+                        activeTrackColor: Colors.grey.shade300,
+                      ),
+                    ),
                 ],
               ),
             ),

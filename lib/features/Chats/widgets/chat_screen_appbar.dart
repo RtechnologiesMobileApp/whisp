@@ -130,14 +130,16 @@ class _ChatAppBarState extends State<ChatAppBar> {
                       debugPrint(
                         "Online status for ${widget.partnerId}: $isOnline",
                       );
-                      return Text(
-                        isOnline ? "Online" : "",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xff771F98),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
+                      return isOnline
+                          ? Text(
+                              "Online",
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xff771F98),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          : SizedBox.shrink();
                     }),
                   ],
                 ),
