@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
+import 'package:whisp/features/home/view/home_screen.dart';
 import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 import 'chat_bottom_sheet.dart';
 
@@ -74,7 +75,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                 onTap: () {
                   socketService.endSession();
 
-                  Get.offAllNamed(Routes.mainHome);
+                  Get.to(MainHomeScreen(index: 1));
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(

@@ -8,7 +8,15 @@ import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 import 'package:whisp/features/profile/view/profile_screen.dart';
  
 
-class MainHomeScreen extends StatelessWidget {
+class MainHomeScreen extends StatefulWidget {
+ int index;
+  MainHomeScreen({super.key, this.index = 0});
+
+  @override
+  State<MainHomeScreen> createState() => _MainHomeScreenState();
+}
+
+class _MainHomeScreenState extends State<MainHomeScreen> {
   final RxInt _selectedIndex = 0.obs;
 
   final List<Widget> _screens = [
@@ -19,14 +27,13 @@ class MainHomeScreen extends StatelessWidget {
     ProfileScreen(),
   ];
 
-  MainHomeScreen({super.key});
-
   void _onItemTapped(int index) {
     _selectedIndex.value = index;
   }
 
   @override
   Widget build(BuildContext context) {
+    _selectedIndex.value = widget.index;
     return Scaffold(
       body: Obx(() => _screens[_selectedIndex.value]),
       bottomNavigationBar: CustomNavBar(
