@@ -4,8 +4,9 @@ import 'package:whisp/config/constants/colors.dart';
 class ChatBubble extends StatelessWidget {
   final bool fromMe;
   final String message;
+  final bool isRead;
 
-  const ChatBubble({super.key, required this.fromMe, required this.message});
+  const ChatBubble({super.key, required this.fromMe, required this.message, required this.isRead});
 
   @override
   Widget build(BuildContext context) {

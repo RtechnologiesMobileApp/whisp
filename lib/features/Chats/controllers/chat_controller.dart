@@ -93,6 +93,7 @@ void sendTyping(bool isTyping) {
 
         // Debug print to verify messages
         history.forEach((msg) {
+         
           print("from: ${msg['from']}, to: ${msg['to']}, body: ${msg['body']}");
         });
 

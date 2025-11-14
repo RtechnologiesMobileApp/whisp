@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:whisp/core/network/api_client.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
@@ -42,15 +44,17 @@ Future<List<Map<String, dynamic>>> getFriendChatHistory(String friendId) async {
   try {
     final res = await _api.get("${ApiEndpoints.getFriendChatHistory}$friendId", requireAuth: true);
     if (res["messages"] == null) return [];
-
+  log("messages ${res["messages"]}");
     return (res["messages"] as List)
         .map((msg) => {
               "fromMe": msg["from"] == SessionController().user!.id,
               "message": msg["body"] ?? '',
               "from": msg["from"],
               "to": msg["to"],
+              "isRead":msg["isRead"]
             })
         .toList();
+        
   } catch (e) {
     debugPrint("Error fetching chat history: $e");
     return [];

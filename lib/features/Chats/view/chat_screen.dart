@@ -118,6 +118,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return ChatBubble(
                       fromMe: msg['fromMe'] ?? false,
                       message: msg['message'] ?? '',
+                      isRead: msg['isRead'] ?? false,
                     );
                   },
                 );
