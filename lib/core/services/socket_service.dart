@@ -191,12 +191,7 @@ void rejectFriend(String requestId, void Function(Map<String, dynamic>) ackCb) {
       socket?.on('ERROR', (data) => cb(Map.from(data)));
 
 
-  //   void onFriendRequestIncoming(void Function(Map) cb) {
-  //   socket?.on('FRIEND_REQUEST_INCOMING', (data) {
-  //     cb(Map.from(data));
-  //     debugPrint('[socket] FRIEND_REQUEST_INCOMING: $data');
-  //   });
-  // }
+ 
 
    void onFriendRequestAccepted(void Function(Map) cb) {
     socket?.on('FRIEND_REQUEST_ACCEPTED', (data) {

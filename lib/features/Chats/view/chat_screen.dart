@@ -4,6 +4,7 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/global.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 import 'package:whisp/features/Chats/widgets/chat_screen_appbar.dart';
+import 'package:whisp/features/Chats/widgets/typing_bubble.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/message_input_field.dart';
@@ -48,40 +49,61 @@ final ChatController controller = Get.isRegistered<ChatController>(tag: widget.i
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
-      return ListView.builder(
-        padding: const EdgeInsets.only(top: 12),
-        itemCount: controller.messages.length,
-        itemBuilder: (context, index) {
-          final msg = controller.messages[index];
-          final bool isFromMe = msg['fromMe'] ?? false;
-          final String message = msg['message'] ?? '';
-          return ChatBubble(fromMe: isFromMe, message: message);
-        },
+      return Obx(() {
+  final msgCount = controller.messages.length;
+  final showTyping = controller.partnerTyping.value;
+
+  return ListView.builder(
+    padding: const EdgeInsets.only(top: 12),
+    itemCount: msgCount + (showTyping ? 1 : 0),
+    itemBuilder: (context, index) {
+      if (showTyping && index == msgCount) {
+        return const TypingBubble(); // ⬅ Typing bubble here
+      }
+
+      final msg = controller.messages[index];
+      return ChatBubble(
+        fromMe: msg['fromMe'] ?? false,
+        message: msg['message'] ?? '',
       );
+    },
+  );
+});
+
+      // return ListView.builder(
+      //   padding: const EdgeInsets.only(top: 12),
+      //   itemCount: controller.messages.length,
+      //   itemBuilder: (context, index) {
+      //     final msg = controller.messages[index];
+      //     final bool isFromMe = msg['fromMe'] ?? false;
+      //     final String message = msg['message'] ?? '';
+      //     return ChatBubble(fromMe: isFromMe, message: message);
+      //   },
+      // );
     },
   ),
 ),
 
- Obx(() {
-      return controller.partnerTyping.value
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  Text(
-                    "${widget.partnerName} is typing...",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : SizedBox.shrink();
-    }),
+//  Obx(() {
+//       return controller.partnerTyping.value
+//           ? Padding(
+//               padding: const EdgeInsets.only(bottom: 6),
+//               child: Row(
+//                 children: [
+//                   const SizedBox(width: 16),
+//                   Text(
+//                     "${widget.partnerName} is typing...",
+//                     style: TextStyle(
+//                       color: Colors.grey,
+//                       fontStyle: FontStyle.italic,
+//                       fontSize: 13,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             )
+//           : SizedBox.shrink();
+//     }),
 
 
 Obx((){
