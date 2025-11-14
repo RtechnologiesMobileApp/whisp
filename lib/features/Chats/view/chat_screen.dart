@@ -10,129 +10,154 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/message_input_field.dart';
 
 class ChatScreen extends StatefulWidget {
- final String partnerId;
+  final String partnerId;
   final String partnerName;
   final String partnerAvatar;
   final bool isFriend;
 
-  const ChatScreen({super.key, required this.partnerId, required this.partnerName, required this.partnerAvatar,this.isFriend = false});
+  const ChatScreen({
+    super.key,
+    required this.partnerId,
+    required this.partnerName,
+    required this.partnerAvatar,
+    this.isFriend = false,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  late ScrollController _scrollController;
+  late ChatController controller;
+  late FriendsController friendController;
 
-  
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController = ScrollController();
+
+    // Initialize ChatController once
+    controller = Get.isRegistered<ChatController>(
+            tag: widget.isFriend ? widget.partnerId : 'random')
+        ? Get.find<ChatController>(
+            tag: widget.isFriend ? widget.partnerId : 'random')
+        : Get.put(
+            ChatController(friendId: widget.partnerId, isFriend: widget.isFriend),
+            tag: widget.isFriend ? widget.partnerId : 'random',
+          );
+
+    // Initialize FriendsController
+    friendController = Get.isRegistered<FriendsController>()
+        ? Get.find<FriendsController>()
+        : Get.put(FriendsController());
+
+    friendController.getBlockedUsers();
+
+    // Scroll to bottom whenever messages change
+    ever(controller.messages, (_) => _scrollToBottom());
+
+    // Optional: scroll to bottom on first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    notificationUserId=widget.partnerId;
-   
-   final FriendsController friendController =Get.isRegistered<FriendsController>()? Get.find<FriendsController>() : Get.put(FriendsController());
-final ChatController controller = Get.isRegistered<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
-    ? Get.find<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
-    : Get.put(
-        ChatController(friendId: widget.partnerId, isFriend: widget.isFriend),
-        tag: widget.isFriend ? widget.partnerId : 'random',
-      );
-   friendController.getBlockedUsers();
-     
+    notificationUserId = widget.partnerId;
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
-      appBar: ChatAppBar(partnerId: widget.partnerId, userName: widget.partnerName, userAvatar: widget.partnerAvatar, isFriend: widget.isFriend,),
+      appBar: ChatAppBar(
+        partnerId: widget.partnerId,
+        userName: widget.partnerName,
+        userAvatar: widget.partnerAvatar,
+        isFriend: widget.isFriend,
+      ),
       body: Column(
         children: [
+          // Messages List
           Expanded(
-  child: Obx(
-    () {
-      if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      return Obx(() {
-  final msgCount = controller.messages.length;
-  final showTyping = controller.partnerTyping.value;
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-  return ListView.builder(
-    padding: const EdgeInsets.only(top: 12),
-    itemCount: msgCount + (showTyping ? 1 : 0),
-    itemBuilder: (context, index) {
-      if (showTyping && index == msgCount) {
-        return const TypingBubble(); // ⬅ Typing bubble here
-      }
+              return Obx(() {
+                final msgCount = controller.messages.length;
+                final showTyping = controller.partnerTyping.value;
 
-      final msg = controller.messages[index];
-      return ChatBubble(
-        fromMe: msg['fromMe'] ?? false,
-        message: msg['message'] ?? '',
-      );
-    },
-  );
-});
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.only(top: 12),
+                  itemCount: msgCount + (showTyping ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (showTyping && index == msgCount) {
+                      return const TypingBubble();
+                    }
 
-      // return ListView.builder(
-      //   padding: const EdgeInsets.only(top: 12),
-      //   itemCount: controller.messages.length,
-      //   itemBuilder: (context, index) {
-      //     final msg = controller.messages[index];
-      //     final bool isFromMe = msg['fromMe'] ?? false;
-      //     final String message = msg['message'] ?? '';
-      //     return ChatBubble(fromMe: isFromMe, message: message);
-      //   },
-      // );
-    },
-  ),
-),
-
-//  Obx(() {
-//       return controller.partnerTyping.value
-//           ? Padding(
-//               padding: const EdgeInsets.only(bottom: 6),
-//               child: Row(
-//                 children: [
-//                   const SizedBox(width: 16),
-//                   Text(
-//                     "${widget.partnerName} is typing...",
-//                     style: TextStyle(
-//                       color: Colors.grey,
-//                       fontStyle: FontStyle.italic,
-//                       fontSize: 13,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             )
-//           : SizedBox.shrink();
-//     }),
-
-
-Obx((){
-  return
-      friendController.blockedUsersList.any((user) => user.id == widget.partnerId)
-    ? InkWell(
-      onTap: () {
-        friendController.unblockUser(widget.partnerId);
-        friendController.fetchFriends();
-        friendController.update();
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 10),
-        padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(10),
-          
+                    final msg = controller.messages[index];
+                    return ChatBubble(
+                      fromMe: msg['fromMe'] ?? false,
+                      message: msg['message'] ?? '',
+                    );
+                  },
+                );
+              });
+            }),
           ),
-        
-        child: Text("You block this user",style: TextStyle(color: Colors.white),)),
-    )
-    : 
 
+          // Blocked user or input field
+          Obx(() {
+            final isBlocked = friendController.blockedUsersList
+                .any((user) => user.id == widget.partnerId);
 
-             MessageInputField(  controller: controller  );
-             })
+            if (isBlocked) {
+              return InkWell(
+                onTap: () {
+                  friendController.unblockUser(widget.partnerId);
+                  friendController.fetchFriends();
+                  friendController.update();
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    "You blocked this user",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            } else {
+              return MessageInputField(controller: controller);
+            }
+          }),
         ],
       ),
     );
   }
 }
+ 

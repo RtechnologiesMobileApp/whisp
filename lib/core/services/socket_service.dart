@@ -117,12 +117,28 @@ class SocketService extends GetxService {
       debugPrint('[socket] cannot emit SEND_MESSAGE_TO_FRIEND: not connected');
     }
   }
-
-  void typing(bool isTyping) {
-    if (socket?.connected ?? false) {
-      socket!.emit('TYPING', {'isTyping': isTyping});
-    }
+  void typing(bool isTyping, {String? toUserId}) {
+  if (socket?.connected ?? false) {
+    final data = {
+      'isTyping': isTyping,
+      if (toUserId != null) 'toUserId': toUserId, // only add if provided
+    };
+    socket!.emit('TYPING', data);
+    debugPrint('[socket] TYPING emitted: $data');
   }
+}
+
+
+  // void typing(bool isTyping,String? toUserId) {
+  //   if (socket?.connected ?? false) {
+  //     socket!.emit('TYPING', {
+  //       'isTyping': isTyping,
+  //       if (toUserId != null) 'toUserId': toUserId,
+
+
+  //       });
+  //   }
+  // }
 
   void endSession() {
     if (socket?.connected ?? false) {
@@ -202,27 +218,31 @@ class SocketService extends GetxService {
   // void onTyping(void Function(Map) cb) =>
   //     socket?.on('TYPING', (data) => cb(Map.from(data)));
 
-    void onTyping(void Function(Map) cb) {
-    socket?.off('TYPING'); // ensure no duplicate listener
-    socket?.on('TYPING', (data) {
-      debugPrint("[socket] >>> TYPING event received: $data");
+   void onTyping(void Function(Map) cb) {
+  socket?.off('TYPING'); // remove previous listeners to avoid duplicates
+  socket?.on('TYPING', (data) {
+    debugPrint("[socket] >>> TYPING event received: $data");
 
-      // data expected: { "isTyping": true, "userId": "abc" }
-      try {
-        final map = Map<String, dynamic>.from(data);
-        final isTyping = map["isTyping"];
-        final userId = map["userId"];
+    try {
+      final map = Map<String, dynamic>.from(data);
 
-        debugPrint(
-          "[socket] TYPING => userId:$userId | isTyping:$isTyping",
-        );
+      // Determine who is typing
+      final isTyping = map["isTyping"] ?? false;
+      // for friend chat, server might send 'userId'; for your emitted 'toUserId' we can also include it
+      final userId = map["userId"] ?? map["fromUserId"] ?? 'unknown';
 
-        cb(map);
-      } catch (e) {
-        debugPrint("[socket] TYPING error: $e");
-      }
-    });
-  }
+      debugPrint("[socket] TYPING => userId:$userId | isTyping:$isTyping");
+
+      cb({
+        'isTyping': isTyping,
+        'userId': userId,
+      });
+    } catch (e) {
+      debugPrint("[socket] TYPING error: $e");
+    }
+  });
+}
+
   void onPartnerLeft(void Function() cb) {
     socket?.off('PARTNER_LEFT');
     socket?.on('PARTNER_LEFT', (_) => cb());

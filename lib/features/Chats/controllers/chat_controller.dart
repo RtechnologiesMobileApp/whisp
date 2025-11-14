@@ -48,9 +48,17 @@ class ChatController extends GetxController {
     });
  
   }
-  void sendTyping(bool isTyping) {
-  SocketService.to.typing(isTyping);
+//   void sendTyping(bool isTyping) {
+//   SocketService.to.typing(isTyping);
+// }
+void sendTyping(bool isTyping) {
+  if (isFriend && friendId != null) {
+    SocketService.to.typing(isTyping, toUserId: friendId!);
+  } else {
+    SocketService.to.typing(isTyping); // random chat
+  }
 }
+
 
 
   void sendMessage() {
