@@ -6,6 +6,7 @@ import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/global.dart';
 import 'package:whisp/core/services/session_manager.dart';
+import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
 import 'package:whisp/features/Chats/view/chat_screen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -23,19 +24,21 @@ class ChatListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-    controller.loadChatList();
-    notificationUserId=null;
-  });
-  String formatTime(String isoString) {
-  try {
-    final dateTime = DateTime.parse(isoString).toLocal(); // convert to local timezone
-    final formatter = DateFormat('h:mm a'); // e.g., 12:05 PM
-    return formatter.format(dateTime);
-  } catch (e) {
-    return ''; // fallback
-  }
-}
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadChatList();
+      notificationUserId = null;
+    });
+    String formatTime(String isoString) {
+      try {
+        final dateTime = DateTime.parse(
+          isoString,
+        ).toLocal(); // convert to local timezone
+        final formatter = DateFormat('h:mm a'); // e.g., 12:05 PM
+        return formatter.format(dateTime);
+      } catch (e) {
+        return ''; // fallback
+      }
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -63,7 +66,9 @@ class ChatListScreen extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
                         ),
                         builder: (_) => SizedBox(
                           height: MediaQuery.of(context).size.height * 0.6,
@@ -86,9 +91,7 @@ class ChatListScreen extends StatelessWidget {
               child: Obx(() {
                 if (controller.isLoading.value) {
                   // Show loader while fetching chat list
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (controller.chats.isEmpty) {
@@ -128,11 +131,11 @@ class ChatListScreen extends StatelessWidget {
                           SlidableAction(
                             onPressed: (_) =>
                                 showUnfriendDialog(chat['name'], "Block", () {
-                              log("💡 Blocking ${chat['id']}");
-                              friendController.blockUser(chat['id']);
-                              friendController.getBlockedUsers();
-                              Get.back();
-                            }),
+                                  log("💡 Blocking ${chat['id']}");
+                                  friendController.blockUser(chat['id']);
+                                  friendController.getBlockedUsers();
+                                  Get.back();
+                                }),
                             backgroundColor: AppColors.brownOrange,
                             foregroundColor: Colors.white,
                             label: 'Block',
@@ -140,15 +143,12 @@ class ChatListScreen extends StatelessWidget {
                           ),
                           SlidableAction(
                             spacing: 6,
-                            onPressed: (_){ 
-                                
+                            onPressed: (_) {
                               log("💡 Reporting ${chat['id']}");
                               showReportBottomSheet(context, (String reason) {
                                 print(reason);
-                                friendController.reportUser(chat['id'], "$reason");
+                                friendController.reportUser(chat['id'], reason);
                               });
-                              
-                            
                             },
                             backgroundColor: AppColors.brown,
                             foregroundColor: Colors.white,
@@ -166,27 +166,37 @@ class ChatListScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundImage: chat['avatar'] != null && chat['avatar'] != ''
+                              backgroundImage:
+                                  chat['avatar'] != null && chat['avatar'] != ''
                                   ? NetworkImage(chat['avatar'])
-                                  : const AssetImage('assets/images/place_holder_pic.jpg') as ImageProvider,
+                                  : const AssetImage(
+                                          'assets/images/place_holder_pic.jpg',
+                                        )
+                                        as ImageProvider,
                             ),
-                            if (chat['isOnline'] == true)
-                              Positioned(
-                                right: 2,
-                                bottom: 2,
-                                child: Container(
-                                  height: 12,
-                                  width: 12,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            Obx(() {
+                              final isOnline =
+                                  SocketService.to.onlineStatus[chat['id']] ??
+                                  false;
+                              return isOnline
+                                  ? Positioned(
+                                      right: 0,
+                                      bottom: 0,
+                                      child: Container(
+                                        height: 12,
+                                        width: 12,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink();
+                            }),
                           ],
                         ),
                         title: Text(
@@ -199,53 +209,69 @@ class ChatListScreen extends StatelessWidget {
                         ),
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 4),
-                          child: chat['isTyping'] == true
-                              ? const Text(
-                                  'typing...',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.grey,
-                                  ),
-                                )
-                              : Builder(
-                                  builder: (_) {
-                                    final currentUserId = SessionController().user!.id;
-                                    final lastUserId = chat['lastMessageUserId'];
-                                    final isFromMe = lastUserId == currentUserId;
-                                    final messageText = chat['lastMessage'] ?? '';
-                                    final isRead = chat['lastMessageRead'] ?? false;
-                                    return RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        children: [
-                                          if (isFromMe)
-                                             TextSpan(
-                                              text: 'You: ',
-                                              style: TextStyle(
-                                                fontWeight:FontWeight.w600,
-                                              ),
-                                            ),
-                                          TextSpan(text: messageText,
-                                         style: TextStyle(
-                                                fontWeight:isRead || isFromMe? FontWeight.w600:FontWeight.bold,
-                                                color: isRead || isFromMe? Colors.grey.shade600 : AppColors.primary
-                                              ),),
-                                        ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              chat['isTyping'] == true
+                                  ? const Text(
+                                      'typing...',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey,
                                       ),
-                                    );
-                                  },
-                                ),
+                                    )
+                                  : Builder(
+                                      builder: (_) {
+                                        final currentUserId =
+                                            SessionController().user!.id;
+                                        final lastUserId =
+                                            chat['lastMessageUserId'];
+                                        final isFromMe =
+                                            lastUserId == currentUserId;
+                                        final messageText =
+                                            chat['lastMessage'] ?? '';
+                                        final isRead =
+                                            chat['lastMessageRead'] ?? false;
+                                        return RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            children: [
+                                              if (isFromMe)
+                                                TextSpan(
+                                                  text: 'You: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              TextSpan(
+                                                text: messageText,
+                                                style: TextStyle(
+                                                  fontWeight: isRead || isFromMe
+                                                      ? FontWeight.w600
+                                                      : FontWeight.bold,
+                                                  color: isRead || isFromMe
+                                                      ? Colors.grey.shade600
+                                                      : AppColors.primary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ],
+                          ),
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                             formatTime(chat['lastMessageTime'] ?? ''),
+                              formatTime(chat['lastMessageTime'] ?? ''),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade500,
@@ -259,15 +285,18 @@ class ChatListScreen extends StatelessWidget {
                           log("name: ${chat['name']}");
                           log("image: ${chat['avatar']}");
                           // Navigate to ChatScreen
-                          final friendController = Get.find<FriendsController>();
-final isStillFriend = friendController.isUserFriend(chat['id']);
+                          final friendController =
+                              Get.find<FriendsController>();
+                          final isStillFriend = friendController.isUserFriend(
+                            chat['id'],
+                          );
                           Get.to(
                             () => ChatScreen(
                               partnerId: chat['id'],
                               partnerName: chat['name'],
                               partnerAvatar: chat['avatar'],
-                             // isFriend: true,
-                               isFriend: isStillFriend,
+                              // isFriend: true,
+                              isFriend: isStillFriend,
                             ),
                           );
                         },
@@ -283,5 +312,3 @@ final isStillFriend = friendController.isUserFriend(chat['id']);
     );
   }
 }
-
- 

@@ -25,29 +25,29 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
 
-     // 🔹 Listen for typing event
-  SocketService.to.onTyping((data) {
-    if (data["userId"] == friendId) {
-      partnerTyping.value = data["isTyping"];
-      debugPrint("Partner typing value ${partnerTyping.value}");
-    }
-  });
-    
-    
-
- 
-    SocketService.to.onMessage((data) {
-      final msgText = data['message'] ?? data['body'] ?? ''; // <-- normalize
-      if (msgText.trim().isEmpty) return; // prevent blank
-
-      messages.add({'fromMe': false, 'message': msgText});
-      // 🧠 Update chat list in real time
-      final chatListController = Get.find<ChatListController>();
-      final partnerId =
-          data['fromUserId'] ?? friendId; // <--- this replaces '<partnerId>'
-      chatListController.updateLastMessage(friendId!, msgText, partnerId);
+    // 🔹 Listen for typing event
+    SocketService.to.onTyping((data) {
+      if (data["userId"] == friendId) {
+        partnerTyping.value = data["isTyping"];
+        debugPrint("Partner typing value ${partnerTyping.value}");
+      }
     });
- 
+    
+    // 🔹 Listen for messages only for this specific chat
+    // Note: ChatListController handles updating the chat list globally
+    SocketService.to.onMessage((data) {
+      final msgText = data['message'] ?? data['body'] ?? '';
+      if (msgText.trim().isEmpty) return;
+
+      // Get the actual sender ID from the message data
+      final senderId = data['fromUserId'] ?? data['from'] ?? '';
+      
+      // Only add message to current chat if it's from the current partner
+      if (friendId != null && senderId == friendId) {
+        messages.add({'fromMe': false, 'message': msgText});
+      }
+      // Chat list update is handled by ChatListController's listener
+    });
   }
 //   void sendTyping(bool isTyping) {
 //   SocketService.to.typing(isTyping);
@@ -79,7 +79,10 @@ void sendTyping(bool isTyping) {
     messages.add({"fromMe": true, "message": text});
     final chatListController = Get.find<ChatListController>();
     final myUserId = SessionController().user!.id;
-    chatListController.updateLastMessage(friendId!, text, myUserId!);
+    // Only update chat list if we have a friendId (friend chat, not random)
+    if (friendId != null && myUserId != null) {
+      chatListController.updateLastMessage(friendId!, text, myUserId);
+    }
 
     messageController.clear();
   }
@@ -96,10 +99,10 @@ void sendTyping(bool isTyping) {
         final history = await FriendRepo().getFriendChatHistory(friendId!);
 
         // Debug print to verify messages
-        history.forEach((msg) {
+        for (var msg in history) {
          
           print("from: ${msg['from']}, to: ${msg['to']}, body: ${msg['body']}");
-        });
+        }
 
         // Assign messages to observable list
         messages.assignAll(
