@@ -9,8 +9,8 @@ import 'api_exception.dart';
 class ApiClient {
   final Dio _dio = Dio(
     BaseOptions(
-     baseUrl: "https://whisp-backend-production-1880.up.railway.app",
-        //  baseUrl: "https://c239c3cd3e4a.ngrok-free.app",
+    //  baseUrl: "https://whisp-backend-production-1880.up.railway.app",
+         baseUrl: "https://8af71cd5407d.ngrok-free.app",
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},

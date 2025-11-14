@@ -60,7 +60,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: const Color.fromRGBO(0, 0, 0, 1).withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -99,8 +99,9 @@ class _ChatAppBarState extends State<ChatAppBar> {
                 ),
                 child: CircleAvatar(
                   radius: 22,
-                  backgroundImage: NetworkImage(widget.userAvatar),
+                  backgroundImage: widget.userAvatar.isNotEmpty ? NetworkImage(widget.userAvatar) : null,
                   backgroundColor: Colors.grey[200],
+                  child: widget.userAvatar.isNotEmpty ? null : Icon(Icons.person, color: Colors.grey[400]),
                 ),
               ),
               const SizedBox(width: 12),

@@ -11,7 +11,7 @@ class AppImages {
   static const String placeholderpic = 'assets/images/place_holder_pic.jpg';
 
   static const String chat_selected = 'assets/icons/chat.png';
-  static const String chat_unselected = 'assets/icons/message_unselected.png';
+  static const String chat_unselected = 'assets/icons/chat_unselected.png';
   static const String friends_selected = 'assets/icons/friends_selected.png';
   static const String friends_unselected =
       'assets/icons/Friends.png';

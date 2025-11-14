@@ -38,7 +38,7 @@ class CustomNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Flexible(child: _buildNavItem(0, "Home", AppImages.homeUnselectedSvg, AppImages.homeSelectedSvg)),
-            Flexible(child: _buildNavItem(1, "Chats", AppImages.chat_selected, AppImages.chat_selected)),
+            Flexible(child: _buildNavItem(1, "Chats", AppImages.chat_unselected, AppImages.chat_selected)),
             Flexible(child: _buildNavItem(2, "Friends", AppImages.friends_unselected, AppImages.friends_unselected)),
             Flexible(child: _buildNavItem(3, "Premium", AppImages.premium_unselected, AppImages.premium_unselected)),
             Flexible(child: _buildNavItem(4, "Profile", AppImages.profile_unselected, AppImages.profile_unselected)),
