@@ -98,7 +98,10 @@ class _ChatScreenState extends State<ChatScreen> {
     return WillPopScope(
       onWillPop: () async {
          socketService.endSession();
-        Get.to(MainHomeScreen(index: 1,));
+          Navigator.of(context).pushAndRemoveUntil(
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
+                      (route) => false,
+                     );
         return true;
       },
       child: Scaffold(
