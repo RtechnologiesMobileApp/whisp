@@ -117,13 +117,27 @@ class SocketService extends GetxService {
       debugPrint('[socket] cannot emit SEND_MESSAGE_TO_FRIEND: not connected');
     }
   }
+
+  void markAsRead(String fromUserId) {
+    if (socket?.connected ?? false) {
+      socket!.emit('MARK_MESSAGES_READ', {
+        'fromUserId': fromUserId,
+     
+      });
+      debugPrint(
+        '[socket] MARK_MESSAGES_READ emitted to $fromUserId',
+      );
+    } else {
+      debugPrint('[socket] cannot emit MARK_MESSAGES_READ: not connected');
+    }
+  }
   void typing(bool isTyping, {String? toUserId}) {
   if (socket?.connected ?? false) {
     final data = {
       'isTyping': isTyping,
       if (toUserId != null) 'toUserId': toUserId, // only add if provided
     };
-    socket!.emit('TYPING', data);
+    socket!.emit('TYPING_SEND', data);
     debugPrint('[socket] TYPING emitted: $data');
   }
 }
@@ -219,8 +233,8 @@ class SocketService extends GetxService {
   //     socket?.on('TYPING', (data) => cb(Map.from(data)));
 
    void onTyping(void Function(Map) cb) {
-  socket?.off('TYPING'); // remove previous listeners to avoid duplicates
-  socket?.on('TYPING', (data) {
+  socket?.off('TYPING_RECEIVE'); // remove previous listeners to avoid duplicates
+  socket?.on('TYPING_RECEIVE', (data) {
     debugPrint("[socket] >>> TYPING event received: $data");
 
     try {

@@ -82,6 +82,9 @@ void sendTyping(bool isTyping) {
 
     messageController.clear();
   }
+  void markAsRead(String partnerId){
+    socketService.markAsRead(partnerId);
+  }
 
   void loadFriendChatHistory() async {
     if (isFriend && friendId != null) {

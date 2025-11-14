@@ -214,7 +214,7 @@ class ChatListScreen extends StatelessWidget {
                                     final lastUserId = chat['lastMessageUserId'];
                                     final isFromMe = lastUserId == currentUserId;
                                     final messageText = chat['lastMessage'] ?? '';
-
+                                    final isRead = chat['lastMessageRead'] ?? false;
                                     return RichText(
                                       text: TextSpan(
                                         style: TextStyle(
@@ -223,13 +223,17 @@ class ChatListScreen extends StatelessWidget {
                                         ),
                                         children: [
                                           if (isFromMe)
-                                            const TextSpan(
+                                             TextSpan(
                                               text: 'You: ',
                                               style: TextStyle(
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight:FontWeight.w600,
                                               ),
                                             ),
-                                          TextSpan(text: messageText),
+                                          TextSpan(text: messageText,
+                                         style: TextStyle(
+                                                fontWeight:isRead || isFromMe? FontWeight.w600:FontWeight.bold,
+                                                color: isRead || isFromMe? Colors.grey.shade600 : AppColors.primary
+                                              ),),
                                         ],
                                       ),
                                     );

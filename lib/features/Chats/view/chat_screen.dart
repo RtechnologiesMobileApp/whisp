@@ -83,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     notificationUserId = widget.partnerId;
-
+    controller.markAsRead(widget.partnerId);
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
       appBar: ChatAppBar(
@@ -104,17 +104,19 @@ class _ChatScreenState extends State<ChatScreen> {
               return Obx(() {
                 final msgCount = controller.messages.length;
                 final showTyping = controller.partnerTyping.value;
-
+                
                 return ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.only(top: 12),
                   itemCount: msgCount + (showTyping ? 1 : 0),
                   itemBuilder: (context, index) {
+
                     if (showTyping && index == msgCount) {
                       return const TypingBubble();
                     }
 
                     final msg = controller.messages[index];
+                    
                     return ChatBubble(
                       fromMe: msg['fromMe'] ?? false,
                       message: msg['message'] ?? '',

@@ -33,7 +33,7 @@ class ChatBubble extends StatelessWidget {
           ),
         ),
         child: Text(
-          message,
+         message,
           style: TextStyle(color: fromMe ? Colors.white : Colors.black87),
         ),
       ),

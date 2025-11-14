@@ -39,6 +39,7 @@ class ChatListController extends GetxController {
             'lastMessage': chat['lastMessage'] ?? '',
             'lastMessageUserId': chat['lastMessageUserId'] ?? '',
             'lastMessageTime': chat['lastMessageTime'] ?? '',
+            'lastMessageRead':chat['lastMessageRead']??false
           };
         }).toList(),
       );
