@@ -2,9 +2,11 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:whisp/core/network/api_client.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/network/api_exception.dart';
+import 'package:whisp/core/services/session_manager.dart';
 
 class ChatRepository {
   final ApiClient _apiClient = ApiClient();
@@ -35,16 +37,25 @@ Future<Map<String, dynamic>> sendVoiceMessage({
     // Endpoint me friendId include karna
     final endpoint = "/api/chat/voice-note/$friendId";
 
+    debugPrint("📤 Sending voice note to endpoint: $endpoint");
+    debugPrint("📤 File path: ${audioFile.path}");
+    debugPrint("📤 File field: voiceNote");
+    debugPrint("📤 Using auth token: ${SessionController().user?.token != null ? 'Yes' : 'No'}");
+
     final response = await _apiClient.postMultipart(
       endpoint,
-      data: {}, // extra data agar koi nahi hai toh empty map
+      data: {},  
       file: audioFile,
-      fileField: "voice",
-      requireAuth: true, // Auth token include hoga header me
+      fileField: "voiceNote",
+      requireAuth: true, 
     );
 
+    debugPrint("✅ Voice note upload response: $response");
+
     return response;
-  } catch (e) {
+  } catch (e, st) {
+    debugPrint("❌ Error sending voice note: $e");
+    debugPrint(st.toString());
     throw ApiException.handleError(e);
   }
 }

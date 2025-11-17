@@ -139,8 +139,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       
                       return ChatBubble(
                         fromMe: msg['fromMe'] ?? false,
-                        message: msg['message'] ?? '',
+                        message: msg['body'] ?? '',
                         isRead: msg['isRead'] ?? false,
+                        isVoice: msg["type"] == "voice-note",
+                        voiceUrl: msg["voiceUrl"],
                       );
                     },
                   );

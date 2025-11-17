@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
   final RecorderController recorder = RecorderController();
   bool isRecording = false;
   String? filePath;
+  int seconds = 0;
+  Timer? timer;
 
   @override
   void initState() {
@@ -31,20 +34,40 @@ class _MessageInputFieldState extends State<MessageInputField> {
       ..sampleRate = 16000;
   }
 
+  void startTimer() {
+    seconds = 0;
+    timer?.cancel();
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() => seconds++);
+    });
+  }
+
+  void stopTimer() {
+    timer?.cancel();
+  }
+
+  String formatTime(int sec) {
+    final m = (sec ~/ 60).toString().padLeft(2, '0');
+    final s = (sec % 60).toString().padLeft(2, '0');
+    return "$m:$s";
+  }
+
   Future<void> startRecording() async {
     var status = await Permission.microphone.request();
     if (!status.isGranted) return;
 
     Directory dir = await getTemporaryDirectory();
-    filePath = "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.m4a";
+    filePath = "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.wav";
 
     await recorder.record(path: filePath!);
+    startTimer();
 
     setState(() => isRecording = true);
   }
 
   Future<void> stopRecording() async {
     await recorder.stop();
+    stopTimer();
     setState(() => isRecording = false);
 
     if (filePath != null) {
@@ -55,150 +78,157 @@ class _MessageInputFieldState extends State<MessageInputField> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: Colors.white,
-        child: Row(
-          children: [
-            // 🎤 RECORD BUTTON
-            GestureDetector(
-              onLongPress: startRecording,
-              onLongPressUp: stopRecording,
-              child: CircleAvatar(
-                backgroundColor: Colors.red,
-                child: Icon(
-                  isRecording ? Icons.mic : Icons.mic_none,
-                  color: Colors.white,
-                ),
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            color: Colors.white,
+            child:Row(
+  children: [
+    Expanded(
+      child: TextField(
+        controller: widget.controller.messageController,
+        onChanged: (text) => widget.controller.sendTyping(true),
+        decoration: InputDecoration(
+          hintText: "Write a message",
+          filled: true,
+          fillColor: const Color(0xffF1F2F5),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    ),
+    const SizedBox(width: 8),
+    // Mic button + timer overlay
+    Column(
+      children: [
+        if (isRecording)
+          Text(
+            formatTime(seconds),
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+        GestureDetector(
+          onTap: isRecording ? stopRecording : startRecording,
+          child: CircleAvatar(
+            radius: 24,
+            backgroundColor: isRecording ? Colors.redAccent : Colors.red,
+            child: Icon(isRecording ? Icons.stop : Icons.mic, color: Colors.white),
+          ),
+        ),
+        if (isRecording)
+          SizedBox(
+            width: 60,
+            height: 40,
+            child: AudioWaveforms(
+              enableGesture: false,
+              size: const Size(60, 40),
+              recorderController: recorder,
+              waveStyle: const WaveStyle(
+                waveColor: Colors.red,
+                showMiddleLine: false,
               ),
             ),
+          ),
+      ],
+    ),
+    const SizedBox(width: 8),
+    // Send button
+    GestureDetector(
+      onTap: widget.controller.sendMessage,
+      child: CircleAvatar(
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.send, color: Colors.white),
+      ),
+    ),
+  ],
+)
 
-            const SizedBox(width: 10),
-
-            // 🔊 WAVEFORM WHILE RECORDING
-            if (isRecording)
-              Expanded(
-                child: AudioWaveforms(
-                  enableGesture: false,
-                  size: Size(MediaQuery.of(context).size.width / 2, 50),
-                  recorderController: recorder,
-                  waveStyle: const WaveStyle(
-                    waveColor: Colors.red,
-                    showMiddleLine: false,
+            // child: Row(
+            //   children: [
+            //     Expanded(
+            //       child: TextField(
+            //         controller: widget.controller.messageController,
+            //         onChanged: (text) => widget.controller.sendTyping(true),
+            //         decoration: InputDecoration(
+            //           hintText: "Write a message",
+            //           filled: true,
+            //           fillColor: const Color(0xffF1F2F5),
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(25),
+            //             borderSide: BorderSide.none,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 8),
+            //     // Mic button
+            //     GestureDetector(
+            //       onTap: isRecording ? stopRecording : startRecording,
+            //       child: Stack(
+            //         alignment: Alignment.center,
+            //         children: [
+            //           CircleAvatar(
+            //             radius: 24,
+            //             backgroundColor: isRecording
+            //                 ? Colors.redAccent
+            //                 : Colors.red,
+            //           ),
+            //           Icon(
+            //             isRecording ? Icons.stop : Icons.mic,
+            //             color: Colors.white,
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //     const SizedBox(width: 8),
+            //     // Send button
+            //     GestureDetector(
+            //       onTap: widget.controller.sendMessage,
+            //       child: CircleAvatar(
+            //         backgroundColor: AppColors.primary,
+            //         child: const Icon(Icons.send, color: Colors.white),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+       
+          ),
+          // Waveform & timer overlay
+          if (isRecording && filePath != null)
+            Positioned(
+              bottom: 70,
+              left: 16,
+              right: 16,
+              child: Column(
+                children: [
+                  Text(
+                    formatTime(seconds),
+                    style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
-                ),
-              )
-            else
-              Expanded(
-                child: TextField(
-                  controller: widget.controller.messageController,
-                  onChanged: (text) {
-  widget.controller.sendTyping(true);
-    
-},
-
-                  decoration: InputDecoration(
-                    hintText: "Write a message",
-                    filled: true,
-                    fillColor: const Color(0xffF1F2F5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
+                  const SizedBox(height: 4),
+                  AudioWaveforms(
+                    enableGesture: false,
+                    size: Size(MediaQuery.of(context).size.width - 32, 50),
+                    recorderController: recorder,
+                    waveStyle: const WaveStyle(
+                      waveColor: Colors.red,
+                      showMiddleLine: false,
                     ),
                   ),
-                ),
+                ],
               ),
-
-            const SizedBox(width: 8),
-
-            // SEND BUTTON
-            GestureDetector(
-              onTap: widget.controller.sendMessage,
-              child: CircleAvatar(
-                backgroundColor: AppColors.primary,
-                child: const Icon(Icons.send, color: Colors.white),
-              ),
-            )
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
 }
 
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:whisp/config/constants/colors.dart';
-// import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 
-// class MessageInputField extends StatefulWidget {
-//   final ChatController controller;
-
-//   const MessageInputField({super.key, required this.controller});
-
-//   @override
-//   State<MessageInputField> createState() => _MessageInputFieldState();
-// }
-
-// class _MessageInputFieldState extends State<MessageInputField> {
-//   Timer? _typingTimer;
-
-//   void _onTextChanged(String value) {
-//     widget.controller.sendTyping(true); // start typing
-
-//     // reset timer
-//     _typingTimer?.cancel();
-//     _typingTimer = Timer(const Duration(seconds: 1), () {
-//       widget.controller.sendTyping(false); // stop typing
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     _typingTimer?.cancel(); // cleanup
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Container(
-//         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-//         color: Colors.white,
-//         child: Row(
-//           children: [
-//             Expanded(
-//               child: TextField(
-//                 controller: widget.controller.messageController,
-//                 onChanged: _onTextChanged, // ⬅ typing detect here
-//                 decoration: InputDecoration(
-//                   hintText: "Write a message",
-//                   contentPadding:
-//                       const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-//                   border: OutlineInputBorder(
-//                     borderRadius: BorderRadius.circular(25),
-//                     borderSide: BorderSide.none,
-//                   ),
-//                   hintStyle: const TextStyle(color: Colors.grey),
-//                   filled: true,
-//                   fillColor: const Color(0xffF1F2F5),
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(width: 8),
-//             GestureDetector(
-//               onTap: widget.controller.sendMessage,
-//               child: CircleAvatar(
-//                 backgroundColor: AppColors.primary,
-//                 child: const Icon(Icons.send, color: Colors.white, size: 20),
-//               ),
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
  
