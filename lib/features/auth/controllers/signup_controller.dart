@@ -169,11 +169,19 @@ Future<void> pickDate(BuildContext context) async {
     try {
       isLoading.value = true;
 
+      // For Google users, generate a secure password (they won't need it)
+      String password;
+      if (isGoogle.value) {
+        password = _generateSecurePassword();
+      } else {
+        password = passwordController.text.trim();
+      }
+
       /// :small_blue_diamond: Call signup API
       final apiResponse = await _authRepo.registerUser(
         name: nameController.text.trim(),
         email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        password: password,
         gender: gender.value,
         dob: dob.value,
         country: selectedCountry.value,
@@ -201,7 +209,7 @@ Future<void> pickDate(BuildContext context) async {
           debugPrint('[socket] Error reconnecting after signup: $e');
         }
       }
-      Get.offAll(() => ProfileView());
+      Get.offAllNamed(Routes.mainHome);
     } catch (e) {
       Get.snackbar("Signup Failed", e.toString());
       debugPrint(":x: Signup Error: $e");
@@ -209,6 +217,21 @@ Future<void> pickDate(BuildContext context) async {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Generate a secure random password for Google sign-in users
+  /// They won't need this password since they'll always sign in with Google
+  String _generateSecurePassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$&*~';
+    final random = DateTime.now().millisecondsSinceEpoch;
+    final buffer = StringBuffer();
+    
+    // Generate 16 character password
+    for (int i = 0; i < 16; i++) {
+      buffer.write(chars[(random + i) % chars.length]);
+    }
+    
+    return buffer.toString();
   }
 
   void selectGender(int index) {

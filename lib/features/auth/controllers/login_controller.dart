@@ -11,6 +11,8 @@ import 'package:whisp/core/services/fcm_service.dart';
 import 'package:whisp/features/auth/models/user_model.dart';
 import 'package:whisp/features/auth/repo/auth_repo.dart';
 import 'package:whisp/core/services/socket_service.dart';
+import 'package:whisp/features/auth/controllers/signup_controller.dart';
+import 'package:whisp/features/auth/view/profile_screen.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -120,110 +122,36 @@ class LoginController extends GetxController {
       final emailExists = await _authRepository.checkEmailExists(googleUser.email);
       
       if (!emailExists) {
-        // User doesn't exist, auto-register them
-        debugPrint("[Google Sign In] User doesn't exist, auto-registering...");
+        // User doesn't exist, navigate to onboarding screens to collect missing info
+        // Google doesn't provide gender, DOB, or country, so we need to collect them
+        debugPrint("[Google Sign In] User doesn't exist, navigating to onboarding...");
+        
         try {
-          String? fcm = await FCMService().getToken();
+          // Get or create SignupController and pre-fill Google user data
+          final signupController = Get.put(SignupController());
+          signupController.nameController.text = googleUser.name;
+          signupController.emailController.text = googleUser.email;
+          signupController.isGoogle.value = true;
           
-          // Generate a secure random password for Google users
-          // They won't need it since they'll always sign in with Google
-          final randomPassword = _generateSecurePassword();
-          
-          // Download Google profile picture and convert to File
-          File? avatarFile;
+          // Download Google profile picture and set it in SignupController
           if (googleUser.profilePic != null && googleUser.profilePic!.isNotEmpty) {
             try {
-              avatarFile = await _downloadImageToFile(googleUser.profilePic!);
-              debugPrint("[Google Sign In] Downloaded profile picture");
+              final avatarFile = await _downloadImageToFile(googleUser.profilePic!);
+              signupController.selectedImage.value = avatarFile;
+              debugPrint("[Google Sign In] Downloaded and set profile picture");
             } catch (e) {
               debugPrint("[Google Sign In] Failed to download profile picture: $e");
-              // Continue without avatar - we'll use a placeholder
+              // User will need to select avatar in ProfileView
             }
           }
           
-          // If no avatar, create a placeholder file or use default
-          if (avatarFile == null) {
-            // Create a placeholder - backend requires a file, so we'll need to handle this
-            // For now, try to use a default image from assets or create an empty file
-            // Actually, let's try downloading a default avatar or create a minimal image
-            debugPrint("[Google Sign In] No profile picture available, using placeholder");
-            // We'll need to handle this case - for now, let's try to create a minimal valid image file
-            // Or better: download a default avatar from a URL
-            try {
-              // Use a default avatar service or create a placeholder
-              avatarFile = await _createPlaceholderAvatar();
-            } catch (e) {
-              debugPrint("[Google Sign In] Failed to create placeholder: $e");
-            }
-          }
-          
-          // Use valid default values for required fields
-          // DOB: 18 years ago (ensures user is old enough)
-          final defaultDob = DateTime.now().subtract(const Duration(days: 365 * 18));
-          final dobString = defaultDob.toIso8601String().split('T')[0]; // Format: YYYY-MM-DD
-          
-          final registerResponse = await _authRepository.registerUser(
-            name: googleUser.name,
-            email: googleUser.email,
-            password: randomPassword, // Generate secure password (user won't need it)
-            gender: "male", // Default gender - user can update later
-            dob: dobString, // Valid DOB format
-            country: "Unknown", // Default country - user can update later
-            avatar: avatarFile, // Use downloaded or placeholder avatar
-            type: "google",
-          );
-          
-          final registerData = registerResponse is Map ? registerResponse : registerResponse.data;
-          final user = UserModel.fromJson(registerData['user']);
-          final token = registerData['token'];
-          final updatedUser = user.copyWith(token: token);
-          
-          await SessionController().saveUserSession(updatedUser);
-          await SessionController().loadSession();
-          
-          // Reconnect socket with new token
-          try {
-            if (Get.isRegistered<SocketService>()) {
-              final socketService = SocketService.to;
-              await socketService.reconnectWithToken(token);
-            }
-          } catch (e) {
-            debugPrint('[socket] Error reconnecting after Google signup: $e');
-          }
-          
-          Get.offAllNamed(Routes.mainHome);
+          // Navigate to ProfileView to start onboarding flow
+          // Flow: ProfileView (avatar) -> GenderView -> DOB -> Country -> createAccount()
+          Get.offAll(() => ProfileView());
           return;
-        } catch (registerError) {
-          debugPrint("[Google Sign In] Auto-registration failed: $registerError");
-          
-          // Extract error message from backend response
-          String errorMessage = "Failed to create account. Please try again.";
-          if (registerError is DioException) {
-            final responseData = registerError.response?.data;
-            if (responseData is Map) {
-              // Backend returns errors as an array
-              if (responseData.containsKey('errors') && responseData['errors'] is List) {
-                final errors = responseData['errors'] as List;
-                errorMessage = errors.isNotEmpty 
-                    ? errors.join(', ').replaceAll('_', ' ').toLowerCase()
-                    : errorMessage;
-              } else {
-                errorMessage = responseData['message'] ?? 
-                               responseData['error'] ?? 
-                               errorMessage;
-              }
-            } else if (responseData is String) {
-              errorMessage = responseData;
-            }
-          } else if (registerError is Exception) {
-            errorMessage = registerError.toString().replaceAll("Exception: ", "");
-          }
-          
-          debugPrint("[Google Sign In] Error message: $errorMessage");
-          
-          // Show error using a more reliable method
-          _showErrorSnackbar("Registration Failed", errorMessage);
-          
+        } catch (e) {
+          debugPrint("[Google Sign In] Error setting up onboarding: $e");
+          _showErrorSnackbar("Error", "Failed to start signup process. Please try again.");
           return;
         }
       }
