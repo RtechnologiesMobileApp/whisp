@@ -47,7 +47,9 @@ Future<Map<String, dynamic>> sendVoiceMessage({
       data: {},  
       file: audioFile,
       fileField: "voiceNote",
+ 
       requireAuth: true, 
+ 
     );
 
     debugPrint("✅ Voice note upload response: $response");
