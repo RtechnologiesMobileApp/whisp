@@ -223,6 +223,15 @@ class SocketService extends GetxService {
   }
 
   // Event listeners: attach callback functions
+
+  void onVoiceMessage(void Function(Map) cb) {
+  socket?.off('VOICE_MESSAGE'); // avoid duplicates
+  socket?.on('VOICE_MESSAGE', (data) {
+    debugPrint("[socket] VOICE_MESSAGE received: $data");
+    cb(Map<String, dynamic>.from(data));
+  });
+}
+
   void onAuthOk(void Function(Map) cb) =>
       socket?.on('AUTH_OK', (data) => cb(Map.from(data)));
   void onMatchFound(void Function(Map) cb) =>
@@ -280,6 +289,7 @@ class SocketService extends GetxService {
       debugPrint('[socket] FRIEND_REQUEST_REJECTED: $data');
     });
   }
+  
 
   void onFriendRequestCanceled(void Function(Map) cb) {
     socket?.on('FRIEND_REQUEST_CANCELED', (data) {

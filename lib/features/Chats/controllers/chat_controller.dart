@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/Chats/controllers/chat_list_controller.dart';
+import 'package:whisp/features/Chats/repo/chat_repo.dart';
 import 'package:whisp/features/friends/repo/friends_repo.dart';
 
 class ChatController extends GetxController {
@@ -126,4 +129,23 @@ void sendTyping(bool isTyping) {
       }
     }
   }
+
+Future<void> sendVoice(File file) async {
+  try {
+    final repo = ChatRepository();
+
+    // 1) Send file to backend via API
+    await repo.sendVoiceMessage(
+      friendId: friendId!,
+      audioFile: file,
+    );
+
+    // 2) DO NOT EMIT SOCKET (backend will emit)
+    // 3) DO NOT ADD TO UI (message backend se aayga)
+
+  } catch (e) {
+    Get.snackbar("Error", e.toString());
+  }
+}
+
 }

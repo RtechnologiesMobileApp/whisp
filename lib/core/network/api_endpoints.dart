@@ -22,5 +22,6 @@ class ApiEndpoints {
   static const String reportUser="$baseUrl/api/moderation/report"; // /api/moderation/block/{{targetUserId}}
   static const String getBlockedUsers="$baseUrl/api/moderation/block";
   static const String setPreferences="$baseUrl/api/auth/preferences";
+  static const String sendVoiceMessage="$baseUrl/api/chat/voice-note/"; ///api/chat/voice-note/<user id> ( user id to whom send the msg)
 }
  

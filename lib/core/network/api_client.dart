@@ -38,22 +38,51 @@ Future<dynamic> get(String endpoint, {bool requireAuth = false}) async {
   }
 }
 
-    Future<dynamic> postMultipart(
-    String endpoint, {
-    required Map<String, dynamic> data,
-    required File? file,
-    required String fileField,
-  }) async {
-    final formData = FormData.fromMap({
-      ...data,
-      if (file != null)
-        fileField: await MultipartFile.fromFile(file.path,
-            filename: file.path.split("/").last),
-    });
+Future<dynamic> postMultipart(
+  String endpoint, {
+  required Map<String, dynamic> data,
+  required File? file,
+  required String fileField,
+  bool requireAuth = false, // add this
+}) async {
+  final token = requireAuth ? SessionController().user!.token : "";
 
-    final response = await _dio.post(endpoint, data: formData);
-    return response.data;
-  }
+  final formData = FormData.fromMap({
+    ...data,
+    if (file != null)
+      fileField: await MultipartFile.fromFile(file.path,
+          filename: file.path.split("/").last),
+  });
+
+  final response = await _dio.post(
+    endpoint,
+    data: formData,
+    options: Options(
+      headers: {
+        if (requireAuth && token!.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+    ),
+  );
+  return response.data;
+}
+
+  //   Future<dynamic> postMultipart(
+  //   String endpoint, {
+  //   required Map<String, dynamic> data,
+  //   required File? file,
+  //   required String fileField,
+  // }) async {
+  //   final formData = FormData.fromMap({
+  //     ...data,
+  //     if (file != null)
+  //       fileField: await MultipartFile.fromFile(file.path,
+  //           filename: file.path.split("/").last),
+  //   });
+
+  //   final response = await _dio.post(endpoint, data: formData);
+  //   return response.data;
+  // }
 
   Future<dynamic> post(String endpoint, Map<String, dynamic> data, {bool requireAuth = false}) async {
     try {

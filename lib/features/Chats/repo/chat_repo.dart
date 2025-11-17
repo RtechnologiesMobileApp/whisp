@@ -1,5 +1,7 @@
  
 
+import 'dart:io';
+
 import 'package:whisp/core/network/api_client.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/network/api_exception.dart';
@@ -24,4 +26,27 @@ class ChatRepository {
       throw ApiException.handleError(e);
     }
   }
+
+Future<Map<String, dynamic>> sendVoiceMessage({
+  required String friendId, // 👈 yeh friend ki id
+  required File audioFile,
+}) async {
+  try {
+    // Endpoint me friendId include karna
+    final endpoint = "/api/chat/voice-note/$friendId";
+
+    final response = await _apiClient.postMultipart(
+      endpoint,
+      data: {}, // extra data agar koi nahi hai toh empty map
+      file: audioFile,
+      fileField: "voice",
+      requireAuth: true, // Auth token include hoga header me
+    );
+
+    return response;
+  } catch (e) {
+    throw ApiException.handleError(e);
+  }
+}
+
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:whisp/config/bindings/app_bindings.dart';
 import 'package:whisp/config/routes/app_pages.dart';
 import 'package:whisp/config/theme/theme.dart';
@@ -19,7 +20,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
    
 
-
+  bool micGranted = await requestMicrophonePermission();
+  if (!micGranted) {
+    print("❌ Microphone permission denied. Voice messages won't work.");
+    // Optionally show dialog to user or exit
+  }
    await AdService().init();
   await AdService().loadInterstitialAd();
   Stripe.publishableKey = 'pk_test_zvk0Ygki42YJ1PXtxMlj0kxq';
@@ -41,6 +46,14 @@ void main() async {
       },
     ),
   );
+}
+
+Future<bool> requestMicrophonePermission() async {
+  var status = await Permission.microphone.status;
+  if (!status.isGranted) {
+    status = await Permission.microphone.request();
+  }
+  return status.isGranted;
 }
 
 class MyApp extends StatelessWidget {
