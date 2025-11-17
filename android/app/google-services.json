@@ -7,17 +7,41 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1036495319175:android:8e1b640e0ae764cc504822",
+        "mobilesdk_app_id": "1:1036495319175:android:9aa64c72d5818795504822",
         "android_client_info": {
-          "package_name": "com.example.whisp"
+          "package_name": "com.roxy.whisp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1036495319175-7gjsc4qgh45fr3qc7o3gckmedp9s42ib.apps.googleusercontent.com",
+          "client_id": "1036495319175-15llplnoq95grp92kq78l7oo86lhsvch.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.whisp",
+            "package_name": "com.roxy.whisp",
+            "certificate_hash": "855d78cc2f3fa76957ea01d31e2f14bf436a6667"
+          }
+        },
+        {
+          "client_id": "1036495319175-69sokjq96ijlg5c78p6td2luifb1vvn4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.roxy.whisp",
+            "certificate_hash": "52ad2b8806ccd529a8642153a743b4c34b4fb7e4"
+          }
+        },
+        {
+          "client_id": "1036495319175-gcajn0fsitictlt7q6sodg0g2rf32nek.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.roxy.whisp",
+            "certificate_hash": "532bbdf4a2f64dab8522ac5f65651c5212db767e"
+          }
+        },
+        {
+          "client_id": "1036495319175-vce1mlegdb7khifa31r4gpjmbjvb7r2c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.roxy.whisp",
             "certificate_hash": "4d6d51fca5786b06ff2f6405d23b25e4d750cf41"
           }
         },

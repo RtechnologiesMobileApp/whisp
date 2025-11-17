@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.whisp"
+    namespace = "com.roxy.whisp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.whisp"
+        applicationId = "com.roxy.whisp"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -54,9 +54,13 @@ android {
 
   buildTypes {
     getByName("release") {
-        // You can disable both shrinking and minification for now
-        isMinifyEnabled = false
-        isShrinkResources = false
+        // Enable code shrinking, obfuscation, and optimization for release builds
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro"
+        )
 
         signingConfig = signingConfigs.getByName("release")
     }

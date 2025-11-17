@@ -60,7 +60,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1036495319175',
     projectId: 'wisp-f8adf',
     storageBucket: 'wisp-f8adf.firebasestorage.app',
-    iosBundleId: 'com.example.whisp',
+    iosBundleId: 'com.roxy.whisp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -69,6 +69,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1036495319175',
     projectId: 'wisp-f8adf',
     storageBucket: 'wisp-f8adf.firebasestorage.app',
-    iosBundleId: 'com.example.whisp',
+    iosBundleId: 'com.roxy.whisp',
   );
 }

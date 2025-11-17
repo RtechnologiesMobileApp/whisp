@@ -205,10 +205,70 @@ Future<dynamic> login({
   }
 
   String _handleError(dynamic e) {
-    if (e) {
-      final msg = e.response?.data?['message'] ?? e.message;
-      if (msg.toString().contains("email")) return "Email already exists.";
-      return msg ?? "Something went wrong, please try again.";
+    if (e is DioException) {
+      // Extract error message from DioException
+      final responseData = e.response?.data;
+      String? errorMessage;
+      
+      if (responseData is Map) {
+        // Backend returns errors as an array in 'errors' field
+        if (responseData.containsKey('errors') && responseData['errors'] is List) {
+          final errors = responseData['errors'] as List;
+          if (errors.isNotEmpty) {
+            // Format errors array into readable message
+            errorMessage = errors
+                .map((err) => err.toString().replaceAll('_', ' ').toLowerCase())
+                .join(', ');
+          }
+        } else {
+          errorMessage = responseData['message'] ?? responseData['error'];
+        }
+      } else if (responseData is String) {
+        try {
+          final parsed = jsonDecode(responseData);
+          if (parsed is Map) {
+            if (parsed.containsKey('errors') && parsed['errors'] is List) {
+              final errors = parsed['errors'] as List;
+              if (errors.isNotEmpty) {
+                errorMessage = errors
+                    .map((err) => err.toString().replaceAll('_', ' ').toLowerCase())
+                    .join(', ');
+              }
+            } else {
+              errorMessage = parsed['message'] ?? parsed['error'];
+            }
+          }
+        } catch (_) {
+          errorMessage = responseData;
+        }
+      }
+      
+      if (errorMessage != null && errorMessage.isNotEmpty) {
+        // Make error messages more user-friendly
+        if (errorMessage.toLowerCase().contains("email") || 
+            errorMessage.toLowerCase().contains("user_already_exists")) {
+          return "Email already exists.";
+        }
+        if (errorMessage.toLowerCase().contains("avatar_required")) {
+          return "Profile picture is required.";
+        }
+        if (errorMessage.toLowerCase().contains("gender_required")) {
+          return "Gender is required.";
+        }
+        if (errorMessage.toLowerCase().contains("date_of_birth_required") ||
+            errorMessage.toLowerCase().contains("dob")) {
+          return "Date of birth is required.";
+        }
+        if (errorMessage.toLowerCase().contains("country_required")) {
+          return "Country is required.";
+        }
+        return errorMessage;
+      }
+      
+      // Fallback to status message
+      return e.message ?? "Something went wrong, please try again.";
+    } else if (e is Exception) {
+      return e.toString();
     } else {
       return "Unexpected error: $e";
     }
