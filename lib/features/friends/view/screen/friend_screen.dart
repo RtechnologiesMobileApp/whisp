@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/features/friends/controller/friend_controller.dart';
 import 'package:whisp/features/friends/view/widgets/unfriend_dialog.dart';
+import 'package:whisp/features/home/view/home_screen.dart';
 import '../widgets/friend_card.dart';
 
 class FriendsScreen extends StatefulWidget {
@@ -123,117 +124,127 @@ Widget _buildRequestsTab() {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.whiteColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-              child: Text(
-                "Friends",
-                style: GoogleFonts.inter(
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 10.h),
-
-            // Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TabBar(
-                controller: _tabController,
-                indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    color: AppColors.primary,
-                    width: 3.0,
+    return WillPopScope(
+       onWillPop: () async {
+         
+          Navigator.of(context).pushAndRemoveUntil(
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
+                      (route) => false,
+                     );
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.whiteColor,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                child: Text(
+                  "Friends",
+                  style: GoogleFonts.inter(
+                    fontSize: 32.sp,
+                    fontWeight: FontWeight.w700,
                   ),
-                  insets: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
-                labelColor: AppColors.primary,
-                unselectedLabelColor: Colors.black54,
-                labelStyle: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-                tabs: const [
-                  Tab(text: 'Friends'),
-                  Tab(text: 'Requests'),
-                ],
               ),
-            ),
-
-            SizedBox(height: 15.h),
-
-            // Search bar only on Friends tab
-            Obx(() {
-              if (currentTabIndex.value == 0) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: SizedBox(
-                    height: 48.h,
-                    child: TextField(
-                      onChanged: (val) => controller.searchQuery.value = val,
-                      decoration: InputDecoration(
-                        hintText: 'Search friends...',
-                        suffixIcon: Container(
-                          margin: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.primary,
+      
+              SizedBox(height: 10.h),
+      
+              // Tabs
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 3.0,
+                    ),
+                    insets: EdgeInsets.symmetric(horizontal: 16.0),
+                  ),
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: Colors.black54,
+                  labelStyle: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Friends'),
+                    Tab(text: 'Requests'),
+                  ],
+                ),
+              ),
+      
+              SizedBox(height: 15.h),
+      
+              // Search bar only on Friends tab
+              Obx(() {
+                if (currentTabIndex.value == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: SizedBox(
+                      height: 48.h,
+                      child: TextField(
+                        onChanged: (val) => controller.searchQuery.value = val,
+                        decoration: InputDecoration(
+                          hintText: 'Search friends...',
+                          suffixIcon: Container(
+                            margin: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.primary,
+                            ),
+                            child: const Icon(Icons.search,
+                                color: AppColors.whiteColor),
                           ),
-                          child: const Icon(Icons.search,
-                              color: AppColors.whiteColor),
-                        ),
-                        filled: true,
-                        fillColor: AppColors.whiteColor,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: AppColors.kLightGray,
-                            width: 1,
+                          filled: true,
+                          fillColor: AppColors.whiteColor,
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: AppColors.kLightGray,
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: AppColors.kLightGray,
-                            width: 1.w,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: AppColors.kLightGray,
+                              width: 1.w,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            }),
-
-         
-
-            // Tab views
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildFriendsTab(),
-                  _buildRequestsTab(),
-                ],
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
+      
+           
+      
+              // Tab views
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildFriendsTab(),
+                    _buildRequestsTab(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
