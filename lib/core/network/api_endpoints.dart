@@ -21,5 +21,6 @@ class ApiEndpoints {
   static const String unblockUser="$baseUrl/api/moderation/block";
   static const String reportUser="$baseUrl/api/moderation/report"; // /api/moderation/block/{{targetUserId}}
   static const String getBlockedUsers="$baseUrl/api/moderation/block";
+  static const String setPreferences="$baseUrl/api/auth/preferences";
 }
  

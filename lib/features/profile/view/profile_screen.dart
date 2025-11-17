@@ -9,8 +9,10 @@ import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
+import 'package:whisp/features/profile/controller/preference_controller.dart';
 import 'package:whisp/features/profile/controller/profile_controller.dart';
 import 'package:whisp/features/profile/view/edit_profile.dart';
+import 'package:whisp/features/profile/widgets/preference_selector_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -81,21 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Row(
                     children: [
-                      // InkWell(
-                      //   onTap: () => Get.back(),
-                      //   child: Container(
-                      //     padding: const EdgeInsets.all(8),
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.grey.shade100,
-                      //       borderRadius: BorderRadius.circular(12),
-                      //     ),
-                      //     child: const Icon(
-                      //       Icons.arrow_back_ios_new,
-                      //       size: 20,
-                      //       color: Colors.black,
-                      //     ),
-                      //   ),
-                      // ),
+                   
                       const SizedBox(width: 16),
                       const Text(
                         "Profile",
@@ -126,23 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : const AssetImage('assets/images/place_holder_pic.jpg')
                               as ImageProvider,
                   ),
-                  // Positioned(
-                  //   right: 0,
-                  //   bottom: 0,
-                  //   child: Container(
-                  //     padding: const EdgeInsets.all(8),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.black,
-                  //       shape: BoxShape.circle,
-                  //       border: Border.all(color: Colors.white, width: 2),
-                  //     ),
-                  //     child: const Icon(
-                  //       Icons.edit,
-                  //       size: 16,
-                  //       color: Colors.white,
-                  //     ),
-                  //   ),
-                  // ),
+                 
                 ],
               ),
             ),
@@ -301,6 +273,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
 
             SizedBox(height: 20.h),
+            Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+  child: CustomButton(
+    text: 'Set Preferences',
+    onPressed: () {
+        if (SessionController().user?.premium == true) {
+    Get.dialog(
+      Dialog(
+        insetPadding: EdgeInsets.all(20),
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: PreferenceSelectorWidget(controller: PreferenceController()),
+        ),
+      ),
+    );
+      } else {
+        // Not premium → show message
+        Get.defaultDialog(
+          title: "Premium Feature",
+          middleText: "Buy premium to use this feature",
+          confirm: ElevatedButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          ),
+        );
+      }
+    },
+  ),
+),
+
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: CustomButton(
