@@ -39,7 +39,7 @@ Future<Map<String, dynamic>> sendVoiceMessage({
       endpoint,
       data: {}, // extra data agar koi nahi hai toh empty map
       file: audioFile,
-      fileField: "voice",
+      fileField: "voiceNote",
       requireAuth: true, // Auth token include hoga header me
     );
 

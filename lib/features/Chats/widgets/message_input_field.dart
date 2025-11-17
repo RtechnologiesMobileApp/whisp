@@ -36,7 +36,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
     if (!status.isGranted) return;
 
     Directory dir = await getTemporaryDirectory();
-    filePath = "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.m4a";
+    filePath = "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.wav";
 
     await recorder.record(path: filePath!);
 

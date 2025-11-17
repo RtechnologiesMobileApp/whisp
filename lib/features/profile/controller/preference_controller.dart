@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:whisp/core/network/api_client.dart';
@@ -9,7 +11,7 @@ class PreferenceController extends GetxController {
   RxBool genderEnabled = false.obs;
   RxBool ageEnabled = false.obs;
   RxBool countryEnabled = false.obs;
-  RxBool cityEnabled = false.obs;
+  RxBool cityEnabled = true.obs;
 
   // Selected values
   RxString gender = "".obs;
@@ -35,6 +37,7 @@ class PreferenceController extends GetxController {
         "age": ageStr,
         "country": countryEnabled.value ? country.value : null,
         "city": cityEnabled.value ? city.value : null,
+        "state":  state.value ?? "",
       }
     };
   }
@@ -43,11 +46,11 @@ class PreferenceController extends GetxController {
   Future<void> loadPreferences() async {
     try {
       final res = await _api.get(ApiEndpoints.setPreferences, requireAuth: true);
-      final data = res["Preferences"] ?? {};
-
+      final data = res["preferences"] ?? {};
+      log(data.toString());
       // Gender
       if (data["gender"] != null) {
-        gender.value = data["gender"];
+        gender.value = data["gender"]=="male"?"Male":data["gender"]=="female"? "Female":"Other";
         genderEnabled.value = true;
       } else {
         genderEnabled.value = false;
@@ -80,6 +83,19 @@ class PreferenceController extends GetxController {
       } else {
         cityEnabled.value = false;
       }
+      //State
+      if (data["state"] != null) {
+        state.value = data["state"];
+        log(data["state"]);
+       
+      } 
+      // City
+      if (data["city"] != null) {
+        city.value = data["city"];
+        cityEnabled.value = true;
+      } else {
+        cityEnabled.value = false;
+      }
     } catch (e) {
       Get.snackbar("Error", "Failed to load preferences");
     }
@@ -100,6 +116,7 @@ class PreferenceController extends GetxController {
     debugPrint("Response Data: ${res.data}");
 
     if (res.statusCode == 200 || res.statusCode == 201) {
+      Get.back();
       Get.snackbar("Success", res.data["message"] ?? "Preferences updated");
     } else {
       Get.snackbar("Error", "Failed to save preferences");

@@ -34,13 +34,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? profilePic;
 
   final controller = Get.put(EditProfileController());
+  final preferencesController = Get.put(PreferenceController());
 
   @override
   void initState() {
     super.initState();
     _initializeNotificationState();
     _loadUser();
-
+    preferencesController.loadPreferences();
     ever(controller.user, (updatedUser) {
       if (!mounted) return; // ✅ Prevent setState after dispose
       setState(() {
@@ -324,9 +325,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Get.dialog(
                         Dialog(
                           insetPadding: EdgeInsets.all(20),
-                          child: Container(
-                            padding: EdgeInsets.all(20),
-                            child: PreferenceSelectorWidget(controller: PreferenceController()),
+                          child: IntrinsicHeight(
+                            child: Container(
+                              padding: EdgeInsets.all(20),
+                              child: PreferenceSelectorWidget(controller: Get.find<PreferenceController>()),
+                            ),
                           ),
                         ),
                       );

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:csc_picker_plus/csc_picker_plus.dart';
@@ -12,117 +14,118 @@ class PreferenceSelectorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Column(
+      
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-
-                  // ---------------- GENDER ----------------
-                  _buildCheckboxTile(
-                    title: "Gender",
-                    checked: controller.genderEnabled,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
+            SingleChildScrollView(
+              // padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+              IconButton(onPressed:(){
+                Get.back();
+              } , icon: Icon(Icons.close))
+            ]),
+                // ---------------- GENDER ----------------
+              _buildCheckboxTile(
+      title: "Gender",
+      checked: controller.genderEnabled,
+      child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade100,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade300),
+    ),
+    
+    child: Obx(() => Wrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: [
+            _buildGenderOption("Male"),
+            _buildGenderOption("Female"),
+            _buildGenderOption("Other"),
+          ],
+        )),
+      ),
+    ),
+    
+                // ---------------- AGE RANGE ----------------
+                _buildCheckboxTile(
+                  title: "Age Range",
+                  checked: controller.ageEnabled,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${controller.ageRange.value.start.round()} - ${controller.ageRange.value.end.round()} years",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 14),
                       ),
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        value: controller.gender.value.isEmpty
+                      RangeSlider(
+                        values: controller.ageRange.value,
+                        min: 18,
+                        max: 70,
+                        divisions: 52,
+                        labels: RangeLabels(
+                          controller.ageRange.value.start.round().toString(),
+                          controller.ageRange.value.end.round().toString(),
+                        ),
+                        onChanged: (values) {
+                          controller.ageRange.value = values;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+            
+                // ---------------- COUNTRY & CITY ----------------
+                _buildCheckboxTile(
+                  title: "Country & City",
+                  checked: controller.countryEnabled,
+                  child: Column(
+                    children: [
+                      CSCPickerPlus(
+                        showStates: true, // optional
+                        showCities: true,
+                        currentCountry: controller.country.value.isEmpty
                             ? null
-                            : controller.gender.value,
-                        hint: const Text("Select Gender"),
-                        items: ["Male", "Female", "Other"]
-                            .map(
-                              (e) => DropdownMenuItem(
-                                value: e,
-                                child: Text(e),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) =>
-                            controller.gender.value = value ?? "",
+                            : controller.country.value,
+                        currentCity: controller.city.value.isEmpty
+                            ? null
+                            : controller.city.value,
+                        onCountryChanged: (value) {
+                          controller.country.value = value ;
+                        },
+                        onStateChanged: (value) {
+                          controller.state.value = value ?? "";
+                          log(value??"NO state");
+                          log(controller.state.value);
+                        },
+                        onCityChanged: (value) {
+                          controller.city.value = value ?? "";
+                          log(value??"NO city");
+                          log(controller.city.value);
+                        },
                       ),
-                    ),
+                    ],
                   ),
-
-                  // ---------------- AGE RANGE ----------------
-                  _buildCheckboxTile(
-                    title: "Age Range",
-                    checked: controller.ageEnabled,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${controller.ageRange.value.start.round()} - ${controller.ageRange.value.end.round()} years",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14),
-                        ),
-                        RangeSlider(
-                          values: controller.ageRange.value,
-                          min: 18,
-                          max: 70,
-                          divisions: 52,
-                          labels: RangeLabels(
-                            controller.ageRange.value.start.round().toString(),
-                            controller.ageRange.value.end.round().toString(),
-                          ),
-                          onChanged: (values) {
-                            controller.ageRange.value = values;
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ---------------- COUNTRY & CITY ----------------
-                  _buildCheckboxTile(
-                    title: "Country & City",
-                    checked: controller.countryEnabled,
-                    child: Column(
-                      children: [
-                        CSCPickerPlus(
-                          showStates: true, // optional
-                          showCities: true,
-                          currentCountry: controller.country.value.isEmpty
-                              ? null
-                              : controller.country.value,
-                          currentCity: controller.city.value.isEmpty
-                              ? null
-                              : controller.city.value,
-                          onCountryChanged: (value) {
-                            controller.country.value = value ?? "";
-                          },
-                          onStateChanged: (value) {
-                            controller.state.value = value ?? "";
-                          },
-                          onCityChanged: (value) {
-                            controller.city.value = value ?? "";
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-                ],
-    )
-              ),
+                ),
+            
+             
+              ],
+                )
             ),
-
+    
             // ---------------- SUBMIT BUTTON ----------------
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(15),
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                    debugPrint("Submit button clicked");
-                  controller.submitPreferences();
+                 await controller.submitPreferences();
+               
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -140,6 +143,17 @@ class PreferenceSelectorWidget extends StatelessWidget {
           ],
         ));
   }
+
+Widget _buildGenderOption(String value) {
+  return RadioListTile<String>(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        title: Text(value),
+        value: value,
+        groupValue: controller.gender.value,
+        onChanged: (val) => controller.gender.value = val ?? "",
+      );
+}
 
   Widget _buildCheckboxTile({
     required String title,
