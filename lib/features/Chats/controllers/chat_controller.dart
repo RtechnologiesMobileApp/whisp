@@ -61,7 +61,7 @@ SocketService.to.onMessage((data) {
   
   messages.add({
     'fromMe': senderId == currentUserId,
-    'message': isVoice ? '' : body,
+    'body': isVoice ? '' : body,
     'isVoice': isVoice,
     'voiceUrl': isVoice ? body : null,
     'type': type,
@@ -97,7 +97,7 @@ void sendTyping(bool isTyping) {
       debugPrint('[chat] Message sent in random session');
     }
 
-    messages.add({"fromMe": true, "message": text});
+    messages.add({"fromMe": true, "body": text});
     final chatListController = Get.find<ChatListController>();
     final myUserId = SessionController().user!.id;
     // Only update chat list if we have a friendId (friend chat, not random)
@@ -149,22 +149,58 @@ void sendTyping(bool isTyping) {
   }
 }
 
-Future<void> sendVoice(File file) async {
+void sendVoice(File file) async {
+  final tempMessage = {
+    "fromMe": true,
+    "body": "",
+    "isVoice": true,
+    "voiceUrl": "https://res.cloudinary.com/dm7uq1adt/raw/upload/v1763390203/whisp/voice-notes/1763390199282.wav",
+    "sending": true
+  };
+
+  messages.add(tempMessage); // add temporary UI
+  update(); // ensure UI reacts
+
   try {
     final repo = ChatRepository();
 
-    // 1) Send file to backend via API
-    await repo.sendVoiceMessage(
+    final voiceUrl = await repo.sendVoiceMessage(
       friendId: friendId!,
       audioFile: file,
     );
 
-    // 2) DO NOT EMIT SOCKET (backend will emit)
-    // 3) DO NOT ADD TO UI (message backend se aayga)
+    // update temporary message with real voiceUrl
+    final index = messages.indexOf(tempMessage);
+    if (index != -1) {
+  messages[index]["voiceUrl"] = voiceUrl;
+  messages[index]["sending"] = false;
+  update();
+}
 
+    // backend will emit socket event as well
   } catch (e) {
     Get.snackbar("Error", e.toString());
+    messages.remove(tempMessage);
+    update();
   }
 }
+
+// Future<void> sendVoice(File file) async {
+//   try {
+//     final repo = ChatRepository();
+
+//     // 1) Send file to backend via API
+//     await repo.sendVoiceMessage(
+//       friendId: friendId!,
+//       audioFile: file,
+//     );
+
+//     // 2) DO NOT EMIT SOCKET (backend will emit)
+//     // 3) DO NOT ADD TO UI (message backend se aayga)
+
+//   } catch (e) {
+//     Get.snackbar("Error", e.toString());
+//   }
+// }
 
 }

@@ -23,16 +23,20 @@ class ChatBubble extends StatefulWidget {
     this.isVoice = false,
     this.voiceUrl,
   });
+  
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
 }
+
 
 class _ChatBubbleState extends State<ChatBubble> {
   aw.PlayerController? waveformPlayer;
   ja.AudioPlayer? audioPlayer;
   bool isPlaying = false;
   bool isLoading = false;
+
+ 
 
   @override
   void initState() {
@@ -41,6 +45,7 @@ class _ChatBubbleState extends State<ChatBubble> {
       initVoicePlayer();
     }
   }
+ 
 
 Future<void> initVoicePlayer() async {
   setState(() => isLoading = true);
@@ -128,6 +133,7 @@ Future<void> initVoicePlayer() async {
     );
   }
 
+ 
   Widget _voiceWidget(double maxWidth) {
     if (isLoading) {
       return SizedBox(
@@ -178,6 +184,7 @@ Future<void> initVoicePlayer() async {
       ),
     );
   }
+
 }
 
 
