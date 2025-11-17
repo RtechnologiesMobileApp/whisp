@@ -314,46 +314,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-            ),
-
-            SizedBox(height: 20.h),
-            Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-  child: CustomButton(
-    text: 'Set Preferences',
-    onPressed: () {
-        if (SessionController().user?.premium == true) {
-    Get.dialog(
-      Dialog(
-        insetPadding: EdgeInsets.all(20),
-        child: Container(
-          padding: EdgeInsets.all(20),
-          child: PreferenceSelectorWidget(controller: PreferenceController()),
-        ),
-      ),
-    );
-      } else {
-        // Not premium → show message
-        Get.defaultDialog(
-          title: "Premium Feature",
-          middleText: "Buy premium to use this feature",
-          confirm: ElevatedButton(
-            onPressed: () => Get.back(),
-            child: const Text("OK"),
-          ),
-        );
-      }
-    },
-  ),
-),
-
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: CustomButton(
-                text: 'Edit Profile',
-                onPressed: () {
-                  Get.to(EditProfileScreen());
-                },
+              SizedBox(height: 20.h),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: CustomButton(
+                  text: 'Set Preferences',
+                  onPressed: () {
+                    if (SessionController().user?.premium == true) {
+                      Get.dialog(
+                        Dialog(
+                          insetPadding: EdgeInsets.all(20),
+                          child: Container(
+                            padding: EdgeInsets.all(20),
+                            child: PreferenceSelectorWidget(controller: PreferenceController()),
+                          ),
+                        ),
+                      );
+                    } else {
+                      // Not premium → show message
+                      Get.defaultDialog(
+                        title: "Premium Feature",
+                        middleText: "Buy premium to use this feature",
+                        confirm: ElevatedButton(
+                          onPressed: () => Get.back(),
+                          child: const Text("OK"),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: CustomButton(
+                  text: 'Edit Profile',
+                  onPressed: () {
+                    Get.to(EditProfileScreen());
+                  },
+                ),
               ),
               SizedBox(height: 10.h),
               Padding(
@@ -363,7 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () {
                     // Clear session and user data
                     SessionController().clearSession();
-      
+
                     // Navigate to login screen and remove all previous routes
                     Get.offAll(() => LoginView());
                   },
