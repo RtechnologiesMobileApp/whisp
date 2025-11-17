@@ -31,6 +31,7 @@ dependencies:
   country_picker: ^2.0.27
   country_picker_plus: ^2.0.2
   cupertino_icons: ^1.0.8
+  csc_picker_plus: ^0.0.3
   dia: ^0.1.5
   dio: ^5.9.0
   firebase_auth: ^6.1.2

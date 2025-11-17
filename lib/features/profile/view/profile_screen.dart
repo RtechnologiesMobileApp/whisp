@@ -9,9 +9,14 @@ import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
+ 
+import 'package:whisp/features/profile/controller/preference_controller.dart';
+ 
 import 'package:whisp/features/home/view/home_screen.dart';
+ 
 import 'package:whisp/features/profile/controller/profile_controller.dart';
 import 'package:whisp/features/profile/view/edit_profile.dart';
+import 'package:whisp/features/profile/widgets/preference_selector_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -309,16 +314,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-      
-              SizedBox(height: 20.h),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: CustomButton(
-                  text: 'Edit Profile',
-                  onPressed: () {
-                    Get.to(EditProfileScreen());
-                  },
-                ),
+            ),
+
+            SizedBox(height: 20.h),
+            Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+  child: CustomButton(
+    text: 'Set Preferences',
+    onPressed: () {
+        if (SessionController().user?.premium == true) {
+    Get.dialog(
+      Dialog(
+        insetPadding: EdgeInsets.all(20),
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: PreferenceSelectorWidget(controller: PreferenceController()),
+        ),
+      ),
+    );
+      } else {
+        // Not premium → show message
+        Get.defaultDialog(
+          title: "Premium Feature",
+          middleText: "Buy premium to use this feature",
+          confirm: ElevatedButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          ),
+        );
+      }
+    },
+  ),
+),
+
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: CustomButton(
+                text: 'Edit Profile',
+                onPressed: () {
+                  Get.to(EditProfileScreen());
+                },
               ),
               SizedBox(height: 10.h),
               Padding(
