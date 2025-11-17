@@ -14,6 +14,8 @@ class ChatBubble extends StatefulWidget {
   final bool isRead;
   final bool isVoice;
   final String? voiceUrl;
+  final String? localPath;
+  final bool isSending;
 
   const ChatBubble({
     super.key,
@@ -22,6 +24,8 @@ class ChatBubble extends StatefulWidget {
     required this.isRead,
     this.isVoice = false,
     this.voiceUrl,
+    this.localPath,
+    this.isSending = false,
   });
   
 
@@ -35,69 +39,116 @@ class _ChatBubbleState extends State<ChatBubble> {
   ja.AudioPlayer? audioPlayer;
   bool isPlaying = false;
   bool isLoading = false;
-
- 
+  String? preparedPath;
 
   @override
   void initState() {
     super.initState();
-    if (widget.isVoice && widget.voiceUrl != null) {
-      initVoicePlayer();
+    _initVoicePlayerIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.isVoice) return;
+
+    final voiceChanged = oldWidget.voiceUrl != widget.voiceUrl;
+    final localChanged = oldWidget.localPath != widget.localPath;
+
+    if (voiceChanged || localChanged) {
+      _disposePlayers();
+      _initVoicePlayerIfNeeded();
     }
   }
- 
 
-Future<void> initVoicePlayer() async {
-  setState(() => isLoading = true);
+  void _initVoicePlayerIfNeeded() {
+    if (!widget.isVoice) return;
+    if (widget.voiceUrl == null && widget.localPath == null) return;
+    initVoicePlayer();
+  }
 
-  final localPath = await downloadVoiceFile(widget.voiceUrl!);
+  Future<void> initVoicePlayer() async {
+    setState(() => isLoading = true);
 
-  waveformPlayer = aw.PlayerController();
-  await waveformPlayer!.preparePlayer(
-    path: localPath,
-    shouldExtractWaveform: true,
-  );
+    try {
+      final path = await _resolveAudioPath();
+      if (path == null) {
+        setState(() => isLoading = false);
+        return;
+      }
 
-  audioPlayer = ja.AudioPlayer();
-  await audioPlayer!.setFilePath(localPath, preload: true);
-  await audioPlayer!.setLoopMode(ja.LoopMode.off);
+      preparedPath = path;
 
-  // waveform ready flag
-  waveformPlayer!.onPlayerStateChanged.listen((state) {
-    // You can setState here if you want to trigger UI after waveform ready
-  });
+      waveformPlayer = aw.PlayerController();
+      await waveformPlayer!.preparePlayer(
+        path: preparedPath!,
+        shouldExtractWaveform: true,
+      );
 
-  // Listen for audio finish
-  audioPlayer!.processingStateStream.listen((state) {
-    if (state == ja.ProcessingState.completed) {
-      audioPlayer!.stop();
-      audioPlayer!.seek(Duration.zero);
-      waveformPlayer!.stopPlayer(); // reset waveform
-      setState(() => isPlaying = false);
+      audioPlayer = ja.AudioPlayer();
+      await audioPlayer!.setFilePath(preparedPath!, preload: true);
+      await audioPlayer!.setLoopMode(ja.LoopMode.off);
+
+      waveformPlayer!.onPlayerStateChanged.listen((state) {});
+
+      audioPlayer!.processingStateStream.listen((state) {
+        if (state == ja.ProcessingState.completed) {
+          audioPlayer!.stop();
+          audioPlayer!.seek(Duration.zero);
+          waveformPlayer!.stopPlayer();
+          if (mounted) {
+            setState(() => isPlaying = false);
+          }
+        }
+      });
+
+      audioPlayer!.playingStream.listen((playing) {
+        if (mounted) {
+          setState(() => isPlaying = playing);
+        }
+      });
+    } catch (e) {
+      debugPrint('Failed to init voice player: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
-  });
+  }
 
-  // Listen to playing state for icon
-  audioPlayer!.playingStream.listen((playing) {
-    setState(() => isPlaying = playing);
-  });
+  Future<String?> _resolveAudioPath() async {
+    if (widget.localPath != null) {
+      final file = File(widget.localPath!);
+      if (await file.exists()) {
+        return file.path;
+      }
+    }
 
-  setState(() => isLoading = false);
-}
+    if (widget.voiceUrl == null) return null;
+    return await downloadVoiceFile(widget.voiceUrl!);
+  }
 
- 
   Future<String> downloadVoiceFile(String url) async {
     final response = await http.get(Uri.parse(url));
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/tempVoice_${DateTime.now().millisecondsSinceEpoch}.mp3'); // ya wav
+    final file = File(
+        '${dir.path}/tempVoice_${DateTime.now().millisecondsSinceEpoch}.mp3'); // ya wav
     await file.writeAsBytes(response.bodyBytes);
     return file.path;
   }
 
+  void _disposePlayers() {
+    waveformPlayer?.dispose();
+    waveformPlayer = null;
+    audioPlayer?.dispose();
+    audioPlayer = null;
+    preparedPath = null;
+    isPlaying = false;
+  }
+
   @override
   void dispose() {
-    waveformPlayer?.dispose();
-    audioPlayer?.dispose();
+    _disposePlayers();
     super.dispose();
   }
 
@@ -135,7 +186,7 @@ Future<void> initVoicePlayer() async {
 
  
   Widget _voiceWidget(double maxWidth) {
-    if (isLoading) {
+    if (isLoading || waveformPlayer == null || audioPlayer == null) {
       return SizedBox(
         height: 50,
         child: Center(
@@ -166,11 +217,9 @@ Future<void> initVoicePlayer() async {
   },
 ),
 
- 
-         
           Expanded(
-            child: widget.voiceUrl == null
-                ? const Text("Invalid voice", style: TextStyle(color: Colors.red))
+            child: preparedPath == null
+                ? const Text("Voice unavailable", style: TextStyle(color: Colors.red))
                 : aw.AudioFileWaveforms(
                     size: const Size(double.infinity, 50),
                     playerController: waveformPlayer!,
@@ -180,13 +229,21 @@ Future<void> initVoicePlayer() async {
                     ),
                   ),
           ),
+          if (widget.isSending)
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: widget.fromMe ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
 }
-
-
- 
- 

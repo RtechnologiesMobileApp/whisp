@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/global.dart';
-import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 import 'package:whisp/features/Chats/widgets/chat_screen_appbar.dart';
@@ -142,7 +141,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         message: msg['body'] ?? '',
                         isRead: msg['isRead'] ?? false,
                         isVoice: msg["type"] == "voice-note",
-                        voiceUrl: msg["voiceUrl"],
+                      voiceUrl: (msg["voiceUrl"] ?? msg["localPath"])?.toString(),
+
+                        isSending: msg["sending"] ?? false,
                       );
                     },
                   );

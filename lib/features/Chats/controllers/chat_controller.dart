@@ -154,53 +154,75 @@ void sendVoice(File file) async {
     "fromMe": true,
     "body": "",
     "isVoice": true,
-    "voiceUrl": "https://res.cloudinary.com/dm7uq1adt/raw/upload/v1763390203/whisp/voice-notes/1763390199282.wav",
+    "type": "voice-note",
+    "voiceUrl": null,
+    "localPath": file.path,
     "sending": true
   };
 
-  messages.add(tempMessage); // add temporary UI
-  update(); // ensure UI reacts
+  messages.add(tempMessage);
+  messages.refresh();
 
   try {
     final repo = ChatRepository();
-
     final voiceUrl = await repo.sendVoiceMessage(
       friendId: friendId!,
       audioFile: file,
     );
 
-    // update temporary message with real voiceUrl
     final index = messages.indexOf(tempMessage);
     if (index != -1) {
-  messages[index]["voiceUrl"] = voiceUrl;
-  messages[index]["sending"] = false;
-  update();
-}
-
-    // backend will emit socket event as well
+      // Only update the needed fields
+      messages[index]["voiceUrl"] = voiceUrl;
+      messages[index]["sending"] = false;
+      messages.refresh();
+    }
   } catch (e) {
     Get.snackbar("Error", e.toString());
     messages.remove(tempMessage);
-    update();
+    messages.refresh();
   }
 }
 
-// Future<void> sendVoice(File file) async {
+// void sendVoice(File file) async {
+//   final tempMessage = {
+//     "fromMe": true,
+//     "body": "",
+//     "isVoice": true,
+//     "type": "voice-note",
+//     "voiceUrl": null,
+//     "localPath": file.path,
+//     "sending": true
+//   };
+
+//   messages.add(tempMessage); // add temporary UI
+//   messages.refresh();
+
 //   try {
 //     final repo = ChatRepository();
 
-//     // 1) Send file to backend via API
-//     await repo.sendVoiceMessage(
+//     final voiceUrl = await repo.sendVoiceMessage(
 //       friendId: friendId!,
 //       audioFile: file,
 //     );
 
-//     // 2) DO NOT EMIT SOCKET (backend will emit)
-//     // 3) DO NOT ADD TO UI (message backend se aayga)
+//     // update temporary message with real voiceUrl
+//     final index = messages.indexOf(tempMessage);
+//     if (index != -1) {
+//       messages[index] = {
+//         ...Map<String, dynamic>.from(messages[index]),
+//         "voiceUrl": voiceUrl,
+//         "sending": false,
+//       };
+//     }
 
+//     // backend will emit socket event as well
 //   } catch (e) {
 //     Get.snackbar("Error", e.toString());
+//     messages.remove(tempMessage);
+//     messages.refresh();
 //   }
 // }
 
+ 
 }
