@@ -74,8 +74,8 @@ Widget _buildNavItem(
               )
             : Image.asset(
                 iconPath,
-                height: 26,
-                width: 26,
+                height: 24,
+                width: 24,
                 color: isSelected ? AppColors.primary : Colors.black,
               ),
         const SizedBox(height: 4),

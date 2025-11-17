@@ -82,9 +82,13 @@ class SignupView extends GetView<SignupController> {
                       icon: Icons.lock_outline,
                       isPassword: true,
                       validator: (value) {
+                        final passwordRegex =
+    RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$');
                         if ((value == null || value.isEmpty ) && !controller.isGoogle.value)
                           return "Password is required";
-
+                        if (!passwordRegex.hasMatch(value!) && !controller.isGoogle.value) {
+  return "Password must contain uppercase, lowercase,\nnumber & special character";
+}
                         return null;
                       },
                     ),
