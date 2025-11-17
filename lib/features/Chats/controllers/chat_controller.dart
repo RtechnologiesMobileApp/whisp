@@ -38,23 +38,41 @@ class ChatController extends GetxController {
     
     // 🔹 Listen for messages only for this specific chat
     // Note: ChatListController handles updating the chat list globally
-    SocketService.to.onMessage((data) {
-      final msgText = data['message'] ?? data['body'] ?? '';
-      if (msgText.trim().isEmpty) return;
 
-      // Get the actual sender ID from the message data
-      final senderId = data['fromUserId'] ?? data['from'] ?? '';
-      
-      // Only add message to current chat if it's from the current partner
-      if (friendId != null && senderId == friendId) {
-        messages.add({'fromMe': false, 'message': msgText});
-      }
-      // Chat list update is handled by ChatListController's listener
-    });
+SocketService.to.onMessage((data) {
+  debugPrint("📥 Incoming SOCKET message:");
+  debugPrint("RAW → $data");
+
+  final senderId = data['from'] ?? data['fromUserId'];
+
+  if (senderId != friendId) return;
+
+  // ----------- FIX START -----------
+  final type = (data['type'] ?? 'text').toString();
+  final isVoice = type == 'voice-note';
+
+  final body = data['body']?.toString() ?? '';
+
+  if (body.isEmpty) {
+    debugPrint("⚠ Ignored empty socket message");
+    return;
   }
-//   void sendTyping(bool isTyping) {
-//   SocketService.to.typing(isTyping);
-// }
+  // ----------- FIX END -----------
+  
+  messages.add({
+    'fromMe': senderId == currentUserId,
+    'message': isVoice ? '' : body,
+    'isVoice': isVoice,
+    'voiceUrl': isVoice ? body : null,
+    'type': type,
+  });
+
+  debugPrint("✅ Added → ${messages.last}");
+});
+
+ 
+  }
+ 
 void sendTyping(bool isTyping) {
   if (isFriend && friendId != null) {
     SocketService.to.typing(isTyping, toUserId: friendId!);
@@ -68,7 +86,7 @@ void sendTyping(bool isTyping) {
   void sendMessage() {
     final text = messageController.text.trim();
     if (text.isEmpty) return;
-    print("💡 Sending message, friendId: $friendId, isFriend: $isFriend");
+    debugPrint("💡 Sending message, friendId: $friendId, isFriend: $isFriend");
 
     // ✅ Use isFriend flag instead of null check
     if (isFriend) {
@@ -93,42 +111,43 @@ void sendTyping(bool isTyping) {
     socketService.markAsRead(partnerId);
   }
 
-  void loadFriendChatHistory() async {
-    if (isFriend && friendId != null) {
-      try {
-        isLoading.value = true;
+ 
+ void loadFriendChatHistory() async {
+  if (isFriend && friendId != null) {
+    try {
+      isLoading.value = true;
 
-        // ✅ Repo already returns List<Map<String, dynamic>>
-        final history = await FriendRepo().getFriendChatHistory(friendId!);
+      final history = await FriendRepo().getFriendChatHistory(friendId!);
 
-        // Debug print to verify messages
-        for (var msg in history) {
-         
-          print("from: ${msg['from']}, to: ${msg['to']}, body: ${msg['body']}");
-        }
-
-        // Assign messages to observable list
-        messages.assignAll(
-          history.map(
-            (msg) => {
-              "fromMe":
-                  msg["from"]?.toString().trim() ==
-                  currentUserId?.toString().trim(),
-              "message":
-                  msg["message"] ??
-                  '', // Repo is already mapping 'body' to 'message'
-            },
-          ),
-        );
-
-        print("💬 Loaded ${messages.length} messages for friend $friendId");
-      } catch (e) {
-        print("❌ Failed to load chat history: $e");
-      } finally {
-        isLoading.value = false;
+      debugPrint("------- RAW HISTORY FROM API -------");
+      for (var msg in history) {
+        debugPrint("this is raw response msg: $msg");
       }
+
+      messages.assignAll(
+        history.map((msg) {
+          final type = msg["type"]?.toString() ?? "text";
+          final isVoice = type == "voice-note";
+
+          return {
+            "fromMe": msg["from"].toString() == currentUserId.toString(),
+            "body": isVoice ? "" : (msg["body"] ?? ''),
+            "isVoice": isVoice,
+            "voiceUrl": isVoice ? msg["body"] : null,
+            "type": type,
+          };
+        }).toList(),
+      );
+
+      debugPrint("🎯 HISTORY →   | body: ${messages.last["body"]}");
+      debugPrint("💬 Loaded ${messages.length} messages for friend $friendId");
+    } catch (e) {
+      debugPrint("❌ Failed to load chat history: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
+}
 
 Future<void> sendVoice(File file) async {
   try {

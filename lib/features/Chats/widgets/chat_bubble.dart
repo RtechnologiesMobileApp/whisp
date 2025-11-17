@@ -1,9 +1,14 @@
 
-import 'package:audio_waveforms/audio_waveforms.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:audio_waveforms/audio_waveforms.dart' as aw;
+import 'package:just_audio/just_audio.dart' as ja;
+ 
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 import 'package:whisp/config/constants/colors.dart';
 
-class ChatBubble extends StatelessWidget {
+class ChatBubble extends StatefulWidget {
   final bool fromMe;
   final String message;
   final bool isRead;
@@ -20,86 +25,161 @@ class ChatBubble extends StatelessWidget {
   });
 
   @override
+  State<ChatBubble> createState() => _ChatBubbleState();
+}
+
+class _ChatBubbleState extends State<ChatBubble> {
+  aw.PlayerController? waveformPlayer;
+  ja.AudioPlayer? audioPlayer;
+  bool isPlaying = false;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isVoice && widget.voiceUrl != null) {
+      initVoicePlayer();
+    }
+  }
+
+Future<void> initVoicePlayer() async {
+  setState(() => isLoading = true);
+
+  final localPath = await downloadVoiceFile(widget.voiceUrl!);
+
+  waveformPlayer = aw.PlayerController();
+  await waveformPlayer!.preparePlayer(
+    path: localPath,
+    shouldExtractWaveform: true,
+  );
+
+  audioPlayer = ja.AudioPlayer();
+  await audioPlayer!.setFilePath(localPath, preload: true);
+  await audioPlayer!.setLoopMode(ja.LoopMode.off);
+
+  // waveform ready flag
+  waveformPlayer!.onPlayerStateChanged.listen((state) {
+    // You can setState here if you want to trigger UI after waveform ready
+  });
+
+  // Listen for audio finish
+  audioPlayer!.processingStateStream.listen((state) {
+    if (state == ja.ProcessingState.completed) {
+      audioPlayer!.stop();
+      audioPlayer!.seek(Duration.zero);
+      waveformPlayer!.stopPlayer(); // reset waveform
+      setState(() => isPlaying = false);
+    }
+  });
+
+  // Listen to playing state for icon
+  audioPlayer!.playingStream.listen((playing) {
+    setState(() => isPlaying = playing);
+  });
+
+  setState(() => isLoading = false);
+}
+
+ 
+  Future<String> downloadVoiceFile(String url) async {
+    final response = await http.get(Uri.parse(url));
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/tempVoice_${DateTime.now().millisecondsSinceEpoch}.mp3'); // ya wav
+    await file.writeAsBytes(response.bodyBytes);
+    return file.path;
+  }
+
+  @override
+  void dispose() {
+    waveformPlayer?.dispose();
+    audioPlayer?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final maxWidth = MediaQuery.of(context).size.width * 0.7;
+
     return Align(
-      alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: widget.fromMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        constraints: BoxConstraints(
+          maxWidth: maxWidth,
+          minWidth: 60,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
         decoration: BoxDecoration(
-          color: fromMe ? AppColors.primary : Colors.white,
+          color: widget.fromMe ? AppColors.primary : Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: isVoice ? _voiceWidget() : Text(
-          message,
-          style: TextStyle(color: fromMe ? Colors.white : Colors.black87),
-        ),
+        child: widget.isVoice ? _voiceWidget(maxWidth) : _textWidget(),
       ),
     );
   }
 
-  Widget _voiceWidget() {
-    final player = PlayerController();
-    player.preparePlayer(path: voiceUrl!);
+  Widget _textWidget() {
+    return Text(
+      widget.message,
+      style: TextStyle(
+        color: widget.fromMe ? Colors.white : Colors.black87,
+        fontSize: 16,
+      ),
+    );
+  }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.play_arrow, color: Colors.white),
-          onPressed: () => player.startPlayer(),
+  Widget _voiceWidget(double maxWidth) {
+    if (isLoading) {
+      return SizedBox(
+        height: 50,
+        child: Center(
+          child: CircularProgressIndicator(color: widget.fromMe ? Colors.white : Colors.black),
         ),
-        AudioFileWaveforms(
-          size: const Size(120, 40),
-          playerController: player,
-          playerWaveStyle: const PlayerWaveStyle(
-            fixedWaveColor: Colors.white60,
-            liveWaveColor: Colors.white,
+      );
+    }
+
+    return Container(
+      constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 140, minHeight: 50),
+      child: Row(
+        children: [
+   IconButton(
+  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
+      color: widget.fromMe ? Colors.white : Colors.black),
+  onPressed: () async {
+    if (!isPlaying) {
+      // Start waveform animation
+       waveformPlayer!.stopPlayer();
+      waveformPlayer!.startPlayer( ); // waveform starts properly
+
+      // Start audio
+      await audioPlayer!.play();
+    } else {
+      await audioPlayer!.pause();
+      waveformPlayer!.pausePlayer();
+    }
+  },
+),
+
+ 
+         
+          Expanded(
+            child: widget.voiceUrl == null
+                ? const Text("Invalid voice", style: TextStyle(color: Colors.red))
+                : aw.AudioFileWaveforms(
+                    size: const Size(double.infinity, 50),
+                    playerController: waveformPlayer!,
+                    playerWaveStyle: aw.PlayerWaveStyle(
+                      fixedWaveColor: widget.fromMe ? Colors.white54 : Colors.black38,
+                      liveWaveColor: widget.fromMe ? Colors.white : Colors.black87,
+                    ),
+                  ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
-// import 'package:flutter/material.dart';
-// import 'package:whisp/config/constants/colors.dart';
 
-// class ChatBubble extends StatelessWidget {
-//   final bool fromMe;
-//   final String message;
-//   final bool isRead;
 
-//   const ChatBubble({super.key, required this.fromMe, required this.message, required this.isRead});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Align(
-//       alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
-//       child: Container(
-//         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-//         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-//         constraints: BoxConstraints(
-//           maxWidth: MediaQuery.of(context).size.width * 0.75,
-//         ),
-//         decoration: BoxDecoration(
-//           color: fromMe ? AppColors.primary : Colors.white,
-//           border: fromMe ? null : Border.all(color: Colors.grey.shade300),
-//           borderRadius: BorderRadius.only(
-//             topLeft: const Radius.circular(16),
-//             topRight: const Radius.circular(16),
-//             bottomLeft: fromMe
-//                 ? const Radius.circular(16)
-//                 : const Radius.circular(0),
-//             bottomRight: fromMe
-//                 ? const Radius.circular(0)
-//                 : const Radius.circular(16),
-//           ),
-//         ),
-//         child: Text(
-//          message,
-//           style: TextStyle(color: fromMe ? Colors.white : Colors.black87),
-//         ),
-//       ),
-//     );
-//   }
-// }
+ 
+ 
