@@ -147,6 +147,9 @@ class _ChatBubbleState extends State<ChatBubble> {
     player = null;
     preparedPath = null;
     isPlaying = false;
+    if (GlobalAudioManager.currentPlayer == player) {
+  GlobalAudioManager.currentPlayer = null;
+}
   }
 
   @override

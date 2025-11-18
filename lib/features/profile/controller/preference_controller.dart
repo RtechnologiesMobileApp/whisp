@@ -36,8 +36,8 @@ class PreferenceController extends GetxController {
         "gender": genderEnabled.value ? gender.value : null,
         "age": ageStr,
         "country": countryEnabled.value ? country.value : null,
-        "city": cityEnabled.value ? city.value : null,
-        "state":  state.value ?? "",
+        "city": countryEnabled.value ? city.value : null,
+        "state":countryEnabled.value ?  state.value : null,
       }
     };
   }
