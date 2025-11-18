@@ -90,8 +90,9 @@ class _MessageInputFieldState extends State<MessageInputField> {
             color: Colors.white,
             child: Row(
               children: [
+               
                 Expanded(
-                  child: TextField(
+                  child:  isRecording?SizedBox():TextField(
                     controller: widget.controller.messageController,
                     onChanged: (text) => widget.controller.sendTyping(true),
                     decoration: InputDecoration(
