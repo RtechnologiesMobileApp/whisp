@@ -10,8 +10,9 @@ import 'package:whisp/config/constants/colors.dart';
 
 class MessageInputField extends StatefulWidget {
   final ChatController controller;
+   final bool isFriend; 
 
-  const MessageInputField({super.key, required this.controller});
+  const MessageInputField({super.key, required this.controller, required this.isFriend});
 
   @override
   State<MessageInputField> createState() => _MessageInputFieldState();
@@ -88,87 +89,89 @@ class _MessageInputFieldState extends State<MessageInputField> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             color: Colors.white,
-            child: Row(
-              children: [
-               
-                Expanded(
-                  child:  isRecording?SizedBox():TextField(
-                    controller: widget.controller.messageController,
-                    onChanged: (text) => widget.controller.sendTyping(true),
-                    decoration: InputDecoration(
-                      hintText: "Write a message",
-                      filled: true,
-                      fillColor: const Color(0xffF1F2F5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Mic button + timer overlay
-                Column(
-                  children: [
-                    if (isRecording)
-                      Text(
-                        formatTime(seconds),
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    GestureDetector(
-                      onTap: isRecording ? stopRecording : startRecording,
-                      child: Obx(
-                        () => CircleAvatar(
-                          radius: 24,
-                          backgroundColor: isRecording
-                              ? Colors.redAccent
-                              : Colors.red,
-                          child: widget.controller.isProcessingAudio.value
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : Icon(
-                                  isRecording ? Icons.stop : Icons.mic,
-                                  color: Colors.white,
-                                ),
-                        ),
-                      ),
-                    ),
-                    if (isRecording)
-                      SizedBox(
-                        width: 60,
-                        height: 40,
-                        child: AudioWaveforms(
-                          enableGesture: false,
-                          size: const Size(60, 40),
-                          recorderController: recorder,
-                          waveStyle: const WaveStyle(
-                            waveColor: Colors.red,
-                            showMiddleLine: false,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(width: 8),
-                // Send button
-                GestureDetector(
-                  onTap: widget.controller.sendMessage,
-                  child: CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    child: const Icon(Icons.send, color: Colors.white),
-                  ),
-                ),
-              ],
+            child:Row(
+  children: [
+    Expanded(
+      child: isRecording ? SizedBox() : TextField(
+        controller: widget.controller.messageController,
+        onChanged: (text) => widget.controller.sendTyping(true),
+        decoration: InputDecoration(
+          hintText: "Write a message",
+          filled: true,
+          fillColor: const Color(0xffF1F2F5),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 8),
+
+    // 👇 MIC only if user is friend
+    if (widget.isFriend)
+      Column(
+        children: [
+          if (isRecording)
+            Text(
+              formatTime(seconds),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+          GestureDetector(
+            onTap: isRecording ? stopRecording : startRecording,
+            child: Obx(
+              () => CircleAvatar(
+                radius: 24,
+                backgroundColor:
+                    isRecording ? Colors.redAccent : Colors.red,
+                child: widget.controller.isProcessingAudio.value
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Icon(
+                        isRecording ? Icons.stop : Icons.mic,
+                        color: Colors.white,
+                      ),
+              ),
+            ),
+          ),
+          if (isRecording)
+            SizedBox(
+              width: 60,
+              height: 40,
+              child: AudioWaveforms(
+                enableGesture: false,
+                size: const Size(60, 40),
+                recorderController: recorder,
+                waveStyle: const WaveStyle(
+                  waveColor: Colors.red,
+                  showMiddleLine: false,
+                ),
+              ),
+            ),
+        ],
+      ),
+
+    const SizedBox(width: 8),
+
+    // Send button
+    GestureDetector(
+      onTap: widget.controller.sendMessage,
+      child: CircleAvatar(
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.send, color: Colors.white),
+      ),
+    ),
+  ],
+ 
 
             // child: Row(
             //   children: [
+               
             //     Expanded(
-            //       child: TextField(
+            //       child:  isRecording?SizedBox():TextField(
             //         controller: widget.controller.messageController,
             //         onChanged: (text) => widget.controller.sendTyping(true),
             //         decoration: InputDecoration(
@@ -183,24 +186,51 @@ class _MessageInputFieldState extends State<MessageInputField> {
             //       ),
             //     ),
             //     const SizedBox(width: 8),
-            //     // Mic button
-            //     GestureDetector(
-            //       onTap: isRecording ? stopRecording : startRecording,
-            //       child: Stack(
-            //         alignment: Alignment.center,
-            //         children: [
-            //           CircleAvatar(
-            //             radius: 24,
-            //             backgroundColor: isRecording
-            //                 ? Colors.redAccent
-            //                 : Colors.red,
+            //     // Mic button + timer overlay
+            //     Column(
+            //       children: [
+            //         if (isRecording)
+            //           Text(
+            //             formatTime(seconds),
+            //             style: const TextStyle(
+            //               color: Colors.red,
+            //               fontWeight: FontWeight.bold,
+            //             ),
             //           ),
-            //           Icon(
-            //             isRecording ? Icons.stop : Icons.mic,
-            //             color: Colors.white,
+            //         GestureDetector(
+            //           onTap: isRecording ? stopRecording : startRecording,
+            //           child: Obx(
+            //             () => CircleAvatar(
+            //               radius: 24,
+            //               backgroundColor: isRecording
+            //                   ? Colors.redAccent
+            //                   : Colors.red,
+            //               child: widget.controller.isProcessingAudio.value
+            //                   ? const CircularProgressIndicator(
+            //                       color: Colors.white,
+            //                     )
+            //                   : Icon(
+            //                       isRecording ? Icons.stop : Icons.mic,
+            //                       color: Colors.white,
+            //                     ),
+            //             ),
             //           ),
-            //         ],
-            //       ),
+            //         ),
+            //         if (isRecording)
+            //           SizedBox(
+            //             width: 60,
+            //             height: 40,
+            //             child: AudioWaveforms(
+            //               enableGesture: false,
+            //               size: const Size(60, 40),
+            //               recorderController: recorder,
+            //               waveStyle: const WaveStyle(
+            //                 waveColor: Colors.red,
+            //                 showMiddleLine: false,
+            //               ),
+            //             ),
+            //           ),
+            //       ],
             //     ),
             //     const SizedBox(width: 8),
             //     // Send button
@@ -213,6 +243,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
             //     ),
             //   ],
             // ),
+            ),
+            
           ),
           // Waveform & timer overlay
           if (isRecording && filePath != null)

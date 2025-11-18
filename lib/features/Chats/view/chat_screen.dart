@@ -186,7 +186,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 );
               } else {
-                return MessageInputField(controller: controller);
+                return MessageInputField(controller: controller, isFriend: widget.isFriend,);
               }
             }),
           ],
