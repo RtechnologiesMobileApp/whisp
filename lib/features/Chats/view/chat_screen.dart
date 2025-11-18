@@ -37,8 +37,16 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+  
+
 
     _scrollController = ScrollController();
+      _scrollController.addListener(() {
+  if (_scrollController.position.pixels ==
+      _scrollController.position.minScrollExtent) {
+    controller.loadMoreMessages();
+  }
+});
 
     // Initialize ChatController once
     controller = Get.isRegistered<ChatController>(

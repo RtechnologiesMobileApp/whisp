@@ -17,10 +17,18 @@ class ChatController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool partnerTyping = false.obs;
   RxBool isProcessingAudio=false.obs;
+
+  /// pagiantion variables
+int limit = 20;
+int offset = 0;
+bool hasMore = true;
+bool isLoadingMore = false;
+
   ChatController({this.friendId, this.isFriend = false}) {
     // ✅ Agar friend chat screen hai aur friendId available hai
     if (isFriend && friendId != null) {
-      loadFriendChatHistory();
+     // loadFriendChatHistory();
+     loadInitialChat(); 
     }
   }
   String? get currentUserId => SessionController().user!.id;
@@ -189,5 +197,58 @@ void sendVoice(File file) async {
     messages.refresh();
   }
 }
+Future<void> loadInitialChat() async {
+  offset = 0;
+  hasMore = true;
+  messages.clear();
+
+  final data = await FriendRepo().getFriendChatHistory(
+    friendId!,
+    limit: limit,
+    offset: offset,
+  );
+
+  messages.assignAll(_parseMessages(data));
+
+  offset += data.length; // next batch ke liye
+}
+
+Future<void> loadMoreMessages() async {
+  if (isLoadingMore || !hasMore) return;
+
+  isLoadingMore = true;
+
+  final data = await FriendRepo().getFriendChatHistory(
+    friendId!,
+    limit: limit,
+    offset: offset,
+  );
+
+  if (data.isEmpty) {
+    hasMore = false;
+  } else {
+    messages.insertAll(0, _parseMessages(data)); // purane msgs top par add
+    offset += data.length;
+  }
+
+  isLoadingMore = false;
+}
+
+
+List<Map<String, dynamic>> _parseMessages(List raw) {
+  return raw.map((msg) {
+    final type = msg["type"]?.toString() ?? "text";
+    final isVoice = type == "voice-note";
+
+    return {
+      "fromMe": msg["fromMe"],
+      "body": isVoice ? "" : (msg["body"] ?? ''),
+      "isVoice": isVoice,
+      "voiceUrl": isVoice ? msg["body"] : null,
+      "type": type,
+    };
+  }).toList();
+}
+
  
 }

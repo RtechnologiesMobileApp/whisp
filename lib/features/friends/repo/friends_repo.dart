@@ -40,33 +40,62 @@ class FriendRepo {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getFriendChatHistory(
-    String friendId,
-  ) async {
-    try {
-      final res = await _api.get(
-        "${ApiEndpoints.getFriendChatHistory}$friendId",
-        requireAuth: true,
-      );
-      if (res["messages"] == null) return [];
-      log("messages ${res["messages"]}");
-      return (res["messages"] as List)
-          .map(
-            (msg) => {
-              "fromMe": msg["from"] == SessionController().user!.id,
-              "body": msg["body"] ?? '',
-              "from": msg["from"],
-              "to": msg["to"],
-              "isRead": msg["isRead"],
-              "type": msg["type"] ?? "text",
-            },
-          )
-          .toList();
-    } catch (e) {
-      debugPrint("Error fetching chat history: $e");
-      return [];
-    }
+Future<List<Map<String, dynamic>>> getFriendChatHistory(
+  String friendId, {
+  int limit = 10,
+  int offset = 0,
+}) async {
+  try {
+    final res = await _api.get(
+      "${ApiEndpoints.getFriendChatHistory}$friendId?limit=$limit&offset=$offset",
+      requireAuth: true,
+    );
+
+    if (res["messages"] == null) return [];
+
+    return (res["messages"] as List).map((msg) {
+      return {
+        "fromMe": msg["from"] == SessionController().user!.id,
+        "body": msg["body"] ?? '',
+        "from": msg["from"],
+        "to": msg["to"],
+        "isRead": msg["isRead"],
+        "type": msg["type"] ?? "text",
+      };
+    }).toList();
+  } catch (e) {
+    debugPrint("Error fetching chat history: $e");
+    return [];
   }
+}
+
+  // Future<List<Map<String, dynamic>>> getFriendChatHistory(
+  //   String friendId,
+  // ) async {
+  //   try {
+  //     final res = await _api.get(
+  //       "${ApiEndpoints.getFriendChatHistory}$friendId",
+  //       requireAuth: true,
+  //     );
+  //     if (res["messages"] == null) return [];
+  //     log("messages ${res["messages"]}");
+  //     return (res["messages"] as List)
+  //         .map(
+  //           (msg) => {
+  //             "fromMe": msg["from"] == SessionController().user!.id,
+  //             "body": msg["body"] ?? '',
+  //             "from": msg["from"],
+  //             "to": msg["to"],
+  //             "isRead": msg["isRead"],
+  //             "type": msg["type"] ?? "text",
+  //           },
+  //         )
+  //         .toList();
+  //   } catch (e) {
+  //     debugPrint("Error fetching chat history: $e");
+  //     return [];
+  //   }
+  // }
 
   Future<List<FriendRequestModel>> getIncomingRequestsList() async {
     final res = await _api.get(
