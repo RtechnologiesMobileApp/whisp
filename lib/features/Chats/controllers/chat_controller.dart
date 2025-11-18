@@ -166,16 +166,21 @@ void sendVoice(File file) async {
 
   try {
     final repo = ChatRepository();
-    final voiceUrl = await repo.sendVoiceMessage(
+     final response = await repo.sendVoiceMessage(
       friendId: friendId!,
       audioFile: file,
     );
 
+   
+ 
     final index = messages.indexOf(tempMessage);
     if (index != -1) {
       // Only update the needed fields
-      messages[index]["voiceUrl"] = voiceUrl;
+      final realUrl = response["url"]; 
+      debugPrint("this is $realUrl");
+      messages[index]["voiceUrl"] = realUrl;
       messages[index]["sending"] = false;
+      messages[index].remove("localPath");
       messages.refresh();
     }
   } catch (e) {
@@ -184,7 +189,5 @@ void sendVoice(File file) async {
     messages.refresh();
   }
 }
-
- 
  
 }
