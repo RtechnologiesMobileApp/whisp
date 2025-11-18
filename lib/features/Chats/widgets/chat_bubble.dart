@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart' as aw;
@@ -88,13 +86,21 @@ class _ChatBubbleState extends State<ChatBubble> {
 
       // Listen to complete
       player!.onCompletion.listen((_) {
-        // player!.stopPlayer();
-        // player!.seekTo(0);
-
         if (mounted) {
           setState(() => isPlaying = false);
         }
+        // No need to manually stop/seek — the package already stops.
+        // But seeking to 0 helps visual feedback immediately
+        player!.seekTo(0);
       });
+      // player!.onCompletion.listen((_)  {
+      //   player!.stopPlayer();
+      //   player!.seekTo(0);
+
+      //   if (mounted) {
+      //     setState(() => isPlaying = false);
+      //   }
+      // });
 
       // Listen to state changes
       player!.onPlayerStateChanged.listen((state) {
@@ -148,8 +154,8 @@ class _ChatBubbleState extends State<ChatBubble> {
     preparedPath = null;
     isPlaying = false;
     if (GlobalAudioManager.currentPlayer == player) {
-  GlobalAudioManager.currentPlayer = null;
-}
+      GlobalAudioManager.currentPlayer = null;
+    }
   }
 
   @override
@@ -217,28 +223,39 @@ class _ChatBubbleState extends State<ChatBubble> {
               isPlaying ? Icons.pause : Icons.play_arrow,
               color: widget.fromMe ? Colors.white : Colors.black,
             ),
-           onPressed: () async {
-  if (isPlaying) {
-    await player!.pausePlayer();
-    return;
-  }
-  if(player!.playerState==aw.PlayerState.paused){
-    await player!.startPlayer();
-    return;
-  }
+            onPressed: () async {
+              // Always stop any other player first (before preparing)
+              await GlobalAudioManager.stopCurrent();
 
-  // Critical fix: re-prepare if stopped
-  if (player!.playerState == aw.PlayerState.stopped) {
-    await player!.preparePlayer(
-      path: preparedPath!,
-      shouldExtractWaveform: false,
-    );
-  }
+              // Toggle pause
+              if (isPlaying) {
+                await player!.pausePlayer();
+                return;
+              }
 
-  await GlobalAudioManager.stopCurrent();
-  GlobalAudioManager.setCurrent(player!);
-  await player!.startPlayer();
-},
+              // Resume if paused
+              if (player!.playerState == aw.PlayerState.paused) {
+                await player!.startPlayer();
+                return;
+              }
+
+              // 🔥 If audio finished → state becomes "stopped"
+              // → MUST re-prepare
+              if (player!.playerState == aw.PlayerState.stopped) {
+                await player!.preparePlayer(
+                  path: preparedPath!,
+                  shouldExtractWaveform: false,
+                );
+              }
+
+              // Set as active player
+              GlobalAudioManager.setCurrent(player!);
+
+              // Start playback
+              await player!.startPlayer();
+            },
+
+             
           ),
 
           Expanded(
@@ -246,10 +263,8 @@ class _ChatBubbleState extends State<ChatBubble> {
               size: const Size(double.infinity, 50),
               playerController: player!,
               playerWaveStyle: aw.PlayerWaveStyle(
-                fixedWaveColor:
-                    widget.fromMe ? Colors.white54 : Colors.black38,
-                liveWaveColor:
-                    widget.fromMe ? Colors.white : Colors.black87,
+                fixedWaveColor: widget.fromMe ? Colors.white54 : Colors.black38,
+                liveWaveColor: widget.fromMe ? Colors.white : Colors.black87,
                 showSeekLine: false,
               ),
             ),
