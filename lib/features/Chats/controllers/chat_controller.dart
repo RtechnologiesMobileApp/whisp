@@ -184,45 +184,6 @@ void sendVoice(File file) async {
   }
 }
 
-// void sendVoice(File file) async {
-//   final tempMessage = {
-//     "fromMe": true,
-//     "body": "",
-//     "isVoice": true,
-//     "type": "voice-note",
-//     "voiceUrl": null,
-//     "localPath": file.path,
-//     "sending": true
-//   };
-
-//   messages.add(tempMessage); // add temporary UI
-//   messages.refresh();
-
-//   try {
-//     final repo = ChatRepository();
-
-//     final voiceUrl = await repo.sendVoiceMessage(
-//       friendId: friendId!,
-//       audioFile: file,
-//     );
-
-//     // update temporary message with real voiceUrl
-//     final index = messages.indexOf(tempMessage);
-//     if (index != -1) {
-//       messages[index] = {
-//         ...Map<String, dynamic>.from(messages[index]),
-//         "voiceUrl": voiceUrl,
-//         "sending": false,
-//       };
-//     }
-
-//     // backend will emit socket event as well
-//   } catch (e) {
-//     Get.snackbar("Error", e.toString());
-//     messages.remove(tempMessage);
-//     messages.refresh();
-//   }
-// }
-
+ 
  
 }

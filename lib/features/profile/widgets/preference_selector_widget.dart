@@ -94,6 +94,10 @@ class PreferenceSelectorWidget extends StatelessWidget {
                         currentCity: controller.city.value.isEmpty
                             ? null
                             : controller.city.value,
+                      currentState: controller.state.value.isEmpty
+    ? null
+    : controller.state.value,
+
                         onCountryChanged: (value) {
                           controller.country.value = value ;
                         },
