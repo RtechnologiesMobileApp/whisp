@@ -9,13 +9,14 @@ import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
- 
+
 import 'package:whisp/features/profile/controller/preference_controller.dart';
- 
+
 import 'package:whisp/features/home/view/home_screen.dart';
- 
+
 import 'package:whisp/features/profile/controller/profile_controller.dart';
 import 'package:whisp/features/profile/view/edit_profile.dart';
+import 'package:whisp/features/profile/view/preference_screen.dart';
 import 'package:whisp/features/profile/widgets/preference_selector_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -75,12 +76,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-       onWillPop: () async {
-         
-          Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
-                      (route) => false,
-                     );
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
+          (route) => false,
+        );
         return true;
       },
       child: Scaffold(
@@ -91,27 +91,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // ===== AppBar with Back Button =====
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        // InkWell(
-                        //   onTap: () => Get.back(),
-                        //   child: Container(
-                        //     padding: const EdgeInsets.all(8),
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.grey.shade100,
-                        //       borderRadius: BorderRadius.circular(12),
-                        //     ),
-                        //     child: const Icon(
-                        //       Icons.arrow_back_ios_new,
-                        //       size: 20,
-                        //       color: Colors.black,
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(width: 16),
                         const Text(
                           "Profile",
@@ -126,9 +114,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-      
+
               const SizedBox(height: 24),
-      
+
               // ===== Profile Picture =====
               Center(
                 child: Stack(
@@ -139,32 +127,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundImage:
                           profilePic != null && profilePic!.isNotEmpty
                           ? NetworkImage(profilePic!)
-                          : const AssetImage('assets/images/place_holder_pic.jpg')
+                          : const AssetImage(
+                                  'assets/images/place_holder_pic.jpg',
+                                )
                                 as ImageProvider,
                     ),
-                    // Positioned(
-                    //   right: 0,
-                    //   bottom: 0,
-                    //   child: Container(
-                    //     padding: const EdgeInsets.all(8),
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.black,
-                    //       shape: BoxShape.circle,
-                    //       border: Border.all(color: Colors.white, width: 2),
-                    //     ),
-                    //     child: const Icon(
-                    //       Icons.edit,
-                    //       size: 16,
-                    //       color: Colors.white,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
-      
+
               const SizedBox(height: 16),
-      
+
               // ===== User Name =====
               Center(
                 child: Text(
@@ -176,9 +149,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-      
+
               const SizedBox(height: 8),
-      
+
               // ===== User Email =====
               Center(
                 child: Text(
@@ -186,9 +159,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
               ),
-      
+
               const SizedBox(height: 32),
-      
+
               // ===== Settings Section =====
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -201,13 +174,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-      
+
               const SizedBox(height: 16),
-      
+
               // ===== Notifications Toggle =====
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(16),
@@ -263,41 +239,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           setState(() {
                             _notificationsEnabled = value;
                           });
-                        // TODO: Call API here to update notification settings
-                        debugPrint('Notifications: $value');
-                        try {
-                          final response = await http.put(
-                            Uri.parse(
-                              '${ApiEndpoints.baseUrl}/api/auth/notifications',
-                            ),
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'Authorization':
-                                  'Bearer ${SessionController().user!.token!}',
-                            },
-                            body: jsonEncode({'enabled': value}),
-                          );
-      
-                          if (response.statusCode != 200) {
+                          // TODO: Call API here to update notification settings
+                          debugPrint('Notifications: $value');
+                          try {
+                            final response = await http.put(
+                              Uri.parse(
+                                '${ApiEndpoints.baseUrl}/api/auth/notifications',
+                              ),
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization':
+                                    'Bearer ${SessionController().user!.token!}',
+                              },
+                              body: jsonEncode({'enabled': value}),
+                            );
+
+                            if (response.statusCode != 200) {
+                              setState(() => _notificationsEnabled = !value);
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              prefs.setBool(
+                                'notificationsEnabled',
+                                _notificationsEnabled ?? true,
+                              );
+                            } else {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              prefs.setBool(
+                                'notificationsEnabled',
+                                _notificationsEnabled ?? true,
+                              );
+                            }
+                          } catch (e) {
                             setState(() => _notificationsEnabled = !value);
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.setBool(
-                              'notificationsEnabled',
-                              _notificationsEnabled ?? true,
-                            );
-                          } else {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.setBool(
-                              'notificationsEnabled',
-                              _notificationsEnabled ?? true,
-                            );
                           }
-                        } catch (e) {
-                          setState(() => _notificationsEnabled = !value);
-                        }
-                      },
+                        },
                         activeThumbColor: Colors.black,
                         activeTrackColor: Colors.grey.shade300,
                       )
@@ -318,34 +294,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 20.h),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: CustomButton(
-                  text: 'Set Preferences',
-                  onPressed: () {
-                    if (SessionController().user?.premium == true) {
-                      Get.dialog(
-                        Dialog(
-                          insetPadding: EdgeInsets.all(20),
-                          child: IntrinsicHeight(
-                            child: Container(
-                              padding: EdgeInsets.all(20),
-                              child: PreferenceSelectorWidget(controller: Get.find<PreferenceController>()),
-                            ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      // Not premium → show message
-                      Get.defaultDialog(
-                        title: "Premium Feature",
-                        middleText: "Buy premium to use this feature",
-                        confirm: ElevatedButton(
-                          onPressed: () => Get.back(),
-                          child: const Text("OK"),
-                        ),
-                      );
-                    }
-                  },
-                ),
+                child:CustomButton(
+  text: 'Set Preferences',
+  onPressed: () {
+    if (SessionController().user?.premium == true) {
+      Get.to(() => PreferenceScreen());
+    } else {
+      Get.defaultDialog(
+        title: "Premium Feature",
+        middleText: "Buy premium to use this feature",
+        confirm: ElevatedButton(
+          onPressed: () => Get.back(),
+          child: const Text("OK"),
+        ),
+      );
+    }
+  },
+),
+
+                // child: CustomButton(
+                //   text: 'Set Preferences',
+                //   onPressed: () {
+                //     if (SessionController().user?.premium == true) {
+                     
+                //       Get.dialog(
+                //         Dialog(
+                //           insetPadding: EdgeInsets.all(20),
+                //           child: IntrinsicHeight(
+                //             child: Container(
+                //               padding: EdgeInsets.all(20),
+                //               child: PreferenceSelectorWidget(controller: Get.find<PreferenceController>()),
+                //             ),
+                //           ),
+                //         ),
+                //       );
+                //     } else {
+                //       // Not premium → show message
+                //       Get.defaultDialog(
+                //         title: "Premium Feature",
+                //         middleText: "Buy premium to use this feature",
+                //         confirm: ElevatedButton(
+                //           onPressed: () => Get.back(),
+                //           child: const Text("OK"),
+                //         ),
+                //       );
+                //     }
+                //   },
+                // ),
+             
               ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
