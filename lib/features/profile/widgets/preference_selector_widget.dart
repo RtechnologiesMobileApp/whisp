@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:csc_picker_plus/csc_picker_plus.dart';
+import 'package:whisp/config/constants/colors.dart';
  
 import '../controller/preference_controller.dart';
 
@@ -133,7 +134,7 @@ class PreferenceSelectorWidget extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

@@ -90,9 +90,11 @@ class _MessageInputFieldState extends State<MessageInputField> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             color: Colors.white,
             child:Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
   children: [
+    !isRecording ?
     Expanded(
-      child: isRecording ? SizedBox() : TextField(
+      child:  TextField(
         controller: widget.controller.messageController,
         onChanged: (text) => widget.controller.sendTyping(true),
         decoration: InputDecoration(
@@ -105,8 +107,23 @@ class _MessageInputFieldState extends State<MessageInputField> {
           ),
         ),
       ),
-    ),
-
+    ):
+       
+            Expanded(
+              child: SizedBox(
+                width: 60,
+                height: 40,
+                child: AudioWaveforms(
+                  enableGesture: false,
+                  size: const Size(60, 40),
+                  recorderController: recorder,
+                  waveStyle: const WaveStyle(
+                    waveColor: Colors.red,
+                    showMiddleLine: false,
+                  ),
+                ),
+              ),
+            ),
     const SizedBox(width: 8),
 
     // 👇 MIC only if user is friend
@@ -137,20 +154,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
               ),
             ),
           ),
-          if (isRecording)
-            SizedBox(
-              width: 60,
-              height: 40,
-              child: AudioWaveforms(
-                enableGesture: false,
-                size: const Size(60, 40),
-                recorderController: recorder,
-                waveStyle: const WaveStyle(
-                  waveColor: Colors.red,
-                  showMiddleLine: false,
-                ),
-              ),
-            ),
+       
         ],
       ),
 
