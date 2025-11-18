@@ -88,8 +88,8 @@ class _ChatBubbleState extends State<ChatBubble> {
 
       // Listen to complete
       player!.onCompletion.listen((_) {
-        player!.stopPlayer();
-        player!.seekTo(0);
+        // player!.stopPlayer();
+        // player!.seekTo(0);
 
         if (mounted) {
           setState(() => isPlaying = false);
@@ -217,21 +217,28 @@ class _ChatBubbleState extends State<ChatBubble> {
               isPlaying ? Icons.pause : Icons.play_arrow,
               color: widget.fromMe ? Colors.white : Colors.black,
             ),
-            onPressed: () async {
-              if (!isPlaying) {
-    // Stop previously playing audio anywhere in chat
-    await GlobalAudioManager.stopCurrent();
-
-    // Register this player as the active one
-    GlobalAudioManager.setCurrent(player!);
-
-    // Start this audio
-    await player!.seekTo(0);
-    await player!.startPlayer();
-  } else {
+           onPressed: () async {
+  if (isPlaying) {
     await player!.pausePlayer();
+    return;
   }
-            },
+  if(player!.playerState==aw.PlayerState.paused){
+    await player!.startPlayer();
+    return;
+  }
+
+  // Critical fix: re-prepare if stopped
+  if (player!.playerState == aw.PlayerState.stopped) {
+    await player!.preparePlayer(
+      path: preparedPath!,
+      shouldExtractWaveform: false,
+    );
+  }
+
+  await GlobalAudioManager.stopCurrent();
+  GlobalAudioManager.setCurrent(player!);
+  await player!.startPlayer();
+},
           ),
 
           Expanded(

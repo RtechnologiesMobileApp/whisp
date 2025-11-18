@@ -125,9 +125,9 @@ class _MessageInputFieldState extends State<MessageInputField> {
             onTap: isRecording ? stopRecording : startRecording,
             child: Obx(
               () => CircleAvatar(
-                radius: 24,
+                radius: 20,
                 backgroundColor:
-                    isRecording ? Colors.redAccent : Colors.red,
+                    isRecording ? AppColors.primary : AppColors.primary,
                 child: widget.controller.isProcessingAudio.value
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Icon(
