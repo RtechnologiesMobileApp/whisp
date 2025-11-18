@@ -1,15 +1,15 @@
 
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart' as aw;
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:just_audio/just_audio.dart' as ja;
- 
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:whisp/config/constants/colors.dart';
+import 'package:whisp/config/global/audio_manager.dart';
 
 class ChatBubble extends StatefulWidget {
   final bool fromMe;
@@ -30,16 +30,13 @@ class ChatBubble extends StatefulWidget {
     this.localPath,
     this.isSending = false,
   });
-  
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
 }
 
-
 class _ChatBubbleState extends State<ChatBubble> {
-  aw.PlayerController? waveformPlayer;
-  ja.AudioPlayer? audioPlayer;
+  aw.PlayerController? player;
   bool isPlaying = false;
   bool isLoading = false;
   String? preparedPath;
@@ -53,20 +50,20 @@ class _ChatBubbleState extends State<ChatBubble> {
   @override
   void didUpdateWidget(covariant ChatBubble oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (!widget.isVoice) return;
 
-    final voiceChanged = oldWidget.voiceUrl != widget.voiceUrl;
-    final localChanged = oldWidget.localPath != widget.localPath;
+    bool voiceChanged = oldWidget.voiceUrl != widget.voiceUrl;
+    bool localChanged = oldWidget.localPath != widget.localPath;
 
     if (voiceChanged || localChanged) {
-      _disposePlayers();
+      _disposePlayer();
       _initVoicePlayerIfNeeded();
     }
   }
 
   void _initVoicePlayerIfNeeded() {
     if (!widget.isVoice) return;
-    if (widget.voiceUrl == null && widget.localPath == null) return;
     initVoicePlayer();
   }
 
@@ -82,77 +79,79 @@ class _ChatBubbleState extends State<ChatBubble> {
 
       preparedPath = path;
 
-      waveformPlayer = aw.PlayerController();
-      
-      await waveformPlayer!.preparePlayer(
+      player = aw.PlayerController();
+
+      await player!.preparePlayer(
         path: preparedPath!,
         shouldExtractWaveform: true,
       );
 
-      audioPlayer = ja.AudioPlayer();
-      await audioPlayer!.setFilePath(preparedPath!, preload: true);
-      await audioPlayer!.setLoopMode(ja.LoopMode.off);
+      // Listen to complete
+      player!.onCompletion.listen((_) {
+        player!.stopPlayer();
+        player!.seekTo(0);
 
-      waveformPlayer!.onPlayerStateChanged.listen((state) {});
-
-      audioPlayer!.processingStateStream.listen((state) {
-        if (state == ja.ProcessingState.completed) {
-          audioPlayer!.stop();
-          audioPlayer!.seek(Duration.zero);
-          waveformPlayer!.stopPlayer();
-          if (mounted) {
-            setState(() => isPlaying = false);
-          }
+        if (mounted) {
+          setState(() => isPlaying = false);
         }
       });
 
-      audioPlayer!.playingStream.listen((playing) {
-        if (mounted) {
-          setState(() => isPlaying = playing);
-        }
+      // Listen to state changes
+      player!.onPlayerStateChanged.listen((state) {
+        if (!mounted) return;
+
+        setState(() {
+          isPlaying = state == aw.PlayerState.playing;
+        });
       });
     } catch (e) {
-      debugPrint('Failed to init voice player: $e');
+      debugPrint("Voice init error: $e");
     } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   Future<String?> _resolveAudioPath() async {
+    // Local file first
     if (widget.localPath != null) {
-      final file = File(widget.localPath!);
-      if (await file.exists()) {
-        return file.path;
-      }
+      File f = File(widget.localPath!);
+      if (await f.exists()) return f.path;
     }
 
-    if (widget.voiceUrl == null) return null;
-    return await downloadVoiceFile(widget.voiceUrl!);
+    // Remote URL fallback
+    if (widget.voiceUrl != null) {
+      return await _downloadVoiceFile(widget.voiceUrl!);
+    }
+
+    return null;
   }
 
-  Future<String> downloadVoiceFile(String url) async {
+  Future<String> _downloadVoiceFile(String url) async {
     final response = await http.get(Uri.parse(url));
+
     final dir = await getTemporaryDirectory();
+
+    final extension = p.extension(url).isNotEmpty ? p.extension(url) : ".wav";
+
     final file = File(
-        '${dir.path}/tempVoice_${DateTime.now().millisecondsSinceEpoch}.mp3'); // ya wav
+      "${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}$extension",
+    );
+
     await file.writeAsBytes(response.bodyBytes);
+
     return file.path;
   }
 
-  void _disposePlayers() {
-    waveformPlayer?.dispose();
-    waveformPlayer = null;
-    audioPlayer?.dispose();
-    audioPlayer = null;
+  void _disposePlayer() {
+    player?.dispose();
+    player = null;
     preparedPath = null;
     isPlaying = false;
   }
 
   @override
   void dispose() {
-    _disposePlayers();
+    _disposePlayer();
     super.dispose();
   }
 
@@ -163,10 +162,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     return Align(
       alignment: widget.fromMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: maxWidth,
-          minWidth: 60,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 60),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
         decoration: BoxDecoration(
@@ -188,63 +184,67 @@ class _ChatBubbleState extends State<ChatBubble> {
     );
   }
 
- 
   Widget _voiceWidget(double maxWidth) {
-    if (isLoading || waveformPlayer == null || audioPlayer == null) {
+    if (isLoading || player == null) {
       return SizedBox(
-  height: 50,
-  child: Center(
-    child: SizedBox(
-     height: 22,
-      width: 22,
-      child: CircularProgressIndicator(
-        strokeWidth: 2.4,
-        color: widget.fromMe ? Colors.white : Colors.black,
-      ),
-),
-),
-);
+        height: 50,
+        child: Center(
+          child: SizedBox(
+            height: 22,
+            width: 22,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.4,
+              color: widget.fromMe ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      );
     }
 
     return Container(
-      constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 140, minHeight: 50),
+      constraints: BoxConstraints(
+        maxWidth: maxWidth,
+        minWidth: 140,
+        minHeight: 50,
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          
-   IconButton(
-  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
-      color: widget.fromMe ? Colors.white : Colors.black),
-  onPressed: () async {
-    if (!isPlaying) {
-      // Start waveform animation
-       waveformPlayer!.stopPlayer();
-      waveformPlayer!.startPlayer( ); // waveform starts properly
+          IconButton(
+            icon: Icon(
+              isPlaying ? Icons.pause : Icons.play_arrow,
+              color: widget.fromMe ? Colors.white : Colors.black,
+            ),
+            onPressed: () async {
+              if (!isPlaying) {
+    // Stop previously playing audio anywhere in chat
+    await GlobalAudioManager.stopCurrent();
 
-      // Start audio
-      await audioPlayer!.play();
-    } else {
-      await audioPlayer!.pause();
-      waveformPlayer!.pausePlayer();
-    }
-  },
-),
+    // Register this player as the active one
+    GlobalAudioManager.setCurrent(player!);
+
+    // Start this audio
+    await player!.seekTo(0);
+    await player!.startPlayer();
+  } else {
+    await player!.pausePlayer();
+  }
+            },
+          ),
 
           Expanded(
-            flex: 5,
-            child: preparedPath == null
-                ? const Text("Voice unavailable", style: TextStyle(color: Colors.red))
-                : aw.AudioFileWaveforms(
-                    size: Size(Get.width, 50),
-                    playerController: waveformPlayer!,
-                    playerWaveStyle: aw.PlayerWaveStyle(
-                      fixedWaveColor: widget.fromMe ? Colors.white54 : Colors.black38,
-                      liveWaveColor: widget.fromMe ? Colors.white : Colors.black87,
-                      showSeekLine: false,
-
-                    ),
-                  ),
+            child: aw.AudioFileWaveforms(
+              size: const Size(double.infinity, 50),
+              playerController: player!,
+              playerWaveStyle: aw.PlayerWaveStyle(
+                fixedWaveColor:
+                    widget.fromMe ? Colors.white54 : Colors.black38,
+                liveWaveColor:
+                    widget.fromMe ? Colors.white : Colors.black87,
+                showSeekLine: false,
+              ),
+            ),
           ),
+
           if (widget.isSending)
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -261,5 +261,4 @@ class _ChatBubbleState extends State<ChatBubble> {
       ),
     );
   }
-
 }

@@ -10,11 +10,11 @@ class ApiClient {
   final Dio _dio = Dio(
     BaseOptions(
  
-    baseUrl: "https://whisp-backend-production-1880.up.railway.app",
+    // baseUrl: "https://whisp-backend-production-1880.up.railway.app",
  
  
  
-        // baseUrl: "https://29c0bf1e0447.ngrok-free.app",
+        baseUrl: "https://d5f0e5c89cc4.ngrok-free.app",
  
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 10),
