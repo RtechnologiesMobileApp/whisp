@@ -66,9 +66,14 @@ class _MessageInputFieldState extends State<MessageInputField> {
   }
 
   Future<void> stopRecording() async {
+    setState(() => isRecording = false);
+
+    // show processing overlay
+    widget.controller.isProcessingAudio.value = true;
+
     await recorder.stop();
     stopTimer();
-    setState(() => isRecording = false);
+    widget.controller.isProcessingAudio.value = false;
 
     if (filePath != null) {
       widget.controller.sendVoice(File(filePath!));
@@ -83,67 +88,81 @@ class _MessageInputFieldState extends State<MessageInputField> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             color: Colors.white,
-            child:Row(
-  children: [
-    Expanded(
-      child: TextField(
-        controller: widget.controller.messageController,
-        onChanged: (text) => widget.controller.sendTyping(true),
-        decoration: InputDecoration(
-          hintText: "Write a message",
-          filled: true,
-          fillColor: const Color(0xffF1F2F5),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-    ),
-    const SizedBox(width: 8),
-    // Mic button + timer overlay
-    Column(
-      children: [
-        if (isRecording)
-          Text(
-            formatTime(seconds),
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-          ),
-        GestureDetector(
-          onTap: isRecording ? stopRecording : startRecording,
-          child: CircleAvatar(
-            radius: 24,
-            backgroundColor: isRecording ? Colors.redAccent : Colors.red,
-            child: Icon(isRecording ? Icons.stop : Icons.mic, color: Colors.white),
-          ),
-        ),
-        if (isRecording)
-          SizedBox(
-            width: 60,
-            height: 40,
-            child: AudioWaveforms(
-              enableGesture: false,
-              size: const Size(60, 40),
-              recorderController: recorder,
-              waveStyle: const WaveStyle(
-                waveColor: Colors.red,
-                showMiddleLine: false,
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widget.controller.messageController,
+                    onChanged: (text) => widget.controller.sendTyping(true),
+                    decoration: InputDecoration(
+                      hintText: "Write a message",
+                      filled: true,
+                      fillColor: const Color(0xffF1F2F5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Mic button + timer overlay
+                Column(
+                  children: [
+                    if (isRecording)
+                      Text(
+                        formatTime(seconds),
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    GestureDetector(
+                      onTap: isRecording ? stopRecording : startRecording,
+                      child: Obx(
+                        () => CircleAvatar(
+                          radius: 24,
+                          backgroundColor: isRecording
+                              ? Colors.redAccent
+                              : Colors.red,
+                          child: widget.controller.isProcessingAudio.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  isRecording ? Icons.stop : Icons.mic,
+                                  color: Colors.white,
+                                ),
+                        ),
+                      ),
+                    ),
+                    if (isRecording)
+                      SizedBox(
+                        width: 60,
+                        height: 40,
+                        child: AudioWaveforms(
+                          enableGesture: false,
+                          size: const Size(60, 40),
+                          recorderController: recorder,
+                          waveStyle: const WaveStyle(
+                            waveColor: Colors.red,
+                            showMiddleLine: false,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 8),
+                // Send button
+                GestureDetector(
+                  onTap: widget.controller.sendMessage,
+                  child: CircleAvatar(
+                    backgroundColor: AppColors.primary,
+                    child: const Icon(Icons.send, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-          ),
-      ],
-    ),
-    const SizedBox(width: 8),
-    // Send button
-    GestureDetector(
-      onTap: widget.controller.sendMessage,
-      child: CircleAvatar(
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.send, color: Colors.white),
-      ),
-    ),
-  ],
-)
 
             // child: Row(
             //   children: [
@@ -193,7 +212,6 @@ class _MessageInputFieldState extends State<MessageInputField> {
             //     ),
             //   ],
             // ),
-       
           ),
           // Waveform & timer overlay
           if (isRecording && filePath != null)
@@ -206,9 +224,10 @@ class _MessageInputFieldState extends State<MessageInputField> {
                   Text(
                     formatTime(seconds),
                     style: const TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   AudioWaveforms(
@@ -228,7 +247,3 @@ class _MessageInputFieldState extends State<MessageInputField> {
     );
   }
 }
-
-
-
- 

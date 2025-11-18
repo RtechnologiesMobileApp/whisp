@@ -2,6 +2,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart' as aw;
+import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:just_audio/just_audio.dart' as ja;
  
 import 'package:path_provider/path_provider.dart';
@@ -80,6 +83,7 @@ class _ChatBubbleState extends State<ChatBubble> {
       preparedPath = path;
 
       waveformPlayer = aw.PlayerController();
+      
       await waveformPlayer!.preparePlayer(
         path: preparedPath!,
         shouldExtractWaveform: true,
@@ -188,17 +192,26 @@ class _ChatBubbleState extends State<ChatBubble> {
   Widget _voiceWidget(double maxWidth) {
     if (isLoading || waveformPlayer == null || audioPlayer == null) {
       return SizedBox(
-        height: 50,
-        child: Center(
-          child: CircularProgressIndicator(color: widget.fromMe ? Colors.white : Colors.black),
-        ),
-      );
+  height: 50,
+  child: Center(
+    child: SizedBox(
+     height: 22,
+      width: 22,
+      child: CircularProgressIndicator(
+        strokeWidth: 2.4,
+        color: widget.fromMe ? Colors.white : Colors.black,
+      ),
+),
+),
+);
     }
 
     return Container(
       constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 140, minHeight: 50),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          
    IconButton(
   icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
       color: widget.fromMe ? Colors.white : Colors.black),
@@ -218,14 +231,17 @@ class _ChatBubbleState extends State<ChatBubble> {
 ),
 
           Expanded(
+            flex: 5,
             child: preparedPath == null
                 ? const Text("Voice unavailable", style: TextStyle(color: Colors.red))
                 : aw.AudioFileWaveforms(
-                    size: const Size(double.infinity, 50),
+                    size: Size(Get.width, 50),
                     playerController: waveformPlayer!,
                     playerWaveStyle: aw.PlayerWaveStyle(
                       fixedWaveColor: widget.fromMe ? Colors.white54 : Colors.black38,
                       liveWaveColor: widget.fromMe ? Colors.white : Colors.black87,
+                      showSeekLine: false,
+
                     ),
                   ),
           ),

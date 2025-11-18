@@ -16,6 +16,7 @@ class ChatController extends GetxController {
   bool isFriend;
   RxBool isLoading = false.obs;
   RxBool partnerTyping = false.obs;
+  RxBool isProcessingAudio=false.obs;
   ChatController({this.friendId, this.isFriend = false}) {
     // ✅ Agar friend chat screen hai aur friendId available hai
     if (isFriend && friendId != null) {
