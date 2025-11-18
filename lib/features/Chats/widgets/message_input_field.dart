@@ -96,7 +96,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
     Expanded(
       child:  TextField(
         controller: widget.controller.messageController,
-        onChanged: (text) => widget.controller.sendTyping(true),
+        onChanged: (text) => widget.controller.sendTyping(),
         decoration: InputDecoration(
           hintText: "Write a message",
           filled: true,

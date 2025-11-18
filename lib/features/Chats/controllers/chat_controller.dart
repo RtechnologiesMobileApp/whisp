@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -82,13 +83,38 @@ SocketService.to.onMessage((data) {
  
   }
  
-void sendTyping(bool isTyping) {
-  if (isFriend && friendId != null) {
-    SocketService.to.typing(isTyping, toUserId: friendId!);
-  } else {
-    SocketService.to.typing(isTyping); // random chat
+ 
+
+ 
+ Timer? _typingTimer;
+bool _isTyping = false;
+
+void sendTyping() {
+  if (!isFriend && friendId == null) return;
+
+  // Emit typing start immediately only once
+  if (!_isTyping) {
+    _isTyping = true;
+    SocketService.to.typing(true, toUserId: friendId!);
   }
+
+  // Cancel previous timer
+  _typingTimer?.cancel();
+
+  // Start a 2-second timer to emit stop typing
+  _typingTimer = Timer(const Duration(seconds: 2), () {
+    _isTyping = false;
+    SocketService.to.typing(false, toUserId: friendId!);
+  });
 }
+
+// void sendTyping(bool isTyping) {
+//   if (isFriend && friendId != null) {
+//     SocketService.to.typing(isTyping, toUserId: friendId!);
+//   } else {
+//     SocketService.to.typing(isTyping); // random chat
+//   }
+// }
 
 
 
