@@ -42,12 +42,11 @@ class ChatListScreen extends StatelessWidget {
     }
 
     return WillPopScope(
-       onWillPop: () async {
-         
-          Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
-                      (route) => false,
-                     );
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
+          (route) => false,
+        );
         return true;
       },
       child: Scaffold(
@@ -58,7 +57,10 @@ class ChatListScreen extends StatelessWidget {
             children: [
               // ===== AppBar Section =====
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -95,7 +97,7 @@ class ChatListScreen extends StatelessWidget {
                   ],
                 ),
               ),
-      
+
               // ===== Chat List =====
               Expanded(
                 child: Obx(() {
@@ -103,12 +105,12 @@ class ChatListScreen extends StatelessWidget {
                     // Show loader while fetching chat list
                     return const Center(child: CircularProgressIndicator());
                   }
-      
+
                   if (controller.chats.isEmpty) {
                     // Show "No Chats" if API returns empty
                     return const Center(child: Text("No Chats"));
                   }
-      
+
                   return ListView.separated(
                     physics: const BouncingScrollPhysics(),
                     itemCount: controller.chats.length,
@@ -157,7 +159,10 @@ class ChatListScreen extends StatelessWidget {
                                 log("💡 Reporting ${chat['id']}");
                                 showReportBottomSheet(context, (String reason) {
                                   print(reason);
-                                  friendController.reportUser(chat['id'], reason);
+                                  friendController.reportUser(
+                                    chat['id'],
+                                    reason,
+                                  );
                                 });
                               },
                               backgroundColor: AppColors.brown,
@@ -177,7 +182,8 @@ class ChatListScreen extends StatelessWidget {
                               CircleAvatar(
                                 radius: 22,
                                 backgroundImage:
-                                    chat['avatar'] != null && chat['avatar'] != ''
+                                    chat['avatar'] != null &&
+                                        chat['avatar'] != ''
                                     ? NetworkImage(chat['avatar'])
                                     : const AssetImage(
                                             'assets/images/place_holder_pic.jpg',
@@ -254,13 +260,15 @@ class ChatListScreen extends StatelessWidget {
                                                   TextSpan(
                                                     text: 'You: ',
                                                     style: TextStyle(
-                                                      fontWeight: FontWeight.w600,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 TextSpan(
                                                   text: messageText,
                                                   style: TextStyle(
-                                                    fontWeight: isRead || isFromMe
+                                                    fontWeight:
+                                                        isRead || isFromMe
                                                         ? FontWeight.w600
                                                         : FontWeight.bold,
                                                     color: isRead || isFromMe
@@ -289,27 +297,51 @@ class ChatListScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          onTap: () {
+                          onTap: () async {
                             log("🧠 Chat item tapped:");
                             log("id: ${chat['id']}");
                             log("name: ${chat['name']}");
                             log("image: ${chat['avatar']}");
-                            // Navigate to ChatScreen
-                            final friendController =
-                                Get.find<FriendsController>();
+                            // 🔥 Wait if friends are still loading
+                            if (friendController.isLoadingFriends.value) {
+                              await friendController.fetchFriends();
+                            }
+
                             final isStillFriend = friendController.isUserFriend(
                               chat['id'],
                             );
+
                             Get.to(
                               () => ChatScreen(
                                 partnerId: chat['id'],
                                 partnerName: chat['name'],
                                 partnerAvatar: chat['avatar'],
-                                // isFriend: true,
                                 isFriend: isStillFriend,
                               ),
                             );
                           },
+
+                          // onTap: () {
+                          //   log("🧠 Chat item tapped:");
+                          //   log("id: ${chat['id']}");
+                          //   log("name: ${chat['name']}");
+                          //   log("image: ${chat['avatar']}");
+                          //   // Navigate to ChatScreen
+                          //   final friendController =
+                          //       Get.find<FriendsController>();
+                          //   final isStillFriend = friendController.isUserFriend(
+                          //     chat['id'],
+                          //   );
+                          //   Get.to(
+                          //     () => ChatScreen(
+                          //       partnerId: chat['id'],
+                          //       partnerName: chat['name'],
+                          //       partnerAvatar: chat['avatar'],
+                          //       // isFriend: true,
+                          //       isFriend: isStillFriend,
+                          //     ),
+                          //   );
+                          // },
                         ),
                       );
                     },
