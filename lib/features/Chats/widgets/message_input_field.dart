@@ -128,7 +128,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
 
     // 👇 MIC only if user is friend
     if (widget.isFriend)
-      Column(
+      Row(
         children: [
           if (isRecording)
             Text(
@@ -138,6 +138,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            SizedBox(width: 8),
+            
           GestureDetector(
             onTap: isRecording ? stopRecording : startRecording,
             child: Obx(

@@ -352,7 +352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 10.h),
+              
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0.w),
                 child: CustomButton(
