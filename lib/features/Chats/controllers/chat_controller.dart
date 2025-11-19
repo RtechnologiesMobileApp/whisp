@@ -17,19 +17,20 @@ class ChatController extends GetxController {
   bool isFriend;
   RxBool isLoading = false.obs;
   RxBool partnerTyping = false.obs;
-  RxBool isProcessingAudio=false.obs;
+  RxBool isProcessingAudio = false.obs;
 
   /// pagiantion variables
-int limit = 20;
-int offset = 0;
-bool hasMore = true;
-bool isLoadingMore = false;
+  int limit = 10;
+  int offset = 0;
+  bool hasMore = true;
+  String? nextCursor;
+  bool isLoadingMore = false;
 
   ChatController({this.friendId, this.isFriend = false}) {
     // ✅ Agar friend chat screen hai aur friendId available hai
     if (isFriend && friendId != null) {
-     // loadFriendChatHistory();
-     loadInitialChat(); 
+      // loadFriendChatHistory();
+      loadInitialChat();
     }
   }
   String? get currentUserId => SessionController().user!.id;
@@ -45,78 +46,63 @@ bool isLoadingMore = false;
         debugPrint("Partner typing value ${partnerTyping.value}");
       }
     });
-    
+
     // 🔹 Listen for messages only for this specific chat
     // Note: ChatListController handles updating the chat list globally
 
-SocketService.to.onMessage((data) {
-  debugPrint("📥 Incoming SOCKET message:");
-  debugPrint("RAW → $data");
+    SocketService.to.onMessage((data) {
+      debugPrint("📥 Incoming SOCKET message:");
+      debugPrint("RAW → $data");
 
-  final senderId = data['from'] ?? data['fromUserId'];
+      final senderId = data['from'] ?? data['fromUserId'];
 
-  if (senderId != friendId) return;
+      if (senderId != friendId) return;
 
-  // ----------- FIX START -----------
-  final type = (data['type'] ?? 'text').toString();
-  final isVoice = type == 'voice-note';
+      // ----------- FIX START -----------
+      final type = (data['type'] ?? 'text').toString();
+      final isVoice = type == 'voice-note';
 
-  final body = data['body']?.toString() ?? '';
+      final body = data['body']?.toString() ?? '';
 
-  if (body.isEmpty) {
-    debugPrint("⚠ Ignored empty socket message");
-    return;
-  }
-  // ----------- FIX END -----------
-  
-  messages.add({
-    'fromMe': senderId == currentUserId,
-    'body': isVoice ? '' : body,
-    'isVoice': isVoice,
-    'voiceUrl': isVoice ? body : null,
-    'type': type,
-  });
+      if (body.isEmpty) {
+        debugPrint("⚠ Ignored empty socket message");
+        return;
+      }
+      // ----------- FIX END -----------
 
-  debugPrint("✅ Added → ${messages.last}");
-});
+      messages.add({
+        'fromMe': senderId == currentUserId,
+        'body': isVoice ? '' : body,
+        'isVoice': isVoice,
+        'voiceUrl': isVoice ? body : null,
+        'type': type,
+      });
 
- 
-  }
- 
- 
-
- 
- Timer? _typingTimer;
-bool _isTyping = false;
-
-void sendTyping() {
-  if (!isFriend && friendId == null) return;
-
-  // Emit typing start immediately only once
-  if (!_isTyping) {
-    _isTyping = true;
-    SocketService.to.typing(true, toUserId: friendId!);
+      debugPrint("✅ Added → ${messages.last}");
+    });
   }
 
-  // Cancel previous timer
-  _typingTimer?.cancel();
+  Timer? _typingTimer;
+  bool _isTyping = false;
 
-  // Start a 2-second timer to emit stop typing
-  _typingTimer = Timer(const Duration(seconds: 2), () {
-    _isTyping = false;
-    SocketService.to.typing(false, toUserId: friendId!);
-  });
-}
+  void sendTyping() {
+    if (!isFriend && friendId == null) return;
 
-// void sendTyping(bool isTyping) {
-//   if (isFriend && friendId != null) {
-//     SocketService.to.typing(isTyping, toUserId: friendId!);
-//   } else {
-//     SocketService.to.typing(isTyping); // random chat
-//   }
-// }
+    // Emit typing start immediately only once
+    if (!_isTyping) {
+      _isTyping = true;
+      SocketService.to.typing(true, toUserId: friendId!);
+    }
 
+    // Cancel previous timer
+    _typingTimer?.cancel();
 
+    // Start a 2-second timer to emit stop typing
+    _typingTimer = Timer(const Duration(seconds: 2), () {
+      _isTyping = false;
+      SocketService.to.typing(false, toUserId: friendId!);
+    });
+  }
 
   void sendMessage() {
     final text = messageController.text.trim();
@@ -142,139 +128,124 @@ void sendTyping() {
 
     messageController.clear();
   }
-  void markAsRead(String partnerId){
+
+  void markAsRead(String partnerId) {
     socketService.markAsRead(partnerId);
   }
 
- 
- void loadFriendChatHistory() async {
-  if (isFriend && friendId != null) {
+  void sendVoice(File file) async {
+    final tempMessage = {
+      "fromMe": true,
+      "body": "",
+      "isVoice": true,
+      "type": "voice-note",
+      "voiceUrl": null,
+      "localPath": file.path,
+      "sending": true,
+    };
+
+    messages.add(tempMessage);
+    messages.refresh();
+
     try {
-      isLoading.value = true;
-
-      final history = await FriendRepo().getFriendChatHistory(friendId!);
-
-      debugPrint("------- RAW HISTORY FROM API -------");
-      for (var msg in history) {
-        debugPrint("this is raw response msg: $msg");
-      }
-
-      messages.assignAll(
-        history.map((msg) {
-          final type = msg["type"]?.toString() ?? "text";
-          final isVoice = type == "voice-note";
-
-          return {
-            "fromMe": msg["from"].toString() == currentUserId.toString(),
-            "body": isVoice ? "" : (msg["body"] ?? ''),
-            "isVoice": isVoice,
-            "voiceUrl": isVoice ? msg["body"] : null,
-            "type": type,
-          };
-        }).toList(),
+      final repo = ChatRepository();
+      final response = await repo.sendVoiceMessage(
+        friendId: friendId!,
+        audioFile: file,
       );
 
-      debugPrint("🎯 HISTORY →   | body: ${messages.last["body"]}");
-      debugPrint("💬 Loaded ${messages.length} messages for friend $friendId");
+      final index = messages.indexOf(tempMessage);
+      if (index != -1) {
+        // Only update the needed fields
+        final realUrl = response["url"];
+        debugPrint("this is $realUrl");
+        messages[index]["voiceUrl"] = realUrl;
+        messages[index]["sending"] = false;
+        messages[index].remove("localPath");
+        messages.refresh();
+      }
     } catch (e) {
-      debugPrint("❌ Failed to load chat history: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-}
-
-void sendVoice(File file) async {
-  final tempMessage = {
-    "fromMe": true,
-    "body": "",
-    "isVoice": true,
-    "type": "voice-note",
-    "voiceUrl": null,
-    "localPath": file.path,
-    "sending": true
-  };
-
-  messages.add(tempMessage);
-  messages.refresh();
-
-  try {
-    final repo = ChatRepository();
-     final response = await repo.sendVoiceMessage(
-      friendId: friendId!,
-      audioFile: file,
-    );
-
-   
- 
-    final index = messages.indexOf(tempMessage);
-    if (index != -1) {
-      // Only update the needed fields
-      final realUrl = response["url"]; 
-      debugPrint("this is $realUrl");
-      messages[index]["voiceUrl"] = realUrl;
-      messages[index]["sending"] = false;
-      messages[index].remove("localPath");
+      Get.snackbar("Error", e.toString());
+      messages.remove(tempMessage);
       messages.refresh();
     }
-  } catch (e) {
-    Get.snackbar("Error", e.toString());
-    messages.remove(tempMessage);
-    messages.refresh();
-  }
-}
-Future<void> loadInitialChat() async {
-  offset = 0;
-  hasMore = true;
-  messages.clear();
-
-  final data = await FriendRepo().getFriendChatHistory(
-    friendId!,
-    limit: limit,
-    offset: offset,
-  );
-
-  messages.assignAll(_parseMessages(data));
-
-  offset += data.length; // next batch ke liye
-}
-
-Future<void> loadMoreMessages() async {
-  if (isLoadingMore || !hasMore) return;
-
-  isLoadingMore = true;
-
-  final data = await FriendRepo().getFriendChatHistory(
-    friendId!,
-    limit: limit,
-    offset: offset,
-  );
-
-  if (data.isEmpty) {
-    hasMore = false;
-  } else {
-    messages.insertAll(0, _parseMessages(data)); // purane msgs top par add
-    offset += data.length;
   }
 
-  isLoadingMore = false;
-}
+  //load initial chat with new variable
+  Future<void> loadInitialChat() async {
+    isLoading.value = true;
+    hasMore = true;
+    nextCursor = null;
+    messages.clear();
 
+    final res = await FriendRepo().getFriendChatHistory(
+      friendId!,
+      limit: limit,
+      beforeId: null,
+    );
 
-List<Map<String, dynamic>> _parseMessages(List raw) {
-  return raw.map((msg) {
-    final type = msg["type"]?.toString() ?? "text";
-    final isVoice = type == "voice-note";
+    final fetched = _parseMessages(res['messages']);
 
-    return {
-      "fromMe": msg["fromMe"],
-      "body": isVoice ? "" : (msg["body"] ?? ''),
-      "isVoice": isVoice,
-      "voiceUrl": isVoice ? msg["body"] : null,
-      "type": type,
-    };
-  }).toList();
-}
+    if (fetched.isNotEmpty) {
+      // API already newest → oldest
+      messages.assignAll(fetched);
+      nextCursor = res["nextCursor"]; // 👈 correct cursor
 
- 
+      // nextCursor = fetched.last["createdAt"]; // oldest → cursor ✔
+    }
+
+    hasMore = res["hasMore"] ?? false;
+    isLoading.value = false;
+  }
+
+  Future<void> loadMoreMessages(ScrollController scroll) async {
+    if (isLoadingMore || !hasMore) return;
+
+    isLoadingMore = true;
+
+    final oldMax = scroll.position.maxScrollExtent;
+
+    final res = await FriendRepo().getFriendChatHistory(
+      friendId!,
+      limit: limit,
+      beforeId: nextCursor, // Use correct cursor ✔
+    );
+
+    final olderMsgs = _parseMessages(res['messages']);
+
+    if (olderMsgs.isNotEmpty) {
+      res["nextCursor"]; // oldest → cursor ✔
+
+      messages.insertAll(0, olderMsgs); // Add on TOP ✔
+
+      hasMore = res["hasMore"] ?? false;
+    } else {
+      hasMore = false;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 20));
+
+    final newMax = scroll.position.maxScrollExtent;
+    final offset = newMax - oldMax;
+    scroll.jumpTo(offset); // keeps scroll position ✔
+
+    isLoadingMore = false;
+  }
+
+  List<Map<String, dynamic>> _parseMessages(List raw) {
+    return raw.map((msg) {
+      final type = msg["type"]?.toString() ?? "text";
+      final isVoice = type == "voice-note";
+
+      return {
+        "id": msg["id"],
+        "fromMe": msg["from"] == currentUserId,
+        "body": isVoice ? "" : msg["body"],
+        "isVoice": isVoice,
+        "voiceUrl": isVoice ? msg["body"] : null,
+        "type": type,
+        "createdAt": msg["createdAt"],
+      };
+    }).toList();
+  }
 }

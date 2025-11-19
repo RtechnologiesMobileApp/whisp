@@ -34,54 +34,75 @@ class _ChatScreenState extends State<ChatScreen> {
   late ChatController controller;
   late FriendsController friendController;
   final socketService = Get.find<SocketService>();
-  @override
-  void initState() {
-    super.initState();
-  
+  bool isLoadingMore = false;
 
+void _scrollListener() {
+  // make sure controller attached
+  if (!_scrollController.hasClients) return;
 
-    _scrollController = ScrollController();
-      _scrollController.addListener(() {
-  if (_scrollController.position.pixels ==
-      _scrollController.position.minScrollExtent) {
-    controller.loadMoreMessages();
+  try {
+    final pos = _scrollController.position;
+    // When user scrolls near top (<= 100 px from top) -> load older messages
+    if (pos.pixels <= pos.minScrollExtent + 100) {
+      // avoid rapid multiple calls — your controller also checks isLoadingMore
+      debugPrint("Reached TOP → loading more...");
+      controller.loadMoreMessages(_scrollController);
+    }
+  } catch (e) {
+    // sometimes position access may throw if controller lost attachment briefly
+    debugPrint("scrollListener error: $e");
   }
-});
+}
 
-    // Initialize ChatController once
-    controller = Get.isRegistered<ChatController>(
-            tag: widget.isFriend ? widget.partnerId : 'random')
-        ? Get.find<ChatController>(
-            tag: widget.isFriend ? widget.partnerId : 'random')
-        : Get.put(
-            ChatController(friendId: widget.partnerId, isFriend: widget.isFriend),
-            tag: widget.isFriend ? widget.partnerId : 'random',
-          );
+ @override
+void initState() {
+  super.initState();
 
-    // Initialize FriendsController
-    friendController = Get.isRegistered<FriendsController>()
-        ? Get.find<FriendsController>()
-        : Get.put(FriendsController());
+  _scrollController = ScrollController();
+  // attach our safe listener
+  _scrollController.addListener(_scrollListener);
 
-    friendController.getBlockedUsers();
+  // Initialize ChatController once
+  controller = Get.isRegistered<ChatController>(
+          tag: widget.isFriend ? widget.partnerId : 'random')
+      ? Get.find<ChatController>(tag: widget.isFriend ? widget.partnerId : 'random')
+      : Get.put(
+          ChatController(friendId: widget.partnerId, isFriend: widget.isFriend),
+          tag: widget.isFriend ? widget.partnerId : 'random',
+        );
 
-    // Scroll to bottom whenever messages change
-     ever(controller.messages, (_) => _scrollToBottom());
-    ever(controller.partnerTyping, (_) {
-  // only scroll when typing becomes visible (optional)
-  if (controller.partnerTyping.value) {
+  // ... rest of your initState (FriendsController init, ever listeners, etc.)
+  friendController = Get.isRegistered<FriendsController>()
+      ? Get.find<FriendsController>()
+      : Get.put(FriendsController());
+
+  friendController.getBlockedUsers();
+
+  // Scroll to bottom whenever messages change
+ever(controller.messages, (messages) {
+  // Only scroll down if last message is from me (sent message)
+  if (messages.isNotEmpty && messages.last["fromMe"] == true) {
     _scrollToBottom();
-  } else {
-    // if you want to always ensure bottom when it disappears, remove the if-check
-    //_scrollToBottom();
   }
 });
-    // Optional: scroll to bottom on first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+
+ // typing bubble ho to scroll only if already at bottom
+ever(controller.partnerTyping, (_) {
+  if (_scrollController.hasClients &&
+      _scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 50) {
+    _scrollToBottom();
   }
+});
+
+
+  // Optional: scroll to bottom on first frame
+  WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+}
 
   @override
   void dispose() {
+     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
   }
@@ -134,6 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   
                   return ListView.builder(
                     controller: _scrollController,
+                   physics: BouncingScrollPhysics(),
                     padding: const EdgeInsets.only(top: 12),
                     itemCount: msgCount + (showTyping ? 1 : 0),
                     itemBuilder: (context, index) {
