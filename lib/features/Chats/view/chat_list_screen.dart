@@ -29,6 +29,12 @@ class ChatListScreen extends StatelessWidget {
       controller.loadChatList();
       notificationUserId = null;
     });
+
+    String trimMessage(String msg, {int max = 30}) {
+      if (msg.length <= max) return msg;
+      return msg.substring(0, max) + "...";
+    }
+
     String formatTime(String isoString) {
       try {
         final dateTime = DateTime.parse(
@@ -245,8 +251,14 @@ class ChatListScreen extends StatelessWidget {
                                               chat['lastMessageUserId'];
                                           final isFromMe =
                                               lastUserId == currentUserId;
-                                          final messageText =
+                                          // final messageText =
+                                          //     chat['lastMessage'] ?? '';
+                                          final originalText =
                                               chat['lastMessage'] ?? '';
+                                          final messageText = trimMessage(
+                                            originalText,
+                                          );
+
                                           final isRead =
                                               chat['lastMessageRead'] ?? false;
                                           return RichText(
@@ -320,28 +332,6 @@ class ChatListScreen extends StatelessWidget {
                               ),
                             );
                           },
-
-                          // onTap: () {
-                          //   log("🧠 Chat item tapped:");
-                          //   log("id: ${chat['id']}");
-                          //   log("name: ${chat['name']}");
-                          //   log("image: ${chat['avatar']}");
-                          //   // Navigate to ChatScreen
-                          //   final friendController =
-                          //       Get.find<FriendsController>();
-                          //   final isStillFriend = friendController.isUserFriend(
-                          //     chat['id'],
-                          //   );
-                          //   Get.to(
-                          //     () => ChatScreen(
-                          //       partnerId: chat['id'],
-                          //       partnerName: chat['name'],
-                          //       partnerAvatar: chat['avatar'],
-                          //       // isFriend: true,
-                          //       isFriend: isStillFriend,
-                          //     ),
-                          //   );
-                          // },
                         ),
                       );
                     },

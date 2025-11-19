@@ -171,7 +171,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     return Align(
       alignment: widget.fromMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 60),
+        constraints: BoxConstraints(maxWidth: maxWidth, minWidth: 25),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
         decoration: BoxDecoration(
