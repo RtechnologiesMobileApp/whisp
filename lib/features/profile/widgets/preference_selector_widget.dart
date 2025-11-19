@@ -140,10 +140,20 @@ class PreferenceSelectorWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    "Save Preferences",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                 child: controller.isLoading.value
+    ? const SizedBox(
+        height: 20,
+        width: 20,
+        child: CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 2,
+        ),
+      )
+    : const Text(
+        "Save Preferences",
+        style: TextStyle(fontSize: 16, color: Colors.white),
+      ),
+
                 ),
               )
             ],

@@ -7,6 +7,7 @@ import 'package:whisp/core/network/api_endpoints.dart';
  
 
 class PreferenceController extends GetxController {
+  RxBool isLoading = false.obs;
   // Checkbox states
   RxBool genderEnabled = false.obs;
   RxBool ageEnabled = false.obs;
@@ -102,8 +103,9 @@ class PreferenceController extends GetxController {
   }
 
   // ------------------ PUT Preferences ------------------
- Future<void> submitPreferences() async {
+Future<void> submitPreferences() async {
   try {
+    isLoading.value = true; // 🔹 Loader start
     debugPrint("Submitting Preferences Payload: ${payload}");
 
     final res = await _api.put(
@@ -124,6 +126,8 @@ class PreferenceController extends GetxController {
   } catch (e) {
     debugPrint("Error saving preferences: $e");
     Get.snackbar("Error", "Failed to save preferences");
+  } finally {
+    isLoading.value = false; // 🔹 Loader stop
   }
 }
 

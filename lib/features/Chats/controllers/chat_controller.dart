@@ -76,6 +76,7 @@ class ChatController extends GetxController {
         'isVoice': isVoice,
         'voiceUrl': isVoice ? body : null,
         'type': type,
+        
       });
 
       debugPrint("✅ Added → ${messages.last}");

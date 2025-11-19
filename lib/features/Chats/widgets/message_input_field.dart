@@ -182,41 +182,7 @@ if (widget.isFriend)
       ),
     ],
   ),
-
-    // if (widget.isFriend)
-    //   Row(
-    //     children: [
-    //       if (isRecording)
-    //         Text(
-    //           formatTime(seconds),
-    //           style: const TextStyle(
-    //             color: Colors.red,
-    //             fontWeight: FontWeight.bold,
-    //           ),
-    //         ),
-    //         SizedBox(width: 8),
-            
-    //       GestureDetector(
-    //         onTap: isRecording ? stopRecording : startRecording,
-    //         child: Obx(
-    //           () => CircleAvatar(
-    //             radius: 20,
-    //             backgroundColor:
-    //                 isRecording ? AppColors.primary : AppColors.primary,
-    //             child: widget.controller.isProcessingAudio.value
-    //                 ? const CircularProgressIndicator(color: Colors.white)
-    //                 : Icon(
-    //                     isRecording ? Icons.stop : Icons.mic,
-    //                     color: Colors.white,
-    //                   ),
-    //           ),
-    //         ),
-    //       ),
-       
-    //     ],
-    //   ),
-
-    const SizedBox(width: 8),
+     const SizedBox(width: 8),
 
     // Send button
     GestureDetector(
