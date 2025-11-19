@@ -40,32 +40,48 @@ class FriendRepo {
     }
   }
 
-Future<List<Map<String, dynamic>>> getFriendChatHistory(
+Future<Map<String, dynamic>> getFriendChatHistory(
   String friendId, {
   int limit = 10,
-  int offset = 0,
+  String? beforeId,
 }) async {
   try {
-    final res = await _api.get(
-      "${ApiEndpoints.getFriendChatHistory}$friendId?limit=$limit&offset=$offset",
-      requireAuth: true,
-    );
+    final url = beforeId != null
+        ? "${ApiEndpoints.getFriendChatHistory}$friendId?limit=$limit&before=$beforeId"
+        : "${ApiEndpoints.getFriendChatHistory}$friendId?limit=$limit";
 
-    if (res["messages"] == null) return [];
+    debugPrint("🟢 Fetching chat history from API:");
+    debugPrint("URL → $url");
 
-    return (res["messages"] as List).map((msg) {
-      return {
-        "fromMe": msg["from"] == SessionController().user!.id,
-        "body": msg["body"] ?? '',
-        "from": msg["from"],
-        "to": msg["to"],
-        "isRead": msg["isRead"],
-        "type": msg["type"] ?? "text",
-      };
-    }).toList();
+    final res = await _api.get(url, requireAuth: true);
+
+    debugPrint("📥 API Response: $res");
+
+    if (res["messages"] == null) {
+      debugPrint("⚠ No messages found in response.");
+      return {"messages": [], "hasMore": false, "nextCursor": null};
+    }
+
+    final messages = (res["messages"] as List);
+
+    debugPrint("📄 Messages fetched (${messages.length}):");
+    for (var msg in messages) {
+      debugPrint("Message → $msg");
+    }
+final nextCursor = res["nextCursor"];
+
+   // final nextCursor = messages.isNotEmpty ? messages.last["createdAt"] : null;
+    debugPrint("⏩ Next Cursor: $nextCursor");
+    debugPrint("🔹 Has More: ${res["hasMore"] ?? false}");
+
+    return {
+      "messages": messages,
+      "hasMore": res["hasMore"] ?? false,
+      "nextCursor": nextCursor,
+    };
   } catch (e) {
-    debugPrint("Error fetching chat history: $e");
-    return [];
+    debugPrint("❌ Error fetching chat history: $e");
+    return {"messages": [], "hasMore": false, "nextCursor": null};
   }
 }
 

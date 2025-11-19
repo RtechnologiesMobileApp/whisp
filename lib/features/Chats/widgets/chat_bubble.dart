@@ -286,4 +286,6 @@ class _ChatBubbleState extends State<ChatBubble> {
       ),
     );
   }
+
+
 }
