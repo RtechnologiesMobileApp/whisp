@@ -22,6 +22,10 @@ class FindingMatchController extends GetxController {
   final partnerId = RxnString();
   final hasMatched = false.obs;
   final isPremium = false.obs;
+  final ignoreMatch = false.obs;
+  final foundMatch = false.obs;
+
+
   // track how many chats done
   int chatCount = 0;
 
@@ -42,46 +46,80 @@ class FindingMatchController extends GetxController {
       debugPrint('AUTH_OK: $data');
     });
 
-    socketService.onMatchFound((data) async {
-      // server sends { partnerId, partnerName, partnerAvatar }
-      log("this is on match found data: ${data.toString()}");
-      final id = data['partner']['id'] as String?;
-      final name = data['partner']['fullName'] as String?;
-      final avatar = data['partner']['avatar'] as String?;
+socketService.onMatchFound((data) async {
+  if (!isSearching.value) return; // Already cancelled
 
-      debugPrint('MATCH_FOUND with $id, name: $name, avatar: $avatar');
+  foundMatch.value = true; // Disable cancel button immediately
 
-      if (id != null) {
-        partnerId.value = id;
-        hasMatched.value = true;
-          if (isPremium.value) {
-          chatCount++;
-          box.write('chatCount', chatCount);
+  final id = data['partner']['id'] as String?;
+  final name = data['partner']['fullName'] as String?;
+  final avatar = data['partner']['avatar'] as String?;
 
-          // show ad only every 4th chat
-          if (chatCount % 4 == 0) {
-            AdService().showInterstitialAd();
-          }
-        } else {
-          // normal user => show every time
-          AdService().showInterstitialAd();
-        }
+  if (id != null) {
+    isSearching.value = false;
 
-        //AdService().showInterstitialAd();
-
-        await Future.delayed(const Duration(seconds: 1));
-
-        // navigate to chat screen with all details
-        Get.offNamed(
-          Routes.chatscreen,
-          arguments: {
-            'partnerId': id,
-            'partnerName': name ?? 'Unknown',
-            'partnerAvatar': avatar ?? '',
-          },
-        );
+    // Premium ads
+    if (isPremium.value) {
+      chatCount++;
+      box.write('chatCount', chatCount);
+      if (chatCount % 4 == 0) {
+        AdService().showInterstitialAd();
       }
-    });
+    } else {
+       AdService().showInterstitialAd();
+    }
+
+    Get.offNamed(
+      Routes.chatscreen,
+      arguments: {
+        'partnerId': id,
+        'partnerName': name ?? 'Unknown',
+        'partnerAvatar': avatar ?? '',
+      },
+    );
+  }
+});
+
+    // socketService.onMatchFound((data) async {
+    //   // server sends { partnerId, partnerName, partnerAvatar }
+    //   log("this is on match found data: ${data.toString()}");
+    //   final id = data['partner']['id'] as String?;
+    //   final name = data['partner']['fullName'] as String?;
+    //   final avatar = data['partner']['avatar'] as String?;
+
+    //   debugPrint('MATCH_FOUND with $id, name: $name, avatar: $avatar');
+
+    //   if (id != null) {
+    //     partnerId.value = id;
+    //     hasMatched.value = true;
+    //       if (isPremium.value) {
+    //       chatCount++;
+    //       box.write('chatCount', chatCount);
+
+    //       // show ad only every 4th chat
+    //       if (chatCount % 4 == 0) {
+    //         AdService().showInterstitialAd();
+    //       }
+    //     } else {
+    //       // normal user => show every time
+    //       AdService().showInterstitialAd();
+    //     }
+
+    //     //AdService().showInterstitialAd();
+
+    //     await Future.delayed(const Duration(seconds: 1));
+
+    //     // navigate to chat screen with all details
+    //     Get.offNamed(
+    //       Routes.chatscreen,
+    //       arguments: {
+    //         'partnerId': id,
+    //         'partnerName': name ?? 'Unknown',
+    //         'partnerAvatar': avatar ?? '',
+    //       },
+    //     );
+    //   }
+    // });
 
     socketService.onError((data) {
       debugPrint('Socket error: $data');
@@ -122,6 +160,7 @@ class FindingMatchController extends GetxController {
 
   // Called when entering FindingMatchScreen UI
   void startSearch() {
+     ignoreMatch.value = false;  
     if (!socketService.connected) {
       // optionally connect again or show error
       debugPrint('Socket not connected');
@@ -136,7 +175,7 @@ class FindingMatchController extends GetxController {
   // Called when cancel button tapped
   void cancelSearch() {
     debugPrint("🛑 Cancel search tapped");
-
+   ignoreMatch.value = true; 
     if (isSearching.value) {
       socketService.cancelRandom();
       isSearching.value = false;
@@ -144,9 +183,9 @@ class FindingMatchController extends GetxController {
 
     // Always go back to previous screen
     if (Get.isOverlaysOpen) {
-      Get.back(); // Close dialog/sheet first if open
+      Get.back(); 
     } else {
-      Get.back(); // Normal back navigation
+     Get.toNamed(Routes.mainHome); // Normal back navigation
     }
   }
 

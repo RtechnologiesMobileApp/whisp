@@ -311,37 +311,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   },
 ),
-
-                // child: CustomButton(
-                //   text: 'Set Preferences',
-                //   onPressed: () {
-                //     if (SessionController().user?.premium == true) {
-                     
-                //       Get.dialog(
-                //         Dialog(
-                //           insetPadding: EdgeInsets.all(20),
-                //           child: IntrinsicHeight(
-                //             child: Container(
-                //               padding: EdgeInsets.all(20),
-                //               child: PreferenceSelectorWidget(controller: Get.find<PreferenceController>()),
-                //             ),
-                //           ),
-                //         ),
-                //       );
-                //     } else {
-                //       // Not premium → show message
-                //       Get.defaultDialog(
-                //         title: "Premium Feature",
-                //         middleText: "Buy premium to use this feature",
-                //         confirm: ElevatedButton(
-                //           onPressed: () => Get.back(),
-                //           child: const Text("OK"),
-                //         ),
-                //       );
-                //     }
-                //   },
-                // ),
-             
+              
               ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
