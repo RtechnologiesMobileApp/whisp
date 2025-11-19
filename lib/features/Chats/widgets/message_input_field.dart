@@ -52,6 +52,14 @@ class _MessageInputFieldState extends State<MessageInputField> {
     final s = (sec % 60).toString().padLeft(2, '0');
     return "$m:$s";
   }
+void cancelRecording() async {
+  stopTimer();
+  await recorder.stop();
+  setState(() {
+    isRecording = false;
+    filePath = null; // delete recorded file
+  });
+}
 
   Future<void> startRecording() async {
     var status = await Permission.microphone.request();
@@ -127,38 +135,86 @@ class _MessageInputFieldState extends State<MessageInputField> {
     const SizedBox(width: 8),
 
     // 👇 MIC only if user is friend
-    if (widget.isFriend)
-      Row(
-        children: [
-          if (isRecording)
-            Text(
-              formatTime(seconds),
-              style: const TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 8),
-            
-          GestureDetector(
-            onTap: isRecording ? stopRecording : startRecording,
-            child: Obx(
-              () => CircleAvatar(
-                radius: 20,
-                backgroundColor:
-                    isRecording ? AppColors.primary : AppColors.primary,
-                child: widget.controller.isProcessingAudio.value
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Icon(
-                        isRecording ? Icons.stop : Icons.mic,
-                        color: Colors.white,
-                      ),
-              ),
-            ),
+    // 👇 MIC only if user is friend
+if (widget.isFriend)
+  Row(
+    children: [
+      // Timer text
+      if (isRecording)
+        Text(
+          formatTime(seconds),
+          style: const TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
           ),
-       
-        ],
+        ),
+
+      const SizedBox(width: 8),
+
+      // ❌ Delete / Cancel Recording Button
+      if (isRecording)
+        GestureDetector(
+          onTap: cancelRecording,
+          child: const CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.close, color: Colors.white),
+          ),
+        ),
+
+      if (isRecording) const SizedBox(width: 8),
+
+      // 🎙️ Mic / Stop Button
+      GestureDetector(
+        onTap: isRecording ? stopRecording : startRecording,
+        child: Obx(
+          () => CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.primary,
+            child: widget.controller.isProcessingAudio.value
+                ? const CircularProgressIndicator(color: Colors.white)
+                : Icon(
+                    isRecording ? Icons.stop : Icons.mic,
+                    color: Colors.white,
+                  ),
+          ),
+        ),
       ),
+    ],
+  ),
+
+    // if (widget.isFriend)
+    //   Row(
+    //     children: [
+    //       if (isRecording)
+    //         Text(
+    //           formatTime(seconds),
+    //           style: const TextStyle(
+    //             color: Colors.red,
+    //             fontWeight: FontWeight.bold,
+    //           ),
+    //         ),
+    //         SizedBox(width: 8),
+            
+    //       GestureDetector(
+    //         onTap: isRecording ? stopRecording : startRecording,
+    //         child: Obx(
+    //           () => CircleAvatar(
+    //             radius: 20,
+    //             backgroundColor:
+    //                 isRecording ? AppColors.primary : AppColors.primary,
+    //             child: widget.controller.isProcessingAudio.value
+    //                 ? const CircularProgressIndicator(color: Colors.white)
+    //                 : Icon(
+    //                     isRecording ? Icons.stop : Icons.mic,
+    //                     color: Colors.white,
+    //                   ),
+    //           ),
+    //         ),
+    //       ),
+       
+    //     ],
+    //   ),
 
     const SizedBox(width: 8),
 
