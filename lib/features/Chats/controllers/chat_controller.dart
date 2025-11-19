@@ -213,15 +213,17 @@ class ChatController extends GetxController {
 
     final olderMsgs = _parseMessages(res['messages']);
 
-    if (olderMsgs.isNotEmpty) {
-      res["nextCursor"]; // oldest → cursor ✔
+   if (olderMsgs.isNotEmpty) {
+  messages.insertAll(0, olderMsgs);
 
-      messages.insertAll(0, olderMsgs); // Add on TOP ✔
+  // 🔥 Update cursor from backend
+  nextCursor = res["nextCursor"];
+  debugPrint("🔄 Updated nextCursor(loadMore): $nextCursor");
 
-      hasMore = res["hasMore"] ?? false;
-    } else {
-      hasMore = false;
-    }
+  hasMore = res["hasMore"] ?? false;
+} else {
+  hasMore = false;
+}
 
     await Future.delayed(const Duration(milliseconds: 20));
 

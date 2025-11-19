@@ -68,8 +68,9 @@ Future<Map<String, dynamic>> getFriendChatHistory(
     for (var msg in messages) {
       debugPrint("Message → $msg");
     }
+final nextCursor = res["nextCursor"];
 
-    final nextCursor = messages.isNotEmpty ? messages.last["createdAt"] : null;
+   // final nextCursor = messages.isNotEmpty ? messages.last["createdAt"] : null;
     debugPrint("⏩ Next Cursor: $nextCursor");
     debugPrint("🔹 Has More: ${res["hasMore"] ?? false}");
 
