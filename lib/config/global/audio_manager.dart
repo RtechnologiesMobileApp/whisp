@@ -17,8 +17,16 @@ class GlobalAudioManager {
   static void setCurrent(PlayerController controller) {
     currentPlayer = controller;
   }
+  static Future<void> pauseCurrent() async {
+    if (currentPlayer != null) {
+      try {
+        await currentPlayer!.pausePlayer();
+        // await currentPlayer!.seekTo(0);
+      } catch (_) {}
+    }
+  }
 }
-
+ 
 // import 'package:audio_waveforms/audio_waveforms.dart';
 
 // class GlobalAudioManager {

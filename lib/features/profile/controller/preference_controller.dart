@@ -8,6 +8,7 @@ import 'package:whisp/core/network/api_endpoints.dart';
 
 class PreferenceController extends GetxController {
   RxBool isLoading = false.obs;
+  RxBool isLoadingPrefs = false.obs;
   // Checkbox states
   RxBool genderEnabled = false.obs;
   RxBool ageEnabled = false.obs;
@@ -46,6 +47,7 @@ class PreferenceController extends GetxController {
   // ------------------ GET Preferences ------------------
   Future<void> loadPreferences() async {
     try {
+      isLoadingPrefs.value=true;
       final res = await _api.get(ApiEndpoints.setPreferences, requireAuth: true);
       final data = res["preferences"] ?? {};
       log(data.toString());
@@ -97,7 +99,9 @@ class PreferenceController extends GetxController {
       } else {
         cityEnabled.value = false;
       }
+      isLoadingPrefs.value=false;
     } catch (e) {
+      isLoadingPrefs.value=false;
       Get.snackbar("Error", "Failed to load preferences");
     }
   }

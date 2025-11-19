@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart' as aw;
@@ -225,11 +226,21 @@ class _ChatBubbleState extends State<ChatBubble> {
             ),
             onPressed: () async {
               // Always stop any other player first (before preparing)
-              await GlobalAudioManager.stopCurrent();
-
+           
+              log("player state: ${player!.playerState}");
               // Toggle pause
               if (isPlaying) {
-                await player!.pausePlayer();
+                  log("pausing.....");
+                // await player!.pausePlayer();
+                await GlobalAudioManager.pauseCurrent();
+
+                return;
+              }
+             if (player!.playerState.isPlaying) {
+              log("pausing.....");
+                await GlobalAudioManager.pauseCurrent();
+
+                // await player!.pausePlayer();
                 return;
               }
 
@@ -238,7 +249,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 await player!.startPlayer();
                 return;
               }
-
+                 await GlobalAudioManager.stopCurrent();
               // 🔥 If audio finished → state becomes "stopped"
               // → MUST re-prepare
               if (player!.playerState == aw.PlayerState.stopped) {
@@ -253,6 +264,7 @@ class _ChatBubbleState extends State<ChatBubble> {
 
               // Start playback
               await player!.startPlayer();
+                log("player state: ${player!.playerState}");
             },
 
              
