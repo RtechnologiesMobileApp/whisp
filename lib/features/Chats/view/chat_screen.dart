@@ -30,6 +30,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  bool _isActive = false;
   late ScrollController _scrollController;
   late ChatController controller;
   late FriendsController friendController;
@@ -57,6 +58,7 @@ void _scrollListener() {
  @override
 void initState() {
   super.initState();
+   _isActive = true;
 
   _scrollController = ScrollController();
   // attach our safe listener
@@ -80,6 +82,11 @@ void initState() {
 
   // Scroll to bottom whenever messages change
 ever(controller.messages, (messages) {
+   if (_isActive) {
+    // sirf tabhi mark as read jab user is screen par ho
+    controller.markAsRead(widget.partnerId);
+  }
+
   // Only scroll down if last message is from me (sent message)
   if (messages.isNotEmpty && messages.last["fromMe"] == true) {
     _scrollToBottom();
@@ -104,6 +111,7 @@ ever(controller.partnerTyping, (_) {
   void dispose() {
      _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+      _isActive = false;
     super.dispose();
   }
 
