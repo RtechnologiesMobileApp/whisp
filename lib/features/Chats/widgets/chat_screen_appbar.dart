@@ -76,7 +76,11 @@ class _ChatAppBarState extends State<ChatAppBar> {
                   socketService.endSession();
                   // Get.back();
                   if (Navigator.canPop(context)) {
-    Navigator.pop(context);                // Random chat → just pop
+    // Navigator.pop(context);                // Random chat → just pop
+      Navigator.of(context).pushAndRemoveUntil(
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
+                      (route) => false,
+                     );
   } else
                   Navigator.of(context).pushAndRemoveUntil(
                      MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
