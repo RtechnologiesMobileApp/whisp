@@ -119,71 +119,146 @@ class FriendCard extends StatelessWidget {
                     ),
                   ),
                 ],
+if (onAccept != null && onReject != null && isRequestModel) ...[
+  // Accept/Reject buttons for Requests tab
+  SizedBox(width: 6.w),
+  
+  // Accept Button
+  ElevatedButton(
+    onPressed: () {
+      final user = SessionController().user;
 
-                if (onAccept != null && onReject != null && isRequestModel) ...[
-                  // Accept/Reject buttons for Requests tab
-                  SizedBox(width: 6.w),
-                  ElevatedButton(
-                    // onPressed: onAccept,
-                    onPressed: () {
-                      final user = SessionController().user;
+      // 🔹 Check premium status
+      if (user?.premium == false) {
+        // Not premium -> redirect to premium screen
+        Get.to(() => PremiumScreen());
+        return; // stop here, don't call accept API
+      }
 
-                      // 🔹 Check premium status
-                      if (user?.premium == false) {
-                        // Not premium -> redirect to premium screen
-                      Get.to(() => PremiumScreen());
-                        return; // stop here, don't call accept API
-                      }
+      // 🔹 If premium -> proceed to accept request
+      onAccept?.call();
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.green.shade50, // Light green background
+      foregroundColor: Colors.green.shade700, // Dark green text
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.r),
+        side: BorderSide(
+          color: Colors.green.shade200, // Border for definition
+          width: 1,
+        ),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.w,
+        vertical: 8.h,
+      ),
+    ),
+    child: Text(
+      "Accept",
+      style: TextStyle(
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+  
+  SizedBox(width: 6.w),
+  
+  // Reject Button
+  ElevatedButton(
+    onPressed: onReject,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.red.shade50, // Light red background
+      foregroundColor: Colors.red.shade700, // Dark red text
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.r),
+        side: BorderSide(
+          color: Colors.red.shade200, // Border for definition
+          width: 1,
+        ),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.w,
+        vertical: 8.h,
+      ),
+    ),
+    child: Text(
+      "Reject",
+      style: TextStyle(
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+],
+                // if (onAccept != null && onReject != null && isRequestModel) ...[
+                //   // Accept/Reject buttons for Requests tab
+                //   SizedBox(width: 6.w),
+                //   ElevatedButton(
+                //     // onPressed: onAccept,
+                //     onPressed: () {
+                //       final user = SessionController().user;
 
-                      // 🔹 If premium -> proceed to accept request
-                      onAccept?.call();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                    ),
-                    child: Text(
-                      "Accept",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 6.w),
-                  ElevatedButton(
-                    onPressed: onReject,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                    ),
-                    child: Text(
-                      "Reject",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+                //       // 🔹 Check premium status
+                //       if (user?.premium == false) {
+                //         // Not premium -> redirect to premium screen
+                //       Get.to(() => PremiumScreen());
+                //         return; // stop here, don't call accept API
+                //       }
+
+                //       // 🔹 If premium -> proceed to accept request
+                //       onAccept?.call();
+                //     },
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: Colors.transparent,
+                //       shadowColor: Colors.transparent,
+                //       elevation: 0,
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10.r),
+                //       ),
+                //       padding: EdgeInsets.symmetric(
+                //         horizontal: 16.w,
+                //         vertical: 8.h,
+                //       ),
+                //     ),
+                //     child: Text(
+                //       "Accept",
+                //       style: TextStyle(
+                //         color: Colors.green,
+                //         fontSize: 13.sp,
+                //         fontWeight: FontWeight.w600,
+                //       ),
+                //     ),
+                //   ),
+                //   SizedBox(width: 6.w),
+                //   ElevatedButton(
+                //     onPressed: onReject,
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: Colors.transparent,
+                //       shadowColor: Colors.transparent,
+                //       elevation: 0,
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10.r),
+                //       ),
+                //       padding: EdgeInsets.symmetric(
+                //         horizontal: 16.w,
+                //         vertical: 8.h,
+                //       ),
+                //     ),
+                //     child: Text(
+                //       "Reject",
+                //       style: TextStyle(
+                //         color: Colors.red,
+                //         fontSize: 13.sp,
+                //         fontWeight: FontWeight.w600,
+                //       ),
+                //     ),
+                //   ),
+                // ],
+            
+            
               ],
             ),
           ),
