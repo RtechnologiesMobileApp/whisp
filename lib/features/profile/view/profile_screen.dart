@@ -5,10 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/services/session_manager.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/features/auth/view/login_view.dart';
+import 'package:whisp/features/premium/view/screens/premium_screen.dart';
 
 import 'package:whisp/features/profile/controller/preference_controller.dart';
 
@@ -306,13 +308,136 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     } else {
                       Get.defaultDialog(
-                        title: "Premium Feature",
-                        middleText: "Buy premium to use this feature",
-                        confirm: ElevatedButton(
-                          onPressed: () => Get.back(),
-                          child: const Text("OK"),
-                        ),
-                      );
+  title: "",
+  titlePadding: EdgeInsets.zero,
+  contentPadding: const EdgeInsets.all(20),
+  backgroundColor: Colors.white,
+  radius: 20,
+  content: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      // Premium Icon with gradient background
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple, Colors.purple.shade300],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          Icons.workspace_premium,
+          size: 50,
+          color: Colors.white,
+        ),
+      ),
+      const SizedBox(height: 20),
+      
+      // Title
+      const Text(
+        "Premium Feature",
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+      const SizedBox(height: 12),
+      
+      // Description
+      Text(
+        "Unlock this feature and many more\nwith Premium subscription",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade600,
+          height: 1.5,
+        ),
+      ),
+      const SizedBox(height: 24),
+      
+      // Buttons
+      Row(
+        children: [
+          // Cancel Button
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => Get.back(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(color: Colors.grey.shade300),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "Maybe Later",
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Upgrade Button
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.deepPurple, AppColors.primary],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.purple.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.back();
+                  
+                   Get.to(() => PremiumScreen());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Upgrade Now",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+                      
+                      // Get.defaultDialog(
+                      //   title: "Premium Feature",
+                      //   middleText: "Buy premium to use this feature",
+                      //   confirm: ElevatedButton(
+                      //     onPressed: () => Get.back(),
+                      //     child: const Text("OK"),
+                      //   ),
+                      // );
                     }
                   },
                 ),
