@@ -75,6 +75,7 @@ socketService.onMatchFound((data) async {
         'partnerId': id,
         'partnerName': name ?? 'Unknown',
         'partnerAvatar': avatar ?? '',
+        'fromIndex':0,
       },
     );
   }

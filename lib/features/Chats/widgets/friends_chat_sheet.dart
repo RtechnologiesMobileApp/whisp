@@ -75,6 +75,7 @@ class FriendsChatSheet extends StatelessWidget {
                             partnerName: friend.name,
                             partnerAvatar: friend.imageUrl ?? '',
                             isFriend: true,
+                            fromIndex: 2,
                           ));
                     },
                   );

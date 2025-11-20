@@ -329,6 +329,7 @@ class ChatListScreen extends StatelessWidget {
                                 partnerName: chat['name'],
                                 partnerAvatar: chat['avatar'],
                                 isFriend: isStillFriend,
+                                fromIndex: 1,
                               ),
                             );
                           },

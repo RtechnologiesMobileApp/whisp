@@ -72,6 +72,7 @@ class AppPages {
           partnerName: args['partnerName'],
           partnerAvatar: args['partnerAvatar'],
           isFriend: args['isFriend'] ?? false,
+          fromIndex: args['fromIndex'] ?? 0,
         );
       },
       binding: AppBindings(),

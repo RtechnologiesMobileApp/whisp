@@ -16,13 +16,15 @@ class ChatScreen extends StatefulWidget {
   final String partnerName;
   final String partnerAvatar;
   final bool isFriend;
+  int fromIndex;
 
-  const ChatScreen({
+   ChatScreen({
     super.key,
     required this.partnerId,
     required this.partnerName,
     required this.partnerAvatar,
     this.isFriend = false,
+     required this.fromIndex,
   });
 
   @override
@@ -152,6 +154,7 @@ ever(controller.partnerTyping, (_) {
           userName: widget.partnerName,
           userAvatar: widget.partnerAvatar,
           isFriend: widget.isFriend,
+          fromIndex: widget.fromIndex,
         ),
         body: Column(
           children: [

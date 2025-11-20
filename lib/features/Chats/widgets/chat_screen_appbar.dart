@@ -13,13 +13,15 @@ class ChatAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String userAvatar;
   final String partnerId;
   final bool isFriend;
+  int fromIndex;
 
-  const ChatAppBar({
+   ChatAppBar({
     super.key,
     required this.userName,
     required this.userAvatar,
     required this.partnerId,
     this.isFriend = false,
+    required this.fromIndex
   });
 
   @override
@@ -78,14 +80,15 @@ class _ChatAppBarState extends State<ChatAppBar> {
                   if (Navigator.canPop(context)) {
     // Navigator.pop(context);                // Random chat → just pop
       Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: widget.fromIndex)),
                       (route) => false,
                      );
-  } else
-                  Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
+  } else {
+                    Navigator.of(context).pushAndRemoveUntil(
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: widget.fromIndex)),
                       (route) => false,
                      );
+                  }
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(

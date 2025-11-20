@@ -48,6 +48,7 @@ class FriendCard extends StatelessWidget {
                         'partnerName': name,
                         'partnerAvatar': avatar,
                         'isFriend': true,
+                        'fromIndex':2,
                       },
                     );
                   }
