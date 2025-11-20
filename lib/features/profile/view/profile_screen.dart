@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _initializeNotificationState();
     _loadUser();
-    preferencesController.loadPreferences();
+    // preferencesController.loadPreferences();
     ever(controller.user, (updatedUser) {
       if (!mounted) return; // ✅ Prevent setState after dispose
       setState(() {

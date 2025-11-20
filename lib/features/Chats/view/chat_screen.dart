@@ -129,6 +129,10 @@ ever(controller.partnerTyping, (_) {
 
   @override
   Widget build(BuildContext context) {
+      final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+      if (bottomInset > 0) {
+        _scrollToBottom();
+      }
     notificationUserId = widget.partnerId;
     controller.markAsRead(widget.partnerId);
     return WillPopScope(
@@ -141,6 +145,7 @@ ever(controller.partnerTyping, (_) {
         return true;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: const Color(0xffF7F8FA),
         appBar: ChatAppBar(
           partnerId: widget.partnerId,

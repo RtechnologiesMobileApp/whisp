@@ -4,10 +4,22 @@ import 'package:whisp/core/widgets/custom_back_button.dart';
 import 'package:whisp/features/profile/controller/preference_controller.dart';
 import 'package:whisp/features/profile/widgets/preference_selector_widget.dart';
 
-class PreferenceScreen extends StatelessWidget {
-  final PreferenceController controller = Get.find<PreferenceController>();
+class PreferenceScreen extends StatefulWidget {
 
   PreferenceScreen({super.key});
+
+  @override
+  State<PreferenceScreen> createState() => _PreferenceScreenState();
+}
+
+class _PreferenceScreenState extends State<PreferenceScreen> {
+  final PreferenceController controller = Get.find<PreferenceController>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+     controller.loadPreferences();
+  }
 
   @override
   Widget build(BuildContext context) {

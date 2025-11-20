@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whisp/core/widgets/custom_navbar.dart';
@@ -28,6 +30,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   ];
 
   void _onItemTapped(int index) {
+    log('Tapped index: $index');
     _selectedIndex.value = index;
   }
 
