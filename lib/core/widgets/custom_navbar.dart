@@ -62,6 +62,7 @@ Widget _buildNavItem(
 
   return GestureDetector(
     onTap: () => onItemTapped(index),
+    
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [

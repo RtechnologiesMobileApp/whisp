@@ -36,7 +36,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _selectedIndex.value = widget.index;
+    // _selectedIndex.value = widget.index;
     return Scaffold(
       body: Obx(() => _screens[_selectedIndex.value]),
       bottomNavigationBar: CustomNavBar(
