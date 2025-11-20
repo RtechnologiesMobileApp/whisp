@@ -104,7 +104,17 @@ class PreferenceSelectorWidget extends StatelessWidget {
                                   : controller.state.value,
           
                               onCountryChanged: (value) {
-                                controller.country.value = value;
+                               // controller.country.value = value;
+                                 if (value != null) {
+                                    // remove emojis & extra spaces
+                                    String clean = value
+                                        .replaceAll(
+                                          RegExp(r'[^\u0000-\u007F]+'),
+                                          '',
+                                        )
+                                        .trim();
+                                    controller.country.value = clean;
+                                  }
                               },
                               onStateChanged: (value) {
                                 controller.state.value = value ?? "";

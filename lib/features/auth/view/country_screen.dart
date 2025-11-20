@@ -178,8 +178,8 @@ class CountryScreen extends StatelessWidget {
                               ),
                               title: Text(country.name),
                               onTap: () {
-                                controller.selectedCountry.value =
-                                    "${country.flagEmoji} ${country.name}";
+                             controller.selectedCountry.value = country.name;
+
                                 Navigator.pop(context);
                               },
                             );
