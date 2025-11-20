@@ -26,30 +26,56 @@ class _FriendsScreenState extends State<FriendsScreen>
 
   @override
  @override
+ @override
 void initState() {
   super.initState();
   _tabController = TabController(length: 2, vsync: this);
 
- _tabController.addListener(() {
-  if (!_tabController.indexIsChanging) {
-    currentTabIndex.value = _tabController.index;
+  _tabController.addListener(() {
+    if (!_tabController.indexIsChanging) {
+      currentTabIndex.value = _tabController.index;
 
-    // 🔹 Lazy-load requests only when user visits Requests tab
-    if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
-      controller.isLoadingRequests.value = true;
-      controller.fetchIncomingRequests();
+      if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
+        controller.isLoadingRequests.value = true;
+        controller.fetchIncomingRequests();
+      }
     }
-  }
-});
+  });
 
+  /// 🟢 FIX: All reactive updates moved here
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    controller.isLoadingFriends.value = true;
+    controller.isLoadingRequests.value = true;
 
-  // 🔹 Force loaders and fetch data when screen opens
-  controller.isLoadingFriends.value = true;
-  controller.isLoadingRequests.value = true;
-
-  controller.fetchFriends();
-  controller.fetchIncomingRequests();
+    controller.fetchFriends();
+    controller.fetchIncomingRequests();
+  });
 }
+// also working
+// void initState() {
+//   super.initState();
+//   _tabController = TabController(length: 2, vsync: this);
+
+//  _tabController.addListener(() {
+//   if (!_tabController.indexIsChanging) {
+//     currentTabIndex.value = _tabController.index;
+
+//     // 🔹 Lazy-load requests only when user visits Requests tab
+//     if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
+//       controller.isLoadingRequests.value = true;
+//       controller.fetchIncomingRequests();
+//     }
+//   }
+// });
+
+
+//   // 🔹 Force loaders and fetch data when screen opens
+//   controller.isLoadingFriends.value = true;
+//   controller.isLoadingRequests.value = true;
+
+//   controller.fetchFriends();
+//   controller.fetchIncomingRequests();
+// }
 
 
   @override
