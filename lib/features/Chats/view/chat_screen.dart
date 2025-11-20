@@ -141,7 +141,7 @@ ever(controller.partnerTyping, (_) {
       onWillPop: () async {
          socketService.endSession();
           Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 1)),
+                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: widget.fromIndex)),
                       (route) => false,
                      );
         return true;
