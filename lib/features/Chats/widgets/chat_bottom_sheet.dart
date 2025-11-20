@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/routes/app_pages.dart';
  
-import 'package:whisp/core/services/socket_service.dart';  
+import 'package:whisp/core/services/socket_service.dart';
+import 'package:whisp/features/Chats/widgets/report_bottom_sheet.dart';
+import 'package:whisp/features/friends/controller/friend_controller.dart';  
 
-void showChatBottomSheet(BuildContext context) {
+void showChatBottomSheet(BuildContext context, String userId) {
   final socketService = Get.find<SocketService>();  
+  final friendController = Get.find<FriendsController>();
 
   showModalBottomSheet(
     context: context,
@@ -34,7 +37,17 @@ void showChatBottomSheet(BuildContext context) {
                 Get.offAllNamed(Routes.findMatch);
               },
             ),
-            _tile("Report", Colors.red, onTap: () {}),
+            _tile("Report", Colors.red, onTap: () {
+               Get.back();
+                showReportBottomSheet(context, (String reason) {
+                                  print(reason);
+                                  friendController.reportUser(
+                                    userId,
+                                    reason,
+                                  );
+                                });
+                               
+            }),
             _tile("Cancel", Colors.black, onTap: () => Get.back()),
           ],
         ),

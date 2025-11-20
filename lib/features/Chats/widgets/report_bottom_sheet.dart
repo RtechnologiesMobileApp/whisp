@@ -30,7 +30,7 @@ void showReportBottomSheet(BuildContext context, Function(String reason) onSelec
          
           children: [
             const Text(
-              "Report AI Message",
+              "Report",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,

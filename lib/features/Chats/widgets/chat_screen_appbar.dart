@@ -224,7 +224,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
 
               // ⋮ More options
               InkWell(
-                onTap: () => showChatBottomSheet(context),
+                onTap: () => showChatBottomSheet(context,widget.partnerId),
                 borderRadius: BorderRadius.circular(12),
                 child: const Padding(
                   padding: EdgeInsets.all(8),
