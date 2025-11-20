@@ -17,6 +17,7 @@ import 'package:whisp/features/home/view/home_screen.dart';
 import 'package:whisp/features/profile/controller/profile_controller.dart';
 import 'package:whisp/features/profile/view/edit_profile.dart';
 import 'package:whisp/features/profile/view/preference_screen.dart';
+import 'package:whisp/features/profile/view/prefrence_loader_screen.dart';
 import 'package:whisp/features/profile/widgets/preference_selector_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? profilePic;
 
   final controller = Get.put(EditProfileController());
-  final preferencesController = Get.put(PreferenceController());
+  //final preferencesController = Get.put(PreferenceController());
 
   @override
   void initState() {
@@ -294,25 +295,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 20.h),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child:CustomButton(
-  text: 'Set Preferences',
-  onPressed: () {
-    if (SessionController().user?.premium == true) {
-      Get.to(() => PreferenceScreen());
-    } else {
-      Get.defaultDialog(
-        title: "Premium Feature",
-        middleText: "Buy premium to use this feature",
-        confirm: ElevatedButton(
-          onPressed: () => Get.back(),
-          child: const Text("OK"),
-        ),
-      );
-    }
-  },
-),
-              
+                child: CustomButton(
+                  text: 'Set Preferences',
+                  onPressed: () {
+                     
+                    if (SessionController().user?.premium == true) {
+                     Get.to(() => PreferenceLoaderScreen());
+                    
+                
+
+                    } else {
+                      Get.defaultDialog(
+                        title: "Premium Feature",
+                        middleText: "Buy premium to use this feature",
+                        confirm: ElevatedButton(
+                          onPressed: () => Get.back(),
+                          child: const Text("OK"),
+                        ),
+                      );
+                    }
+                  },
+                ),
               ),
+             
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: CustomButton(
@@ -322,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
               ),
-              
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0.w),
                 child: CustomButton(

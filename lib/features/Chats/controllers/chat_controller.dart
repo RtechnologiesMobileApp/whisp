@@ -28,7 +28,7 @@ class ChatController extends GetxController {
 
   ChatController({this.friendId, this.isFriend = false}) {
     // ✅ Agar friend chat screen hai aur friendId available hai
-    if (isFriend && friendId != null) {
+    if (friendId != null) {
       // loadFriendChatHistory();
       loadInitialChat();
     }

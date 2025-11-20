@@ -13,12 +13,15 @@ class PreferenceScreen extends StatefulWidget {
 }
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
-  final PreferenceController controller = Get.find<PreferenceController>();
+   final PreferenceController controller = Get.put(PreferenceController());
+ 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-     controller.loadPreferences();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    controller.loadPreferences();
+  });
   }
 
   @override
@@ -39,15 +42,22 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         ),
       ),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: PreferenceSelectorWidget(
-              controller: controller,
+      body: Obx(() {
+  if (controller.isLoadingPrefs.value) {
+    return Center(child: CircularProgressIndicator());
+  }
+       return SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: PreferenceSelectorWidget(
+                controller: controller,
+              ),
             ),
           ),
-        ),
+        );
+      
+      }
       ),
     );
   }

@@ -83,7 +83,7 @@ void initState() {
   // Scroll to bottom whenever messages change
 ever(controller.messages, (messages) {
    if (_isActive) {
-    // sirf tabhi mark as read jab user is screen par ho
+     
     controller.markAsRead(widget.partnerId);
   }
 
