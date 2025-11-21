@@ -142,17 +142,21 @@ class SocketService extends GetxService {
   }
 }
 
+void recording(bool isRecording, {String? toUserId}) {
+  if (socket?.connected ?? false) {
+    final data = {
+      'isRecording': isRecording,
+      if (toUserId != null) 'toUserId': toUserId,
+    };
 
-  // void typing(bool isTyping,String? toUserId) {
-  //   if (socket?.connected ?? false) {
-  //     socket!.emit('TYPING', {
-  //       'isTyping': isTyping,
-  //       if (toUserId != null) 'toUserId': toUserId,
+    socket!.emit('RECORDING_SEND', data);
+    debugPrint('[socket] RECORDING emitted: $data');
+  } else {
+    debugPrint('[socket] RECORDING emit failed: Socket not connected!');
+  }
+}
 
-
-  //       });
-  //   }
-  // }
+  
 
   void endSession() {
     if (socket?.connected ?? false) {
@@ -262,6 +266,31 @@ class SocketService extends GetxService {
       });
     } catch (e) {
       debugPrint("[socket] TYPING error: $e");
+    }
+  });
+}
+
+
+void onRecording(void Function(Map) cb) {
+  socket?.off('RECORDING_RECEIVE'); // remove duplicate listeners
+
+  socket?.on('RECORDING_RECEIVE', (data) {
+    debugPrint("[socket] >>> RECORDING event received: $data");
+
+    try {
+      final map = Map<String, dynamic>.from(data);
+
+      final isRecording = map["isRecording"] ?? false;
+      final userId = map["from"] ?? map["toUserId"] ?? 'unknown';
+
+      debugPrint("[socket] RECORDING => userId:$userId | isRecording:$isRecording");
+
+      cb({
+        'isRecording': isRecording,
+        'userId': userId,
+      });
+    } catch (e) {
+      debugPrint("[socket] RECORDING error: $e");
     }
   });
 }

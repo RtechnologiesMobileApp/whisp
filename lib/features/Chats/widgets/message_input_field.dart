@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:whisp/core/services/socket_service.dart';
 import 'package:whisp/features/Chats/controllers/chat_controller.dart';
 import 'package:whisp/config/constants/colors.dart';
 
@@ -20,6 +21,7 @@ class MessageInputField extends StatefulWidget {
 
 class _MessageInputFieldState extends State<MessageInputField> {
   final RecorderController recorder = RecorderController();
+  final SocketService socketService = Get.find<SocketService>();
   bool isRecording = false;
   String? filePath;
   int seconds = 0;
@@ -55,6 +57,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
 void cancelRecording() async {
   stopTimer();
   await recorder.stop();
+   socketService.recording(false, toUserId: widget.controller.friendId);
+  debugPrint("❌ Recording cancelled event emitted");
   setState(() {
     isRecording = false;
     filePath = null; // delete recorded file
@@ -64,7 +68,8 @@ void cancelRecording() async {
   Future<void> startRecording() async {
     var status = await Permission.microphone.request();
     if (!status.isGranted) return;
-
+socketService.recording(true, toUserId: widget.controller.friendId);
+ debugPrint("🎤 Recording started event emitted");
     Directory dir = await getTemporaryDirectory();
     filePath = "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.wav";
 
@@ -76,6 +81,9 @@ void cancelRecording() async {
 
   Future<void> stopRecording() async {
     setState(() => isRecording = false);
+      socketService.recording(false, toUserId: widget.controller.friendId);
+  debugPrint("🛑 Recording stopped event emitted");
+
 
     // show processing overlay
     widget.controller.isProcessingAudio.value = true;

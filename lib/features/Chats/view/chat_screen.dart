@@ -60,6 +60,23 @@ void _scrollListener() {
  @override
 void initState() {
   super.initState();
+  socketService.onRecording((data) {
+  final isRecording = data['isRecording'];
+  final userId = data['userId'];
+
+  if (userId == widget.partnerId) {
+    controller.partnerRecording.value = isRecording;
+    debugPrint("🎧 Friend recording: $isRecording");
+    
+    // scroll bottom if visible
+    if (_scrollController.hasClients &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 50) {
+      _scrollToBottom();
+    }
+  }
+});
+
    _isActive = true;
 
   _scrollController = ScrollController();

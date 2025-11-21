@@ -18,6 +18,8 @@ class ChatController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool partnerTyping = false.obs;
   RxBool isProcessingAudio = false.obs;
+  RxBool partnerRecording = false.obs;
+
 
   /// pagiantion variables
   int limit = 10;
@@ -46,6 +48,8 @@ class ChatController extends GetxController {
         debugPrint("Partner typing value ${partnerTyping.value}");
       }
     });
+
+
 
     // 🔹 Listen for messages only for this specific chat
     // Note: ChatListController handles updating the chat list globally
