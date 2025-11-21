@@ -29,7 +29,8 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="false"
         android:requestLegacyExternalStorage="false"
-        android:networkSecurityConfig="@xml/network_security_config">
+        android:networkSecurityConfig="@xml/network_security_config"
+         android:enableOnBackInvokedCallback="true">
 
     <!-- IMPORTANT: Replace with your actual AdMob App ID before publishing to Play Store -->
     <!-- Test Ad Unit ID: ca-app-pub-3940256099942544~3347511713 -->

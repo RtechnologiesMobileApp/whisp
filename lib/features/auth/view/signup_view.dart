@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:whisp/config/constants/colors.dart';
 import 'package:whisp/config/constants/images.dart';
 import 'package:whisp/config/routes/app_pages.dart';
+import 'package:whisp/core/network/api_endpoints.dart';
 import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/core/widgets/custom_text_field.dart';
 
@@ -46,7 +48,7 @@ class SignupView extends GetView<SignupController> {
               // Text Fields
               Form(
                 key: controller.formKey,
-                 
+
                 child: Column(
                   children: [
                     // Text Fields
@@ -82,13 +84,16 @@ class SignupView extends GetView<SignupController> {
                       icon: Icons.lock_outline,
                       isPassword: true,
                       validator: (value) {
-                        final passwordRegex =
-    RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$');
-                        if ((value == null || value.isEmpty ) && !controller.isGoogle.value)
+                        final passwordRegex = RegExp(
+                          r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$',
+                        );
+                        if ((value == null || value.isEmpty) &&
+                            !controller.isGoogle.value)
                           return "Password is required";
-                        if (!passwordRegex.hasMatch(value!) && !controller.isGoogle.value) {
-  return "Password must contain uppercase, lowercase,\nnumber & special character";
-}
+                        if (!passwordRegex.hasMatch(value!) &&
+                            !controller.isGoogle.value) {
+                          return "Password must contain uppercase, lowercase,\nnumber & special character";
+                        }
                         return null;
                       },
                     ),
@@ -129,8 +134,17 @@ class SignupView extends GetView<SignupController> {
                       'Accept ',
                       style: TextStyle(color: Colors.black),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async {
+                       final Uri url = Uri.parse(ApiEndpoints.acceptTerms);
+                        if (!await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        )) {
+                          throw Exception('Could not launch $url');
+                        }
+                      },
                       child: const Text(
                         'Terms and Conditions',
                         style: TextStyle(
@@ -146,88 +160,87 @@ class SignupView extends GetView<SignupController> {
               const SizedBox(height: 12),
 
               // Create Account Button
- SizedBox(
-  width: double.infinity,
-  height: 52,
-  child: Obx(() {
-    bool isActive = controller.isFormValid.value;
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: Obx(() {
+                  bool isActive = controller.isFormValid.value;
 
-    return CustomButton(
-      text: controller.isLoading.value ? 'Loading...' : 'Create Account',
+                  return CustomButton(
+                    text: controller.isLoading.value
+                        ? 'Loading...'
+                        : 'Create Account',
 
-      // ✅ DISABLED STATE — null when form invalid
-      onPressed: isActive
-          ? () {
-              // ✅ Step 1: Validate form fields
-              if (!controller.formKey.currentState!.validate()) {
-                return;
-              }
+                    // ✅ DISABLED STATE — null when form invalid
+                    onPressed: isActive
+                        ? () {
+                            // ✅ Step 1: Validate form fields
+                            if (!controller.formKey.currentState!.validate()) {
+                              return;
+                            }
 
-              // ✅ Step 2: Check terms
-              if (!controller.acceptTerms.value) {
-                Get.snackbar(
-                  'Terms Required',
-                  'Please accept terms and conditions.',
-                );
-                return;
-              }
+                            // ✅ Step 2: Check terms
+                            if (!controller.acceptTerms.value) {
+                              Get.snackbar(
+                                'Terms Required',
+                                'Please accept terms and conditions.',
+                              );
+                              return;
+                            }
 
-              // ✅ Step 3: Run the API call (async allowed inside)
-              controller.checkEmailAndProceed();
-            }
-          : null,
+                            // ✅ Step 3: Run the API call (async allowed inside)
+                            controller.checkEmailAndProceed();
+                          }
+                        : null,
 
-      // ✅ Button styling when enabled/disabled
-      borderRadius: 24,
-      isLoading: controller.isLoading.value,
-      color: isActive
-          ? AppColors.primary
-          : Colors.grey.withOpacity(0.4),
-      textColor: isActive
-          ? Colors.white
-          : Colors.white.withOpacity(0.6),
-    );
-  }),
-),
+                    // ✅ Button styling when enabled/disabled
+                    borderRadius: 24,
+                    isLoading: controller.isLoading.value,
+                    color: isActive
+                        ? AppColors.primary
+                        : Colors.grey.withOpacity(0.4),
+                    textColor: isActive
+                        ? Colors.white
+                        : Colors.white.withOpacity(0.6),
+                  );
+                }),
+              ),
 
-//               SizedBox(
-//                 width: double.infinity,
-//                 height: 52,
-//                 child: Obx(() {
-//                   return CustomButton(
-//                     text: controller.isLoading.value
-//                         ? 'Loading...'
-//                         : 'Create Account',
-//                onPressed: () async {
-//   // ✅ Step 1: Run validation here
-//   if (!controller.formKey.currentState!.validate()) {
-//     return; // stop execution if invalid
-//   }
+              //               SizedBox(
+              //                 width: double.infinity,
+              //                 height: 52,
+              //                 child: Obx(() {
+              //                   return CustomButton(
+              //                     text: controller.isLoading.value
+              //                         ? 'Loading...'
+              //                         : 'Create Account',
+              //                onPressed: () async {
+              //   // ✅ Step 1: Run validation here
+              //   if (!controller.formKey.currentState!.validate()) {
+              //     return; // stop execution if invalid
+              //   }
 
-//   // ✅ Step 2: Check terms accepted before calling API
-//   if (!controller.acceptTerms.value) {
-//     Get.snackbar(
-//       'Terms Required',
-//       'Please accept terms and conditions.',
-//     );
-//     return;
-//   }
+              //   // ✅ Step 2: Check terms accepted before calling API
+              //   if (!controller.acceptTerms.value) {
+              //     Get.snackbar(
+              //       'Terms Required',
+              //       'Please accept terms and conditions.',
+              //     );
+              //     return;
+              //   }
 
-//   // ✅ Step 3: Run the actual function only if all valid
-//   await controller.checkEmailAndProceed();
-// },
+              //   // ✅ Step 3: Run the actual function only if all valid
+              //   await controller.checkEmailAndProceed();
+              // },
 
-                   
-//                     borderRadius: 24,
-//                     isLoading: controller
-//                         .isLoading
-//                         .value, // agar CustomButton loader support karta hai
-//                   );
-//                 }),
-            
-            
-//               ),
+              //                     borderRadius: 24,
+              //                     isLoading: controller
+              //                         .isLoading
+              //                         .value, // agar CustomButton loader support karta hai
+              //                   );
+              //                 }),
 
+              //               ),
               const SizedBox(height: 16),
               const Text('or Signup with'),
 

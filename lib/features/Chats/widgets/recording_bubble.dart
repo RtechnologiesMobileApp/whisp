@@ -70,7 +70,7 @@ class _PulseMicState extends State<PulseMic>
       scale: _scaleAnim,
       child: const Icon(
         Icons.mic,
-        color: Colors.red,
+        color: Colors.grey,
         size: 18,
       ),
     );
