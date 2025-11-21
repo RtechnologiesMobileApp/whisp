@@ -48,6 +48,21 @@ class ChatController extends GetxController {
         debugPrint("Partner typing value ${partnerTyping.value}");
       }
     });
+    // 🔹 Listen for Recording Event
+SocketService.to.onRecording((data) {
+  debugPrint("[socket] 🎤 Recording event received: $data");
+
+  final userId = data["from"] ?? data["userId"];
+  final isRecording = data["isRecording"] ?? false;
+
+  if (userId == friendId) {
+    partnerRecording.value = isRecording;
+    debugPrint("🎧 Partner recording: $isRecording (friendId: $friendId)");
+  } else {
+    debugPrint("⚠ Skipped recording event — other user");
+  }
+});
+
 
 
 
