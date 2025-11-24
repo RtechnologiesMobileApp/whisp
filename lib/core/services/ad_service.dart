@@ -10,9 +10,10 @@ class AdService extends GetxService {
   InterstitialAd? _interstitialAd;
   bool _isAdLoaded = false;
 
-  /// Test Ad Unit ID (works on all devices)
-  
-  static const String interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  /// Production Ad Unit IDs
+  static const String interstitialAdUnitId = 'ca-app-pub-9148185035281718/4854906272';
+  static const String bannerAdUnitId = 'ca-app-pub-9148185035281718/8459109362';
+  static const String rewardedAdUnitId = 'ca-app-pub-9148185035281718/2851559464';
 
   /// Initialize the Mobile Ads SDK
   Future<void> init() async {
