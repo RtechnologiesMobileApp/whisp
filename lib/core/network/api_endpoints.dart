@@ -2,7 +2,7 @@ class ApiEndpoints {
 
  
  
- static const String baseUrl = "https://whisp-backend-production-1880.up.railway.app";  
+ static const String baseUrl = "https://whisp-backend.up.railway.app";  
  
  
  
@@ -29,6 +29,6 @@ class ApiEndpoints {
   static const String getBlockedUsers="$baseUrl/api/moderation/block";
   static const String setPreferences="$baseUrl/api/auth/preferences";
   static const String sendVoiceMessage="$baseUrl/api/chat/voice-note/"; ///api/chat/voice-note/<user id> ( user id to whom send the msg)
-  static const String acceptTerms="https://whisp-lannding-page-production.up.railway.app/terms";
+  static const String acceptTerms="$baseUrl/terms";
 }
  

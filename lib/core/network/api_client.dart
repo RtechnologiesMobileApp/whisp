@@ -11,7 +11,7 @@ class ApiClient {
     BaseOptions(
  
  
-    baseUrl: "https://whisp-backend-production-1880.up.railway.app",
+    baseUrl: "https://whisp-backend.up.railway.app",
  
  
  
