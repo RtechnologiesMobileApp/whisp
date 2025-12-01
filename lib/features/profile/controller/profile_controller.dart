@@ -14,6 +14,15 @@ class EditProfileController extends GetxController {
   var selectedImage = Rx<File?>(null);
   var selectedCountry = ''.obs;
 
+  void loadUser() {
+    final sessionUser = SessionController().user;
+    if (sessionUser != null) {
+      user.value = sessionUser;
+      selectedCountry.value = sessionUser.country ?? '';
+      selectedImage.value = null; // Reset image selection
+    }
+  }
+
   /// Update profile - only sends changed fields
   Future<void> updateProfile({
     String? fullName,

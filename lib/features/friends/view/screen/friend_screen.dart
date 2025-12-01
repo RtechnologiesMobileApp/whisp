@@ -22,61 +22,58 @@ class _FriendsScreenState extends State<FriendsScreen>
   final controller = Get.find<FriendsController>();
 
   final RxInt currentTabIndex = 0.obs;
-  
 
   @override
- @override
- @override
-void initState() {
-  super.initState();
-  _tabController = TabController(length: 2, vsync: this);
+  @override
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
 
-  _tabController.addListener(() {
-    if (!_tabController.indexIsChanging) {
-      currentTabIndex.value = _tabController.index;
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        currentTabIndex.value = _tabController.index;
 
-      if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
-        controller.isLoadingRequests.value = true;
-        controller.fetchIncomingRequests();
+        if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
+          controller.isLoadingRequests.value = true;
+          controller.fetchIncomingRequests();
+        }
       }
-    }
-  });
+    });
 
-  /// 🟢 FIX: All reactive updates moved here
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    controller.isLoadingFriends.value = true;
-    controller.isLoadingRequests.value = true;
+    /// 🟢 FIX: All reactive updates moved here
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.isLoadingFriends.value = true;
+      controller.isLoadingRequests.value = true;
 
-    controller.fetchFriends();
-    controller.fetchIncomingRequests();
-  });
-}
-// also working
-// void initState() {
-//   super.initState();
-//   _tabController = TabController(length: 2, vsync: this);
+      controller.fetchFriends();
+      controller.fetchIncomingRequests();
+    });
+  }
+  // also working
+  // void initState() {
+  //   super.initState();
+  //   _tabController = TabController(length: 2, vsync: this);
 
-//  _tabController.addListener(() {
-//   if (!_tabController.indexIsChanging) {
-//     currentTabIndex.value = _tabController.index;
+  //  _tabController.addListener(() {
+  //   if (!_tabController.indexIsChanging) {
+  //     currentTabIndex.value = _tabController.index;
 
-//     // 🔹 Lazy-load requests only when user visits Requests tab
-//     if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
-//       controller.isLoadingRequests.value = true;
-//       controller.fetchIncomingRequests();
-//     }
-//   }
-// });
+  //     // 🔹 Lazy-load requests only when user visits Requests tab
+  //     if (_tabController.index == 1 && controller.friendRequests.isEmpty) {
+  //       controller.isLoadingRequests.value = true;
+  //       controller.fetchIncomingRequests();
+  //     }
+  //   }
+  // });
 
+  //   // 🔹 Force loaders and fetch data when screen opens
+  //   controller.isLoadingFriends.value = true;
+  //   controller.isLoadingRequests.value = true;
 
-//   // 🔹 Force loaders and fetch data when screen opens
-//   controller.isLoadingFriends.value = true;
-//   controller.isLoadingRequests.value = true;
-
-//   controller.fetchFriends();
-//   controller.fetchIncomingRequests();
-// }
-
+  //   controller.fetchFriends();
+  //   controller.fetchIncomingRequests();
+  // }
 
   @override
   void dispose() {
@@ -84,79 +81,78 @@ void initState() {
     super.dispose();
   }
 
-Widget _buildFriendsTab() {
-  return Obx(() {
-    if (controller.isLoadingFriends.value) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  Widget _buildFriendsTab() {
+    return Obx(() {
+      if (controller.isLoadingFriends.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-    final friends = controller.filteredFriends;
-    if (friends.isEmpty) {
-      return const Center(child: Text("No friends yet."));
-    }
+      final friends = controller.filteredFriends;
+      if (friends.isEmpty) {
+        return const Center(child: Text("No friends yet."));
+      }
 
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      itemCount: friends.length,
-      itemBuilder: (context, index) {
-        final friend = friends[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
-          child: FriendCard(
-            friend: friend,
-            onToggleFriend: () {
-              showUnfriendDialog(friend.name, "Unfriend", (){
-               controller.unfriendUser(friend.id);
-               Get.back();
-              });
-              }
-          ),
-        );
-      },
-    );
-  });
-}
+      return ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        itemCount: friends.length,
+        itemBuilder: (context, index) {
+          final friend = friends[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+            child: FriendCard(
+              friend: friend,
+              onToggleFriend: () {
+                showUnfriendDialog(friend.name, "Unfriend", () {
+                  controller.unfriendUser(friend.id);
+                  Get.back();
+                });
+              },
+            ),
+          );
+        },
+      );
+    });
+  }
 
- // Requests tab
-Widget _buildRequestsTab() {
-  return Obx(() {
-    if (controller.isLoadingRequests.value) {
-      // 🔹 Loader while requests are loading
-      return const Center(child: CircularProgressIndicator());
-    }
+  // Requests tab
+  Widget _buildRequestsTab() {
+    return Obx(() {
+      if (controller.isLoadingRequests.value) {
+        // 🔹 Loader while requests are loading
+        return const Center(child: CircularProgressIndicator());
+      }
 
-    final requests = controller.friendRequests;
-    if (requests.isEmpty) {
-      return const Center(child: Text("No friend requests."));
-    }
+      final requests = controller.friendRequests;
+      if (requests.isEmpty) {
+        return const Center(child: Text("No friend requests."));
+      }
 
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      itemCount: requests.length,
-      itemBuilder: (context, index) {
-        final req = requests[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
-          child: FriendCard(
-            friend: req, // FriendRequestModel
-            onAccept: () => controller.acceptRequest(req.id),
-            onReject: () => controller.rejectRequest(req.id),
-          ),
-        );
-      },
-    );
-  });
-}
+      return ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        itemCount: requests.length,
+        itemBuilder: (context, index) {
+          final req = requests[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+            child: FriendCard(
+              friend: req, // FriendRequestModel
+              onAccept: () => controller.acceptRequest(req.id),
+              onReject: () => controller.rejectRequest(req.id),
+            ),
+          );
+        },
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-       onWillPop: () async {
-         
-          Navigator.of(context).pushAndRemoveUntil(
-                     MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
-                      (route) => false,
-                     );
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MainHomeScreen(index: 0)),
+          (route) => false,
+        );
         return true;
       },
       child: Scaffold(
@@ -176,9 +172,9 @@ Widget _buildRequestsTab() {
                   ),
                 ),
               ),
-      
+
               SizedBox(height: 10.h),
-      
+
               // Tabs
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -201,15 +197,20 @@ Widget _buildRequestsTab() {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
                   ),
-                  tabs: const [
+                  tabs: [
                     Tab(text: 'Friends'),
-                    Tab(text: 'Requests'),
+                    Obx(
+                      () => Tab(
+                        text:
+                            'Requests${controller.friendRequests.length == 0 ? "" : "(${controller.friendRequests.length})"}',
+                      ),
+                    ),
                   ],
                 ),
               ),
-      
+
               SizedBox(height: 15.h),
-      
+
               // Search bar only on Friends tab
               Obx(() {
                 if (currentTabIndex.value == 0) {
@@ -227,13 +228,16 @@ Widget _buildRequestsTab() {
                               shape: BoxShape.circle,
                               color: AppColors.primary,
                             ),
-                            child: const Icon(Icons.search,
-                                color: AppColors.whiteColor),
+                            child: const Icon(
+                              Icons.search,
+                              color: AppColors.whiteColor,
+                            ),
                           ),
                           filled: true,
                           fillColor: AppColors.whiteColor,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
@@ -256,17 +260,12 @@ Widget _buildRequestsTab() {
                   return const SizedBox.shrink();
                 }
               }),
-      
-           
-      
+
               // Tab views
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
-                    _buildFriendsTab(),
-                    _buildRequestsTab(),
-                  ],
+                  children: [_buildFriendsTab(), _buildRequestsTab()],
                 ),
               ),
             ],
@@ -275,4 +274,4 @@ Widget _buildRequestsTab() {
       ),
     );
   }
-} 
+}

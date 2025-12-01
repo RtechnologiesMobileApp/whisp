@@ -20,9 +20,8 @@ class ChatController extends GetxController {
   RxBool isProcessingAudio = false.obs;
   RxBool partnerRecording = false.obs;
 
-
   /// pagiantion variables
-  int limit = 10;
+  int limit = 15;
   int offset = 0;
   bool hasMore = true;
   String? nextCursor;
@@ -49,22 +48,19 @@ class ChatController extends GetxController {
       }
     });
     // 🔹 Listen for Recording Event
-SocketService.to.onRecording((data) {
-  debugPrint("[socket] 🎤 Recording event received: $data");
+    SocketService.to.onRecording((data) {
+      debugPrint("[socket] 🎤 Recording event received: $data");
 
-  final userId = data["from"] ?? data["userId"];
-  final isRecording = data["isRecording"] ?? false;
+      final userId = data["from"] ?? data["userId"];
+      final isRecording = data["isRecording"] ?? false;
 
-  if (userId == friendId) {
-    partnerRecording.value = isRecording;
-    debugPrint("🎧 Partner recording: $isRecording (friendId: $friendId)");
-  } else {
-    debugPrint("⚠ Skipped recording event — other user");
-  }
-});
-
-
-
+      if (userId == friendId) {
+        partnerRecording.value = isRecording;
+        debugPrint("🎧 Partner recording: $isRecording (friendId: $friendId)");
+      } else {
+        debugPrint("⚠ Skipped recording event — other user");
+      }
+    });
 
     // 🔹 Listen for messages only for this specific chat
     // Note: ChatListController handles updating the chat list globally
@@ -95,7 +91,6 @@ SocketService.to.onRecording((data) {
         'isVoice': isVoice,
         'voiceUrl': isVoice ? body : null,
         'type': type,
-        
       });
 
       debugPrint("✅ Added → ${messages.last}");
@@ -205,6 +200,9 @@ SocketService.to.onRecording((data) {
     );
 
     final fetched = _parseMessages(res['messages']);
+    debugPrint(
+      "📥 Initial chat loaded: ${fetched.length} messages. hasMore: ${res["hasMore"]}, nextCursor: ${res["nextCursor"]}",
+    );
 
     if (fetched.isNotEmpty) {
       // API already newest → oldest
@@ -223,35 +221,45 @@ SocketService.to.onRecording((data) {
 
     isLoadingMore = true;
 
-    final oldMax = scroll.position.maxScrollExtent;
+    try {
+      final oldMax = scroll.position.maxScrollExtent;
 
-    final res = await FriendRepo().getFriendChatHistory(
-      friendId!,
-      limit: limit,
-      beforeId: nextCursor, // Use correct cursor ✔
-    );
+      final res = await FriendRepo().getFriendChatHistory(
+        friendId!,
+        limit: limit,
+        beforeId: nextCursor, // Use correct cursor ✔
+      );
 
-    final olderMsgs = _parseMessages(res['messages']);
+      debugPrint(
+        "📥 Load more response: ${res['messages'].length} messages. hasMore: ${res["hasMore"]}, nextCursor: ${res["nextCursor"]}",
+      );
 
-   if (olderMsgs.isNotEmpty) {
-  messages.insertAll(0, olderMsgs);
+      final olderMsgs = _parseMessages(res['messages']);
 
-  // 🔥 Update cursor from backend
-  nextCursor = res["nextCursor"];
-  debugPrint("🔄 Updated nextCursor(loadMore): $nextCursor");
+      if (olderMsgs.isNotEmpty) {
+        messages.insertAll(0, olderMsgs);
 
-  hasMore = res["hasMore"] ?? false;
-} else {
-  hasMore = false;
-}
+        // 🔥 Update cursor from backend
+        nextCursor = res["nextCursor"];
+        debugPrint("🔄 Updated nextCursor(loadMore): $nextCursor");
 
-    await Future.delayed(const Duration(milliseconds: 20));
+        hasMore = res["hasMore"] ?? false;
+      } else {
+        hasMore = false;
+      }
 
-    final newMax = scroll.position.maxScrollExtent;
-    final offset = newMax - oldMax;
-    scroll.jumpTo(offset); // keeps scroll position ✔
+      await Future.delayed(const Duration(milliseconds: 20));
 
-    isLoadingMore = false;
+      if (scroll.hasClients) {
+        final newMax = scroll.position.maxScrollExtent;
+        final offset = newMax - oldMax;
+        scroll.jumpTo(offset); // keeps scroll position ✔
+      }
+    } catch (e) {
+      debugPrint("Error loading more messages: $e");
+    } finally {
+      isLoadingMore = false;
+    }
   }
 
   List<Map<String, dynamic>> _parseMessages(List raw) {

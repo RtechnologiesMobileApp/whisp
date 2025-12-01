@@ -27,6 +27,7 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.loadChatList();
+      friendController.fetchFriends();
       notificationUserId = null;
     });
 
@@ -316,7 +317,14 @@ class ChatListScreen extends StatelessWidget {
                             log("image: ${chat['avatar']}");
                             // 🔥 Wait if friends are still loading
                             if (friendController.isLoadingFriends.value) {
-                              await friendController.fetchFriends();
+                              log(
+                                "⏳ Waiting for friends list to complete loading...",
+                              );
+                              while (friendController.isLoadingFriends.value) {
+                                await Future.delayed(
+                                  Duration(milliseconds: 100),
+                                );
+                              }
                             }
 
                             final isStillFriend = friendController.isUserFriend(

@@ -9,28 +9,50 @@ import 'package:whisp/core/widgets/custom_button.dart';
 import 'package:whisp/core/widgets/custom_text_field.dart';
 import 'package:whisp/features/profile/controller/profile_controller.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  EditProfileScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
   final controller = Get.put(EditProfileController());
 
-  final nameController = TextEditingController();
-  final dobController = TextEditingController();
-  final genderController = TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController dobController;
+  late TextEditingController genderController;
+
+  @override
+  void initState() {
+    super.initState();
+    // 🟢 Fix: Load fresh user data from session
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadUser();
+      // Update controllers after user is loaded
+      final user = controller.user.value;
+      nameController.text = user.name;
+      dobController.text = user.dob ?? '';
+      genderController.text = user.gender ?? '';
+    });
+
+    // Initialize with current data first to avoid null errors if any
+    final user = controller.user.value;
+    nameController = TextEditingController(text: user.name);
+    dobController = TextEditingController(text: user.dob ?? '');
+    genderController = TextEditingController(text: user.gender ?? '');
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    dobController.dispose();
+    genderController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Pre-fill user data
-    final user = controller.user.value;
-    nameController.text = user.name;
-    dobController.text = user.dob ?? '';
-    genderController.text = user.gender ?? '';
-    if (controller.selectedCountry.value.isEmpty &&
-        user.country != null &&
-        user.country!.isNotEmpty) {
-      controller.selectedCountry.value = user.country!;
-    }
-
     return Scaffold(
       appBar: AppBar(
         leading: CustomBackButton(),
@@ -347,6 +369,5 @@ class EditProfileScreen extends StatelessWidget {
         );
       },
     );
- 
   }
 }

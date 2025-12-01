@@ -32,7 +32,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   bool _isActive = false;
   late ScrollController _scrollController;
   late ChatController controller;
@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // When user scrolls near top (<= 100 px from top) -> load older messages
       if (pos.pixels <= pos.minScrollExtent + 100) {
         // avoid rapid multiple calls — your controller also checks isLoadingMore
-        debugPrint("Reached TOP → loading more...");
+        debugPrint("Reached TOP → loading more... (pixels: ${pos.pixels})");
         controller.loadMoreMessages(_scrollController);
       }
     } catch (e) {
@@ -61,6 +61,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // Register observer
+
     socketService.onRecording((data) {
       final isRecording = data['isRecording'];
       final userId = data['userId'];
@@ -134,10 +136,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Unregister observer
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _isActive = false;
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    if (bottomInset > 0.0) {
+      // Keyboard opened
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {
@@ -154,12 +167,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    if (bottomInset > 0) {
-      _scrollToBottom();
+    // Removed side effects from build: _scrollToBottom and markAsRead
+    // notificationUserId = widget.partnerId; // This might be better in initState or didChangeDependencies if needed
+
+    // Ensure messages are marked as read when screen is built/active
+    if (_isActive) {
+      controller.markAsRead(widget.partnerId);
     }
-    notificationUserId = widget.partnerId;
-    controller.markAsRead(widget.partnerId);
+
     return WillPopScope(
       onWillPop: () async {
         socketService.endSession();
@@ -200,20 +215,34 @@ class _ChatScreenState extends State<ChatScreen> {
                     physics: BouncingScrollPhysics(),
                     padding: const EdgeInsets.only(top: 12),
                     //  itemCount: msgCount + (showTyping ? 1 : 0),
-                    itemCount: msgCount + extra,
+                    //  itemCount: msgCount + (showTyping ? 1 : 0),
+                    itemCount: msgCount + extra + 1, // +1 for loader at top
                     itemBuilder: (context, index) {
-                      // if (showTyping && index == msgCount) {
-                      //   return const TypingBubble();
-                      // }
+                      // 0-th index is loader (if loading more) or empty space
+                      if (index == 0) {
+                        if (controller.isLoadingMore) {
+                          return const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      }
 
-                      // if (controller.partnerRecording.value) {
-                      //   return const RecordingBubble(); // 🎤
-                      // }
-                      if (index == msgCount) {
+                      // Adjust index because of the loader at 0
+                      final msgIndex = index - 1;
+
+                      if (msgIndex == msgCount) {
                         if (showRecording) return const RecordingBubble();
                         if (showTyping) return const TypingBubble();
                       }
-                      final msg = controller.messages[index];
+
+                      // Safety check
+                      if (msgIndex < 0 || msgIndex >= msgCount)
+                        return const SizedBox.shrink();
+
+                      final msg = controller.messages[msgIndex];
 
                       return ChatBubble(
                         fromMe: msg['fromMe'] ?? false,
